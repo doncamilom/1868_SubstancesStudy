@@ -1,0 +1,13 @@
+\begin{thebibliography}{1}
+
+\bibitem{CNN_dH}
+X.~Zheng, P.~Zheng, and R.-Z. Zhang, ``Machine learning material properties
+  from the periodic table using convolutional neural networks,'' {\em Chem.
+  Sci.}, vol.~9, pp.~8426--8432, 2018.
+
+\bibitem{parallelNN}
+W.~{Hong}, N.~{Zheng}, Z.~{Xiong}, and Z.~{Hu}, ``A parallel deep neural
+  network using reviews and item metadata for cross-domain recommendation,''
+  {\em IEEE Access}, vol.~8, pp.~41774--41783, 2020.
+
+\end{thebibliography}
