@@ -20,6 +20,7 @@ def main():
     NMax = int(sys.argv[2])
 
     cmpnds = makeVecs.allVecs(DataFile,NMax)  #List of vectors representing all compounds in dataset
+
     FullElemntList = makeVecs.getElemList(DataFile,NMax)
 
     #Construct a dict to go from element symbol to an index
@@ -28,14 +29,13 @@ def main():
         elemDict[i] = elem
     
     #### Load periodic table schemes for building representation (pick one)
-    #TP = TPs.TP
     TP = TPs.TP
     TPshape = getTPShape()
 
     if rank==0:
         avgN = np.mean(np.sum(cmpnds,axis=1))
-        print("Average num. of atoms per compound: ", round(avgN,4))
-        print("Max num. ligands R: ", avgN*cmpnds.shape[0])
+        print("\n * Average num. of atoms per compound: ", round(avgN,4))
+        print(" * Max num. ligands R: ", avgN*cmpnds.shape[0])
         print()
 
         print("Finding unique Rs...")
@@ -43,13 +43,29 @@ def main():
     t0=time()
     Rlist = findRs(cmpnds)
 
-    print(f"P{rank} Finding commmonalities...")
-    
-    CommList,Rlist = getCommonal(Rlist,cmpnds,elemDict,rank)
-    if rank==0:
-        print(f"\nTime: {time()-t0:.3f} s\t NProc: {size}\t NMax: {NMax} ")
+    if rank==0: 
+        print(f"\n * {cmpnds.shape[0]} unique compounds out of {NMax} requested.\n")
+        print(" Unique Rs: ", Rlist.shape[0])
+    #################
+    ## Following code taken from https://gist.github.com/krischer/2c7b95beed642248487a
+    def split(container, count):
+        return [container[_i::count] for _i in range(count)]
 
-#    plotExample(CommList[0],[TP],'H')
+    if rank == 0:    Rlist = split(Rlist, size)
+    else:            Rlist = None
+
+    Rlist = comm.scatter(Rlist, root=0)
+    ## Up to here
+    ################
+
+
+
+    print(f"  -- P{rank} Finding commonalities...\n")
+    CommList,Rlist = getCommonal(Rlist,cmpnds,elemDict)
+    if rank==0:
+        print(f"Time: {time()-t0:.3f} s\t NProc: {size}\t NMax: {NMax} ")
+
+
     
     # Collect data and merge
     CommList_ = MPI.COMM_WORLD.gather(CommList,root=0)    
@@ -61,13 +77,15 @@ def main():
         
         #### Let's calculate some useful values
         # Mean number of element per list?
-        LenR = [ len(x) for x in CommListTotal ] 
+        LenR = [ len(set(x)) for x in CommListTotal ] 
         meanLen = sum(LenR)/len(LenR)
         print("Mean number of compounds per R :",meanLen)
+        print("Max number of compounds per R :",max(LenR))
 
 
+#        plotExample(CommList[np.argmax(LenR)],[TP],'H')
 
-## Auxiliary functions:
+
 
 def getTPShape():
     """Return the shape of the global PT"""
@@ -109,12 +127,11 @@ def findRs(cmpnds):
     
     Rs = np.concatenate([Rs,ns],axis=1)   # First columns represent an R ligand. last column represents subind. n
     Rs = np.unique(Rs,axis=0) #This array contains all unique Rs.
-#    if rank==0:
-#        print("Unique Rs: ", Rs.shape[0])
 
-    return Rs 
+    return Rs
+ 
     
-def getCommonal(Rs,cmpnds,elemDict,rank):
+def getCommonal(Rs,cmpnds,elemDict):
     """Get Commonalities. For each R(n) find all elements X such that compound R-Xn exists in dataset. 
     Build a list of these for each R(n)
     rank is the number of processors in which the operation is to be run"""
@@ -126,9 +143,9 @@ def getCommonal(Rs,cmpnds,elemDict,rank):
 
     j=0 #Counter for Rs with more than one appearence
 
-    N = int(len(Rs)/size)
+    for i,R_ in enumerate(Rs):
+        if i%1000==0:       print( f"\tPast {i}th R" )
 
-    for i,R_ in enumerate(Rs[N*rank:max(N*(rank+1),len(Rs)-1)]):
         n = R_[-1]  #Take subindex 
         R = R_[:-1] #The actual R
         curr_list = []  #List to hold elements X, where R-X exist, for this R
@@ -148,8 +165,9 @@ def getCommonal(Rs,cmpnds,elemDict,rank):
             R_list.append(R_)
             j+=1
 
-#    np.save(f'Data/R_Tables_P{rank}.npy',np.array(Table_list))
-#    np.save(f'Data/R_Vector_P{rank}.npy',np.array(R_list))
+    print("Saving...")
+    np.save(f'Data/R_Tables_P{rank}.npy',np.array(Table_list))
+    np.save(f'Data/R_Vector_P{rank}.npy',np.array(R_list))
     return Comm_list,R_list  #This list contains lists (one for each R) of elements X such that R-X exist in dataset.
 
 
