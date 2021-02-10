@@ -1,4 +1,4 @@
-\documentclass[twoside,twocolumn]{article}
+\documentclass[]{article}
 
 \usepackage[version = 4]{mhchem} %chem symbols and equations
 \usepackage{graphicx} %graphics
@@ -10,7 +10,7 @@
 \usepackage[T1]{fontenc} % Use 8-bit encoding that has 256 glyphs
 \linespread{1.05} % Line spacing - Palatino needs more space between lines
 \usepackage{microtype} % Slightly tweak font spacing for aesthetics
-\usepackage[english,spanish]{babel} % Language hyphenation and typographical rules
+\usepackage[english]{babel} % Language hyphenation and typographical rules
 
 \usepackage[hmarginratio=1:1,top=27mm,columnsep=20pt,left=15mm,right=15mm]{geometry} % Document margins
 \usepackage[hang,small, labelfont=bf,up]{caption} % Custom captions under/above floats in tables or figures
@@ -36,7 +36,10 @@
 \renewcommand{\maketitlehookd}{%
 \begin{abstract}
 \noindent
-En este documento voy a escribir algunos detalles de los avances en el trabajo con el Profesor Guillermo Restrepo, as\'i como preguntas e ideas que puedan surgir en el camino. 
+
+
+%% ######
+
 \end{abstract}
 }
 
@@ -44,7 +47,7 @@ En este documento voy a escribir algunos detalles de los avances en el trabajo c
 
 \begin{document}
 
-\title{Avances del trabajo con Prof. Guillermo Restrepo} 
+\title{The structure of the chemical space of 1868.} 
 
 \author{%
 \textsc{Andr\'es C. Marulanda}\thanks{Corresponding author} \\[1ex]
@@ -56,108 +59,137 @@ En este documento voy a escribir algunos detalles de los avances en el trabajo c
 \maketitle
 
 
-\section{Introducci\'on}
+\section{Introduction}
 \label{sec:intro}
 
-El objetivo es obtener un algoritmo capaz de hacer predicciones utilizando datos de sustancias actuales (hasta cierta fecha). Para esto, el objetivo es leer el sistema peri\'odico (PS) de la misma manera que lo vi\'o Mendeleev para hacer sus predicciones; esto es, saber en qu\'e partes la similaridad es vertical, en cuales es horizontal, diagonal, etc, y c\'omo hacer predicciones sobre nuevos compuestos con este conocimiento.
-Inicialmente pensamos en redes neuronales convolucionales que tomen como input datos representados en un esquema de tabla peri\'odica, similar a lo que hicieron en \cite{CNN_dH}.
+During the previous months we discussed about producing an algorithm capable of making predictions about new substances based on known substances, up to some date. The initial approach was to use convolutional neural networks (CNN) to learn from some representation of the data containing also information about some periodic table (PT), similar to \cite{CNN_dH}. 
 
-Adicionalmente podemos intentar interpretar (disecar) la red neuronal. Esto lo podemos hacer de la misma manera que se hace para las redes que se ocupan de tareas de visi\'on artificial, por lo que podemos ver cada uno de los filtros y como estos se comportan a medida que los inputs var\'ian. 
+We also want to compare different PTs against Mendeleev's and against the more recent PT produced by Prof. Restrepo's group and see which one, if any, contains the most information about the substances at the time, meaning which representation can yield better predictive results for the CNN. This algorithm can then be explored in order to see what it sees and how it makes the predictions, kind of asking Mendeleev why and how he chose to predict substance properties in the way he did (for Ga and Ge, for instance).
 
-Esto podr\'ia dar la informaci\'on de c\'omo leer alg\'un PS, sea el de Mendeleev o cualquier otro, pues nos podr\'ia dar informaci\'on de en qu\'e partes del PS importan las similaridades verticales, diagonales, etc. 
-El c\'odigo desarrollado hasta este momento toma como entrada un custom PS, esto es, un PS escrito por el usuario. Este puede ser el de Mendeleev, el desarrollado por el grupo de Prof. Restrepo o cualquier otro. La utilidad de esto recae en que puede darnos alguna idea de c\'omo es la convergencia del algoritmo con diferentes PSs, y con esto evaluar el contenido de informaci\'on de cada uno. As\'i podr\'ian compararse algoritmos para leer el PS de Mendeleev contra PS organizados aleatoriamente, entre otros.
+Initially it was proposed that for this task "matrices of existence"  should be constructed, meaning that in a table a substance gets a 1 if it exists and a 0 if it doesn't, which would make the task a supervised learning one, which is the most explored type of machine learning these days.
 
-Hasta este punto se tendr\'ia un "Mendeleev robot", al cual podemos examinar para ver como toma decisiones.
+This is, however, a somewhat loose task as the existence of a compound is in principle only limited to humanity's knowledge of it, so many possible substances in the training set would probably be wrongly labeled, which is a fundamental problem for the approach. Given this, the approach is discarded as it provides little insight into the inner structure of the chemistry of this period.
 
-Si logramos esto, digamos, para el PS (y sustancias) de 1868, podemos pensar en hacer lo mismo para varios a\~nos alrededor de \'este y evaluar como era la capacidad predictiva del PS de este a\~no. Esto podr\'ia dar alguna evidencia de que 1868 fue el a\~no (o la \'epoca) m\'as apropiada para la creaci\'on del PS. En este punto cabe aclarar que ya se tiene listo un art\'iculo sobre este tema, donde se muestra que el PS estaba listo para ser formulado desde 1840.
+I decided then to do some exploratory data analysis (EDA) on these tables and see if some structure can directly be extracted from the data as opposed to feeding some algorithm with it right away. This has already started and the results are explored in the following sections.
 
-M\'as adelante podr\'ian entrenarse sistemas similares para no s\'olo predecir probabilidad de existencia, sino tambi\'en para aproximar algunas propiedades de compuestos por reemplazamiento de un elemento. Esto podr\'ia ser de utilidad, por ejemplo, si se buscara predecir propiedades de los compuestos formados con elementos desconocidos hasta la fecha, que es precisamente lo que hizo Mendeleev con el esta\~no y otros. 
+The approach mentioned above still would work, however, if we used some properties of known substances as inputs (as opposed to just 1s and 0s for existence). That way we can directly ask an algorithm to predict properties of new compounds based on the (learned) structure of the chemical space and the properties of similar substances. 
 
-Se quiere utilizar sustancias mas PS como entrada para un algoritmo. Digamos, por ejemplo, que para las sustancias $\ce{R-Na_n}$ y $\ce{R-K_n}$ existen propiedades medidas. Luego, el objetivo del algoritmo ser\'a predecir esta propiedad para, p.e., $\ce{R-Fe_n}$ (Fe o cualquier otro). Esta propiedad puede ser alguna propiedad experimental, o probabilidad de existencia, etc.
-
-El algoritmo se encarga en el primer caso de aproximar la funci\'on
+In this case then, an algorithm would try to approximate the value of some property p of substance $R-X_n$.
 
 \begin{equation}
 \label{eq:eq1}
- f(R-x_n) = f( x, existent R-Y_n , PS )
+ p(R-X_n) = f( X, existent R-Y_n , PT )
 \end{equation}
 
-Y en el segundo caso de calcular la siguiente probabilidad:
-
-\begin{equation}
-\label{eq:eq2}
-P ( existe R-X |  existe R-Y  + PS )
-\end{equation}
-
-Con X cualquier elemento conocido en la \'epoca, Y un elemento tal que $\ce{R-Y_n}$ existe en la \'epoca considerada y PS es el sistema peri\'odico de esa \'epoca.
-
-Del algoritmo se espera que eval\'ue la similaridad entre X y Y, de manera que si estos son similares, la probabilidad de que exista un compuesto resultado de la sustituci\'on de estos elementos deber\'ia de ser alta, y sus propiedades similares. Esta informaci\'on de similaridad deber\'ia de poder encontrarse, por supuesto, en el PS. 
+X being any element (characterized by its position in the given PT), Y being any element such that $\ce{R-Y_n}$ is in the dataset, and PT the periodic table considered.
 
 
-\section{Tratamiento de datos}
+\section{Data preprocessing}
 \label{sec:sec2}
 
-El input puede ser un esquema de la tabla peri\'odica (PT), construido de la siguiente manera.
+As initially proposed, tables were constructed in such a way that two elements X,Y appear in the same table only if there exist 2 compounds $A = R-X_n$ and $B = R-Y_n$, where if X were replaced by Y in compound A, the result would be compound B. This approximation ignores every structural factor and relies only on compositional data.
 
-Suponga que existe un conjunto de elementos A = \{$A_i$\} y un fragmento de sustancia R tal que $\ce{R-A_n}$ existe en la \'epoca considerada. Entonces en nuestra representaci\'on, en la posici\'on de cada uno de los elementos de A en la PT se asignar\'a un valor de 1. De otra manera, el valor ser\'a de 0. Ahora bien, la pregunta es: existe la sustancia R-Y, para un elemento conocido Y? 
-Este elemento Y tendr\'a un valor de -1 en la representaci\'on de la PT (PTR).
-En caso que R-Y exista en esta \'epoca, el label (y) es igual a 1, de otra manera es igual a 0. Un ejemplo de esta PTR se da en la figura \ref{fig:fig1}, en la que se indica que los elementos K, Mg, O, S comparten una composici\'on R-X$_n$ en com\'un, esto es, el compuesto RX$_n$ existe en el conjunto de datos con X = K, Mg, O, S. Adicionalmente se indica la pregunta: Existe el compuesto R-Br$_n$?
+Note from this approach that n is an integer, that is, there's a problem when treating non-stoichiometric compounds. In the given dataset there are actually examples of such non-stoichiometric compounds, and so this case had to be handled properly.
+
+This was solved in the following way: if upon duplication of all ns in the given compound this compound is stoichiometric, then work with that, otherwise discard the compound. All compunds that weren't used in this analysis due to this are stored under the out.log file, which corresponds to the output of the MPIgetTabs.py script used for the aforementioned data preprocessing. 
+
+A total of 6145 tables was produced, and a sample of these is shown in figure \ref{fig:fig1}. The PT was the standard long-version of the PT.
 
 \begin{figure}[h!]
-	\includegraphics[width=\linewidth]{ex1TPR.png}
-	\caption{Representaci\'on de la tabla peri\'odica (PTR). (Arriba/abajo) representaci\'on incluyendo/sin serie de lant\'anidos.}
+  \centering
+	\includegraphics[width=16.0cm]{tables.png}
+	\caption{Periodic table representation of the dataset.}
 	\label{fig:fig1}
 \end{figure}
 
-Similarmente, en el caso de la predicci\'on de propiedades, estos valores se intercambian por los valores reales de las sustancias consideradas.
+Where purple means no element exist at this position, red means an element in this position exists in dataset, and white means there exist a compound $R-X_n$, with X being the element at this position and R the molecular fragment associated with this table. In this example, for instance, the data shows that both $\ce{ZrF4}$ and $\ce{ZrCl4}$ exist in dataset, but there exist no other compound with formula $\ce{ZrX4}$. It also shows that most lanthanides and actinides, as well as Tc, Re, Ga and Ge hadn't been discovered to this date. The vertical relationships on this side of the PT are clear from this sample.
 
-\subsection{Generaci\'on de los datos}
-
-Se encuentra cada fragmento $\ce{R_n}$ en el dataset, luego se encuentra una lista de elementos A = {$A_i$} tal que $\ce{R-A_n}$ exista para cada n; lo que produce una cantidad N($\ce{R_n}$) de fragmentos $\ce{R_n}$ y por lo tanto de PTRs. El nuevo dataset contiene la informaci\'on correspondiente a las similaridades entre elementos, as\'i como los $\ce{R_n}$ con los que se combinan.
-
-En este punto se hace un an\'alisis exploratorio de los datos (EDA), para lo cual se pueden tener consideraciones que se exponen en la siguiente secci\'on.
-
-El tama\~no del dataset para alimentar al algoritmo efectivamente es expandido al incluir la informaci\'on sobre las sustancias que quieren predecirse, esto es, mediante un "labeling" del dataset. 
-Para cada PTR puede sugerirse al algoritmo que ejecute la predicci\'on de propiedades para X elementos, lo que incrementa el tama\~no del dataset a N($\ce{R_n}$)*X.
-
-\subsection{Algoritmo}
-Suponga que tiene un compuesto R-X$_n$, con $n \geq 1$. Consideramos como un nuevo R$'$ la combinaci\'on RX, de manera que tenemos un ``nuevo compuesto'' RX-X$_{n-1}$ = R$'$-X$_{n-1}$. Puede continuarse de esta manera hasta agotar n, esto es, pueden crearse n-1 nuevos R$'$ para un total de $n$ Rs diferentes a partir de uno s\'olo de los elementos de uno de los compuestos. Con esto se genera una cantidad de $\ce{R_n}$s igual a la suma de todos los sub\'indices de cada elemento en todos los compuestos.
-
-Naturalmente esto aumenta la cantidad de datos disponibles, pues se explota cada uno de los sub\'indices de cada elemento en cada f\'ormula molecular, lo cual es una ventaja en t\'erminos computacionales pues puede llevar a la reducci\'on del overfitting y otros problemas que se encuentran durante la producci\'on de modelos en machine learning (ML).
-
-Por ejemplo, las f\'ormulas $\ce{C6BrCl2H3}$ y $\ce{C6Cl3H3}$ pueden compararse as\'i: pueden escribirse como $\ce{C6Cl2H3-Br}$ y $\ce{C6Cl2H3-Cl}$. Esto lleva a que $\ce{Cl}$ y $\ce{Br}$ comparten este ligando en com\'un, mostrando una similaridad que no se expresa con m\'etodos m\'as simples.
+It must be pointed out that, during preprocessing, a table is saved only if there are at least two white squares in it. Note that this implies a large loss of data as tables with only one white square correspond to unique compounds, meaning these compounds are all lost. This merits a more in-depth study and a new approach that explicitly tackles this is discussed further on.
 
 
-\section{An\'alisis de datos}
+\section{Exploratory Data Analysis (EDA)}
 
-Una vez se tengan las PTR, se procede con el an\'alisis de los datos. Esta secci\'on se divide en dos: an\'alisis exploratorio (EDA), en el que se quiere obtener datos estad\'isticos y medidas generales del dataset, y modelaci\'on, donde se quiere intentar dar estructura, significado y utilidad a los datos generados. 
+Having generated all the tables, we now go into data analysis. Modellation by itself must wait until I get more data (that is, substances' properties) and even then an EDA always leads to valuable insights, so that will be discussed in this section.
 
-\subsection{EDA}
+From figure \ref{fig:fig1} the typical vertical similarity can be spoted in the large majority of tables (vertical blocks of white squares). We may ask, however, to what extent is this vertical similarity rule followed throughout the whole dataset? That is, is it more prevalent than, for instance, horizontal or diagonal (or any other) similarity?
 
-Ah pues aqu\'i se hacen cosas :|
+To answer this, the horizontal neighbor distance (HND) was calculated for each white element in each table. This is calculated as the difference in PT groups there are from one white element to another in the same table. A HND of 0 means the two elements belong in the same group, reinforcing the vertical similarity, while a larger distance implies a departure from this.
 
-\subsection{Modelaci\'on}
-\subsubsection{Clustering}
-En esta secci\'on se pretende utilizar m\'etodos de ML y los datos obtenidos para dar estructura, significado y utilidad a los datos generados.
-El primer m\'etodo que puede usarse es clustering. En este se utilizan algoritmos para encontrar clusters de elementos (no estrictamente en el sentido qu\'imico) similares dada una representaci\'on. En este caso al aplicarlo a las PTR, buscamos las combinaciones de elementos que m\'as ocurren en estas. Debe recordarse que cada PTR representa a una sustancia por medio de los elementos que la componen y son reemplazables entre s\'i, lo que sugiere similaridad. Si los elementos de uno conjunto son en verdad similares, esto se repetir\'a constantemente a trav\'es de todas las sustancias consideradas, por lo que los clusters con mayor n\'umero de PTRs corresponder\'an a los grupos de similaridad m\'as evidentes. En general lo que se obtiene son clusters representado grupos de similaridad entre elementos, lo que en la visi\'on del PS como hipergrafos ordenados se nombra ''hyperedges''.
+The results are then averaged throughout the tables and are shown in figure \ref{fig:fig2}.
 
-\subsubsection{Algoritmo predictor}
-La idea inicialmente es utilizar redes neuronales para aproximar la funci\'on descrita por las ecuaciones \ref{eq:eq1} y \ref{eq:eq2}. La arquitectura a usar es uno de los grandes problemas debido a que no existe una \'unica manera de obtener una \'optima y usualmente la aproximaci\'on es una heur\'istica, donde se sugiere c\'omo se quiere que el algoritmo lea los datos. Adicionalmente en las arquitecturas convencionales existen limitaciones en t\'erminos del tipo de datos que pueden usarse, por lo que esto debe pensarse detenidamente. Por ejemplo, las redes convolucionales (CNN) se usan para la lectura de im\'agenes; si se quisiera dar como input una imagen mas un vector, tendr\'ia que pensarse en algo m\'as.
+\begin{figure}[h!]
+  \centering
+	\includegraphics[width=14.0cm]{meanHND.png}
+	\caption{Mean HND for the elements in the PT.}
+	\label{fig:fig2}
+\end{figure}
 
-Un problema de nuestra representaci\'on, sin embargo, es que no conserva nada de la informaci\'on del fragmento R ni del sub\'indice n, sino s\'olo de los elementos que se combinan con R en la proporci\'on n. Esto puede resultar problem\'atico sobre todo en la aplicaci\'on de estimaci\'on de propiedades de nuevos compuestos. Por ejemplo el compuesto $\ce{C6H5-Cl}$ es un clorobenceno, y claramente puede prepararse un an\'alogo con Br y I. En este caso R es $\ce{C6H5}$. Similarmente ocurre con NaCl, donde se pueden tambi\'en formar NaBr y NaI. Claramente los Rs son muy diferentes, as\'i como los compuestos formados por estos, de manera que la obtenci\'on de propiedades de compuestos \'unicamente a partir de la representaci\'on hasta aqu\'i formulada probablemente deba ser replanteada.
+The interpretation of this plot is somewhat tricky but it clearly shows that, overall, the vertical similarities do not occur throughout the whole PT and, furthermore, this occurs more frequently to the right of the PT. Groups 1 and 2 show surprisingly high HNDs considering how chemically similar these elements are inside their group. This is explained considering the metallic character of these elements, which is in some aspects similar to that of transition metals.
 
-Una soluci\'on puede ser convertir este R en un vector, donde cada entrada indica la cantidad de equivalentes de un elemento que se encuentran en este R, y su longitud es la cantidad de elementos \'unicos en el dataset. El problema de esto es que no es compatible con la arquitectura de una CNN.
+We can calculate a number of other different distances, but I think this is the most important as the PT is constructed on the basis of order and similarity, with the similarity expresed as a strictly vertical one on this representation. We may now construct a new PT by optimization of this quantity, which would lead to a PT where HND is minimized while preserving atomic number ordering. This should naturally lead to a more complete PT, and would allow a comparison between systems.
 
-Esto puede arreglarse creando una nueva arquitectura de manera que permita ambas representaciones simult\'aneamente. En esta arquitectura, se lee por un lado la representaci\'on en tabla peri\'odica mediante capas convolucionales, y por el otro el vector R por medio de redes neuronales densas (DNN) convencionales. Estas dos arquitecturas generan cada una un vector, que puede concatenarse para generar una \'unica entrada a una s\'ola red, que producir\'a la salida esperada, sea probabilidad de existencia o propiedades de compuestos, etc, similar a lo que hacen p.e. en \cite{parallelNN}. Esta arquitectura es ilustrada en la figura \ref{fig:fig2}.
+This might be done using genetic algorithms, which are perfect for these kind of problems where an exhaustive exploration of the space of configurations is impossible and the mixing of configurations is somewhat straightforward.
 
-\begin{figure*}[t!]
-\centering
-\renewcommand{\figurename}{Figura}
-\caption{Arquitectura propuesta de red neuronal.}
-\label{fig:fig2}
-\includegraphics[width=19cm]{CDDNN.png}
-\end{figure*}
+\begin{figure}[h!]
+  \centering
+	\includegraphics[width=13.0cm]{replace_H.png}
+	\caption{Replaceability of H in dataset. Both plots show the same data in different formats. a) PT format showing vertical relationships and b) Barplot showing elements in atomic number order, bar height is number of times H and this element appear in the same table.}
+	\label{fig:fig3}
+\end{figure}
 
+A more individual exploration can be done using the same data. Particularly, the degree of replaceability was calculated for each pair of elements as the number of times both elements appear in the same table. From this, we can obtain some more detailed insights about the relationships between elements, as shown in figure \ref{fig:fig3}.
+
+It can clearly be seen that H is, under our approximation, more similar to C, N and O, and the halogens (except F). A similarity with the halogens are expected, as in most of organic chemistry these appear as substituents of H, but the similarity to C, N and O must be further explored.
+
+As a quick comment, some of the substances responsible of the high H-O replaceability are: 
+$\ce{SX2}$, $\ce{OTlX}$, $\ce{NX3}$, $\ce{MoOX}$, $\ce{MnOX}$. These show that this result is actually due to the presence of metallic oxides, hydroxides and hydrides, and happens with elements with many oxidation states, such as transition metals and other non-metals such as S and N.
+
+To show the power of these plots, another example is brought into play (figure \ref{fig:fig4}).
+
+\begin{figure}[h!]
+  \centering
+	\includegraphics[width=13.0cm]{replace_Fe.png}
+	\caption{Replaceability of Fe in dataset.}
+	\label{fig:fig4}
+\end{figure}
+
+The replaceability plot for Fe shows that, for this element, the similarity is mostly horizontal along the 4th period transition metals, but it also shows a large similarity with alkaline earth elements. This result is, I think, non trivial and deserves a more in-depth exploration. Some questions arise as, for instance, can a new PT be constructed, in such a way that this information is mre explicitly given? If not, is there some particular reason (probably a topological one) for this?.
+
+As an additional observation, the plots for alkaline elements (Na for instance) do not show such a marked similarity to transition metals and are instead more cluttered around group 1 of PT.
+
+We could go on and do one of these plots for each element, but this becomes quite tedious as we would have to analize more than 90 of these individually. Instead we can unravel the periodic table representations into a 1-dimensional format, do some normalization on this replaceability measure, and procede to concatenate all 1-D arrays into one large square matrix, as shown in figure \ref{fig:fig5}. This ultimately looks much like a correlation matrix as it states element-wise relationships between pairs of elements in a more concise format.
+
+The details of the normalization are important as it determines what is shown on the figure. In this case each row of the matrix was divided by the maximum value of said row. This value naturally corresponds to the same element as the row, which justifies the observation that the diagonal of the matrix is all ones.
+
+Due to the normalization used, the matrix is not symmetric, which means the matrix doesn't equal its transpose. As an example, take the couple La-Fe. As can be seen, the row corresponding to La has a high value (near 1) at the Fe column, meaning La can be replaced by Fe most of the time (within this dataset). When we look at the Fe row, the value corresponding to 1 is one of the lowest, meaning Fe can not be replaced by La most of the time. 
+
+The unidirectionality of these relationships is important as it may lead to several conclusions (drawn naively only from this study), namely:
+
+\begin{itemize}
+	\item The chemistry of La wasn't as explored as that of Fe at the time. This can be thought of in sociological terms, as an exploration of the new element (La) limited to trying to copy the chemistry of a seemingly similar element (Fe).
+	\item Or possibly the chemistry of La is more restricted than that of Fe, meaning possibly that the oxidation numbers for La are only a subset of those for Fe.
+\end{itemize}
+
+\begin{figure}[h!]
+  \centering
+	\includegraphics[width=18.0cm]{matrix.png}
+	\caption{Replaceability of Fe in dataset.}
+	\label{fig:fig5}
+\end{figure}
+
+In more general terms, some substructures can be seen within the matrix such as, for instance, vertical, horizontal and diagonal lines, which explicitly suggest the higher structure the PT is intended to capture. Again, some optimization work can be performed on this matrix, similar to \cite{Glawe_2016}. The present paper could in fact be an extension of this, as it takes a very similar concept and extends it from inorganic solids to all known substances (up to some date).
+
+Aside from such loose statements, it has to be pointed out that this matrix gives important information about the dataset, which ultimately speaks about the chemistry of the moment. This must be more thoroughly analized, but I think it already is an important product of this project.
+
+\section{Further work}
+
+As already pointed out, the data preprocessing presented here represents a huge loss of data as it doesn't exploit the full structure of the chemical compositional formulas and disregards a number of formulas as these are unique in the sense that no replacement of any atom in the formula leads to another compound in the dataset. It must be noted, however, that this preprocesing was initially conceived for a tabular representation intended to feed a CNN. A different preprocessing would require a different algorithm.
+
+A new approach, one which takes into account these failures and aims to exploit the full structure of the dataset, relies on a similar idea as automatic computer text generation using recurrent neural networks (RNN). Under this approach, an RNN is exposed to a corpus of raw text and asked to predict what the next word will be, based on some current state. For instance, a state may be "Colombian people speak" and the algorithm would be expected to say "spanish" with high probability. More on this on \href{https://karpathy.github.io/2015/05/21/rnn-effectiveness/}{Karpathy} \cite{text_gen_rnn}.
+
+The power of this approach relies on the fact that the algorithm needs to learn to structure text in the given language, remember previous information, and be aware of context. A direct bridge to chemistry is constructed when we think of compositional formulas as a new language, where based on the context (e.g. some information about the formula) we'd like our model to predict what elements and in what quantities could complete them. An example of this is having "$\ce{H2}$" as an input. The output would be $\ce{H2O}$, or $\ce{H2S}$ with high probability, but other results such as $\ce{H2Br}$ shouldn't be as likely.
+
+It is in this sense that RNNs could help exploit the full structure of the dataset without the need of any additional data. Naturally, the interesting part comes after the algorithm has been trained. At this stage we have to analyze the strcuture of this network, the results it produces, among other tests.
 
 
 

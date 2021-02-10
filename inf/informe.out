@@ -1,9 +1,4 @@
-\BOOKMARK [1][-]{section.1}{Introducci\363n}{}% 1
-\BOOKMARK [1][-]{section.2}{Tratamiento de datos}{}% 2
-\BOOKMARK [2][-]{subsection.2.1}{Generaci\363n de los datos}{section.2}% 3
-\BOOKMARK [2][-]{subsection.2.2}{Algoritmo}{section.2}% 4
-\BOOKMARK [1][-]{section.3}{An\341lisis de datos}{}% 5
-\BOOKMARK [2][-]{subsection.3.1}{EDA}{section.3}% 6
-\BOOKMARK [2][-]{subsection.3.2}{Modelaci\363n}{section.3}% 7
-\BOOKMARK [3][-]{subsubsection.3.2.1}{Clustering}{subsection.3.2}% 8
-\BOOKMARK [3][-]{subsubsection.3.2.2}{Algoritmo predictor}{subsection.3.2}% 9
+\BOOKMARK [1][-]{section.1}{Introduction}{}% 1
+\BOOKMARK [1][-]{section.2}{Data preprocessing}{}% 2
+\BOOKMARK [1][-]{section.3}{Exploratory Data Analysis \(EDA\)}{}% 3
+\BOOKMARK [1][-]{section.4}{Further work}{}% 4
