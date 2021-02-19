@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017/Debian) (preloaded format=pdflatex 2019.10.6)  1 FEB 2021 15:40
+This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017/Debian) (preloaded format=pdflatex 2019.10.6)  18 FEB 2021 17:38
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -828,70 +828,83 @@ LaTeX Font Info:    Font shape `U/msb/m/n' will be
 LaTeX Font Info:    Font shape `T1/pplx/bx/n' in size <12> not available
 (Font)              Font shape `T1/pplx/b/n' tried instead on input line 62.
 LaTeX Font Info:    Font shape `U/msa/m/n' will be
-(Font)              scaled to size 10.42007pt on input line 77.
+(Font)              scaled to size 10.42007pt on input line 69.
 LaTeX Font Info:    Font shape `U/msa/m/n' will be
-(Font)              scaled to size 7.91925pt on input line 77.
+(Font)              scaled to size 7.91925pt on input line 69.
 LaTeX Font Info:    Font shape `U/msb/m/n' will be
-(Font)              scaled to size 10.42007pt on input line 77.
+(Font)              scaled to size 10.42007pt on input line 69.
 LaTeX Font Info:    Font shape `U/msb/m/n' will be
-(Font)              scaled to size 7.91925pt on input line 77.
+(Font)              scaled to size 7.91925pt on input line 69.
 [1
 
 {/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}]
-<tables.png, id=40, 1084.05pt x 303.2931pt>
+Underfull \hbox (badness 10000) in paragraph at lines 80--81
+
+ []
+
+LaTeX Font Info:    Try loading font information for U+fplmbb on input line 84.
+
+(/usr/share/texlive/texmf-dist/tex/latex/psnfss/ufplmbb.fd
+File: ufplmbb.fd 2003/10/30 Fontinst v1.914 font definitions for U/fplmbb.
+)
+<tables.png, id=40, 1037.3154pt x 294.1389pt>
 File: tables.png Graphic file (type png)
 <use tables.png>
-Package pdftex.def Info: tables.png  used on input line 100.
-(pdftex.def)             Requested size: 455.24408pt x 127.36835pt.
+Package pdftex.def Info: tables.png  used on input line 93.
+(pdftex.def)             Requested size: 512.1496pt x 145.21994pt.
 LaTeX Font Info:    Font shape `T1/pplx/bx/n' in size <9> not available
-(Font)              Font shape `T1/pplx/b/n' tried instead on input line 101.
- [2 <./tables.png>]
-<meanHND.png, id=50, 1062.8508pt x 331.9602pt>
+(Font)              Font shape `T1/pplx/b/n' tried instead on input line 94.
+
+
+LaTeX Warning: `!h' float specifier changed to `!ht'.
+
+[2]
+<meanHND.png, id=52, 1004.7939pt x 334.3692pt>
 File: meanHND.png Graphic file (type png)
 <use meanHND.png>
-Package pdftex.def Info: meanHND.png  used on input line 122.
-(pdftex.def)             Requested size: 398.33858pt x 124.40878pt.
-<replace_H.png, id=51, 915.6609pt x 492.6405pt>
+Package pdftex.def Info: meanHND.png  used on input line 109.
+(pdftex.def)             Requested size: 455.24408pt x 151.49025pt.
+ [3 <./tables.png> <./meanHND.png>]
+<replace_H.png, id=61, 915.6609pt x 492.6405pt>
 File: replace_H.png Graphic file (type png)
 <use replace_H.png>
-Package pdftex.def Info: replace_H.png  used on input line 135.
+Package pdftex.def Info: replace_H.png  used on input line 120.
 (pdftex.def)             Requested size: 369.88582pt x 198.99963pt.
-
-[3 <./meanHND.png> <./replace_H.png>]
-<replace_Fe.png, id=62, 901.6887pt x 492.6405pt>
+ [4 <./replace_H.png>]
+<replace_Fe.png, id=70, 901.6887pt x 492.6405pt>
 File: replace_Fe.png Graphic file (type png)
 <use replace_Fe.png>
-Package pdftex.def Info: replace_Fe.png  used on input line 151.
+Package pdftex.def Info: replace_Fe.png  used on input line 139.
 (pdftex.def)             Requested size: 369.88582pt x 202.08914pt.
- [4 <./replace_Fe.png>]
-<matrix.png, id=71, 1306.46092pt x 1143.49208pt>
+ [5 <./replace_Fe.png>]
+<matrix.png, id=81, 1306.46092pt x 1143.49208pt>
 File: matrix.png Graphic file (type png)
 <use matrix.png>
-Package pdftex.def Info: matrix.png  used on input line 175.
+Package pdftex.def Info: matrix.png  used on input line 159.
 (pdftex.def)             Requested size: 512.1496pt x 448.26329pt.
- [5 <./matrix.png>] (./informe.bbl)
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 200.
- [6]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 200.
+ [6 <./matrix.png>] (./informe.bbl)
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 172.
+ [7]
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 172.
  (./informe.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 200.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 200.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 172.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 172.
 Package rerunfilecheck Info: File `informe.out' has not changed.
-(rerunfilecheck)             Checksum: 23679CE7C567E503296A4EC6154CB42C;215.
+(rerunfilecheck)             Checksum: 858AFE010FBD4F0B75462380F040EBEC;319.
 
 
 LaTeX Font Warning: Some font shapes were not available, defaults substituted.
 
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 200.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 172.
  ) 
 Here is how much of TeX's memory you used:
- 19941 strings out of 494820
- 356279 string characters out of 6177789
- 471157 words of memory out of 5000000
- 22840 multiletter control sequences out of 15000+600000
- 598811 words of font info for 271 fonts, out of 8000000 for 9000
+ 19958 strings out of 494820
+ 356305 string characters out of 6177789
+ 473313 words of memory out of 5000000
+ 22834 multiletter control sequences out of 15000+600000
+ 598254 words of font info for 279 fonts, out of 8000000 for 9000
  62 hyphenation exceptions out of 8191
- 38i,13n,52p,10380b,453s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 36i,11n,49p,10380b,445s stack positions out of 5000i,500n,10000p,200000b,80000s
 pdfTeX warning (dest): name{Hfootnote.1} has been referenced but does not exi
 st, replaced by a fixed one
 
@@ -900,13 +913,14 @@ texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texlive/texmf-d
 ist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/share/texlive/texmf-dist/fo
 nts/type1/public/amsfonts/cm/cmsy6.pfb></usr/share/texlive/texmf-dist/fonts/typ
 e1/public/amsfonts/cm/cmsy9.pfb></usr/share/texlive/texmf-dist/fonts/type1/publ
-ic/fpl/fplrc8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/palatino/uplb
-8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/palatino/uplr8a.pfb></usr
-/share/texlive/texmf-dist/fonts/type1/urw/palatino/uplri8a.pfb>
-Output written on informe.pdf (6 pages, 1469155 bytes).
+ic/mathpazo/fplmbb.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/fpl/fp
+lrc8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/palatino/uplb8a.pfb></
+usr/share/texlive/texmf-dist/fonts/type1/urw/palatino/uplr8a.pfb></usr/share/te
+xlive/texmf-dist/fonts/type1/urw/palatino/uplri8a.pfb>
+Output written on informe.pdf (7 pages, 1712363 bytes).
 PDF statistics:
- 120 PDF objects out of 1000 (max. 8388607)
- 93 compressed objects within 1 object stream
- 21 named destinations out of 1000 (max. 500000)
- 56378 words of extra memory for PDF output out of 61914 (max. 10000000)
+ 135 PDF objects out of 1000 (max. 8388607)
+ 105 compressed objects within 2 object streams
+ 20 named destinations out of 1000 (max. 500000)
+ 55362 words of extra memory for PDF output out of 61914 (max. 10000000)
 

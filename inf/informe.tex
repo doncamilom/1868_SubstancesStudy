@@ -47,10 +47,10 @@
 
 \begin{document}
 
-\title{The structure of the chemical space of 1868.} 
+\title{A computational approach to the periodic system.} 
 
 \author{%
-\textsc{Andr\'es C. Marulanda}\thanks{Corresponding author} \\[1ex]
+\textsc{Andr\'es Marulanda-Bran}\thanks{Corresponding author} \\[1ex]
 \normalsize Universidad de Antioquia \\ % Your institution
 \normalsize \href{mailto:correoAndres}{acamilo.marulanda@udea.edu.co} % Your email address
 }
@@ -62,108 +62,92 @@
 \section{Introduction}
 \label{sec:intro}
 
-During the previous months we discussed about producing an algorithm capable of making predictions about new substances based on known substances, up to some date. The initial approach was to use convolutional neural networks (CNN) to learn from some representation of the data containing also information about some periodic table (PT), similar to \cite{CNN_dH}. 
+Mendeleev's periodic system is, and for the last 150 years has been, regarded as one of the most important discoveries/inventions in the history of chemistry and in general the natural sciences. It was conceived after nearly one century of substantial efforts from the chemical community, remarkably from D\"obereiner, Meyer and Mendeleev himself, the last of whom being the one that discovered and first used the periodic system as a predictive tool during the second half of the 18th century.
 
-We also want to compare different PTs against Mendeleev's and against the more recent PT produced by Prof. Restrepo's group and see which one, if any, contains the most information about the substances at the time, meaning which representation can yield better predictive results for the CNN. This algorithm can then be explored in order to see what it sees and how it makes the predictions, kind of asking Mendeleev why and how he chose to predict substance properties in the way he did (for Ga and Ge, for instance).
+The periodic system (PS) was devised as a mean to systematize the generality of the chemical information of the time, which mainly consisted of chemical compositions of substances and their properties. To this time a few things were known about the elements and the way they gave rise to all the substances, the most relevant being that they can be sorted by weight, and that some of these show particular similarities such as the kinds of compounds they produce, and some chemical and physical properties of the substances they are present in. This allowed scientists to group some of the elements in small groups based on their similarity, giving rise to the question of whether the large set of known elements could be represented within a single system allowing to express and generalize this knowledge.
 
-Initially it was proposed that for this task "matrices of existence"  should be constructed, meaning that in a table a substance gets a 1 if it exists and a 0 if it doesn't, which would make the task a supervised learning one, which is the most explored type of machine learning these days.
+The main idea is to arrange the elements in a two-dimensional array, where the horizontal dimension expresses an order relationship, meaning an element is heavier than any element to its left, and strictly lighter than any element to its right (on the same row). Its vertical dimension expresses similarity in the sense that if two elements lie within the same column, they are -ought to be- chemically similar. Mendeleev's concept of similarity relies on the basis of the likeness of the chemical formulas the elements usually take part on, a concept very closely related to that of valence. One important note came with the first report of the PS, and is that not only vertical similarities occur throughout the table, such as for instance between K-Rb-Cs; but also horizontal ones, such as Pt-Ir-Os. It is important to note that this was a purely empirical approach and it depended on the known substances and elements of the time and, even further, depended on the substances a scientist knew at the time or even $\textit{decided}$ to use for her/his analysis. 
 
-This is, however, a somewhat loose task as the existence of a compound is in principle only limited to humanity's knowledge of it, so many possible substances in the training set would probably be wrongly labeled, which is a fundamental problem for the approach. Given this, the approach is discarded as it provides little insight into the inner structure of the chemistry of this period.
+Mendeleev, however, didn't use the whole set of substances known at the time -the chemical space-; in fact, it has been reported that he used only very specific subsets of this chemical space, including hydrides, hydroxides, halogenides, oxydes, and some others. In comparison, it is now known that more than 11000 substances had been discovered to that time, suggesting that the known chemical space was very likely undersampled, only because of its unbearable extension. In addition to this, the last 150 years have brought with them a consistently exponential increase in the size of the chemical space, with some clearly distinguishable regimes characterized by the different kinds of substances produced. 
 
-I decided then to do some exploratory data analysis (EDA) on these tables and see if some structure can directly be extracted from the data as opposed to feeding some algorithm with it right away. This has already started and the results are explored in the following sections.
+With this, the questions arise of whether the 1868's periodic system "fits" that time's data, and how it has been affected by the changes on the chemical space through time. All of this amounts to questioning the fitness of \textit{a} periodic system, on the basis of the foundations well established 150 years ago and the available chemical space. Going even further, having obtained a way of measuring the fitness of a PS, the next step is finding an optimal configuration for this fitness measure, leading possibly to a different and more expressive periodic system, yet following Mendeleev's data-driven approach but in a big data setting.
 
-The approach mentioned above still would work, however, if we used some properties of known substances as inputs (as opposed to just 1s and 0s for existence). That way we can directly ask an algorithm to predict properties of new compounds based on the (learned) structure of the chemical space and the properties of similar substances. 
-
-In this case then, an algorithm would try to approximate the value of some property p of substance $R-X_n$.
-
-\begin{equation}
-\label{eq:eq1}
- p(R-X_n) = f( X, existent R-Y_n , PT )
-\end{equation}
-
-X being any element (characterized by its position in the given PT), Y being any element such that $\ce{R-Y_n}$ is in the dataset, and PT the periodic table considered.
-
+To answer these, and other questions, this study makes use of the set of available substances discovered up to the year 2015, extracted from the Reaxys database. The article is structured as follows: Section II presents the general data-preprocessing procedure and the reasoning behind it. Section III, the calculations performed and an analysis and discussion of the results. Section IV presents an optimization setting for the PS with (probably, but not quite yet) possible candidate configurations and the analysis of these results.
 
 \section{Data preprocessing}
 \label{sec:sec2}
 
-As initially proposed, tables were constructed in such a way that two elements X,Y appear in the same table only if there exist 2 compounds $A = R-X_n$ and $B = R-Y_n$, where if X were replaced by Y in compound A, the result would be compound B. This approximation ignores every structural factor and relies only on compositional data.
+The compositional formulas of all the available compounds were extracted from the database in such a way that the data ends up being a collection of text strings such as for instance C6H12O. The main idea of our preprocessing is to convert this corpus of strings into a more meaningful and easy-to-analyze format, over which mathematical operations and statistical measures can be performed. For such a task, the underlying "grammar" behind each compound's composition is to be found, and for that matter the processing and analysis must be focused on interactions between compounds rather than the conversion of single compounds into machine-readable formats. Note that this approach differs from usual machine learning studies in that for these, the latter formats are constructed and given to an algorithm, having the structure of the data being looked for $\textit{after}$ the preprocessing; while the  approach presented here aims to directly extract structure from the data, allowing to make analyses and conclusions before any statistical learning is invoked.\\
 
-Note from this approach that n is an integer, that is, there's a problem when treating non-stoichiometric compounds. In the given dataset there are actually examples of such non-stoichiometric compounds, and so this case had to be handled properly.
+For that end, sets of elements were constructed in such a way that two elements X,Y appear in the same set only if there exist 2 compounds $A = R-X_n$ and $B = R-Y_n$, where if n atoms of X were replaced by n atoms of Y in compound A, the result would be compound B. A set was constructed for every possible (R,n) pair found in the original dataset, and only those sets containing at least 2 elements were considered. This processing naturally expresses a similarity relationship between all the elements within a single set. An example of the computation is as follows: assuming the compounds $\ce{KOH}$, $\ce{NaOH}$ and $\ce{H2O}$ exist, then by this treatment a set {K,Na,H} will be formed corresponding to the formula OH-X. For this particular example, R = OH and n = 1.
 
-This was solved in the following way: if upon duplication of all ns in the given compound this compound is stoichiometric, then work with that, otherwise discard the compound. All compunds that weren't used in this analysis due to this are stored under the out.log file, which corresponds to the output of the MPIgetTabs.py script used for the aforementioned data preprocessing. 
+Note that this approach assumes that n is an integer, that is, there's a problem when treating non-stoichiometric compounds. In the given dataset there are actually examples of such non-stoichiometric compounds, and so this case needs to be properly handled. This was solved in the following way: if upon duplication of all subindices in the given compound this compound is stoichiometric, we work with the new, index-duplicated compound (this works for subindices n=x/2, x $\in \mathbb{N}$). Otherwise the compound is discarded. This first consideration should be studied in more detail as these compounds may correspond to, for instance, crystalline phases with non-stoichiometric amounts of water molecules.
+It is worthwhile noting that this approximation ignores every structural factor and relies only on compositional data.
 
-A total of 6145 tables was produced, and a sample of these is shown in figure \ref{fig:fig1}. The PT was the standard long-version of the PT.
+For the purpose of visualization and analysis, such sets can then be conveniently represented in a 2-dimensional representation so as to include the information of some periodic system, that is, the relative positions of the elements in a given set, within the given PS. Examples of such a representation are shown in figure \ref{fig:fig1} where, for each element of a given set, its corresponding position in the given PS is pictured white. 
+
+Starting from 11356 substances known to the year 1868, a total of 6145 said tables were produced. The PT used is the \href{https://www.chemicool.com/longperiodictable.html}{standard long-version of the PT}.
 
 \begin{figure}[h!]
   \centering
-	\includegraphics[width=16.0cm]{tables.png}
-	\caption{Periodic table representation of the dataset.}
+	\includegraphics[width=18.0cm]{tables.png}
+	\caption{Periodic table representation of the constructed dataset.}
 	\label{fig:fig1}
 \end{figure}
 
-Where purple means no element exist at this position, red means an element in this position exists in dataset, and white means there exist a compound $R-X_n$, with X being the element at this position and R the molecular fragment associated with this table. In this example, for instance, the data shows that both $\ce{ZrF4}$ and $\ce{ZrCl4}$ exist in dataset, but there exist no other compound with formula $\ce{ZrX4}$. It also shows that most lanthanides and actinides, as well as Tc, Re, Ga and Ge hadn't been discovered to this date. The vertical relationships on this side of the PT are clear from this sample.
+Here, black means no element exist at this position, red means an element in this position exists in dataset, and white means there exist a compound $R-X_n$ as explained above. In this example, for instance, the data shows that both $\ce{ZrF4}$ and $\ce{ZrCl4}$ exist in dataset, but there exist no other compound with formula $\ce{ZrX4}$. It also shows that most lanthanides and actinides, as well as Tc, Re, Ga and Ge hadn't been discovered to this date. The vertical relationships on this side of the PS are clear from this sample.
 
-It must be pointed out that, during preprocessing, a table is saved only if there are at least two white squares in it. Note that this implies a large loss of data as tables with only one white square correspond to unique compounds, meaning these compounds are all lost. This merits a more in-depth study and a new approach that explicitly tackles this is discussed further on.
+\section{Results and discussion}
 
+\subsection{Mean Horizontal Neighbouring Distance}
+From figure \ref{fig:fig1} the typical vertical similarity can be spoted in the majority of tables from this sample (manifested as vertical blocks of white squares). We may ask, however, to what extent is this vertical similarity rule followed throughout the whole dataset? That is, is it more prevalent than, for instance, horizontal or diagonal (or any other) similarity and, in any case, how much deviation is there from the ideal arrangement?
 
-\section{Exploratory Data Analysis (EDA)}
-
-Having generated all the tables, we now go into data analysis. Modellation by itself must wait until I get more data (that is, substances' properties) and even then an EDA always leads to valuable insights, so that will be discussed in this section.
-
-From figure \ref{fig:fig1} the typical vertical similarity can be spoted in the large majority of tables (vertical blocks of white squares). We may ask, however, to what extent is this vertical similarity rule followed throughout the whole dataset? That is, is it more prevalent than, for instance, horizontal or diagonal (or any other) similarity?
-
-To answer this, the horizontal neighbor distance (HND) was calculated for each white element in each table. This is calculated as the difference in PT groups there are from one white element to another in the same table. A HND of 0 means the two elements belong in the same group, reinforcing the vertical similarity, while a larger distance implies a departure from this.
-
-The results are then averaged throughout the tables and are shown in figure \ref{fig:fig2}.
+To answer this, the horizontal neighboring distance (HND) was computed. For each element in each table, this is calculated as the averaged difference in PS groups there exist from the element to all its neighbors in the same table. This quantity is then averaged throughout all tables and the result is shown in figure \ref{fig:fig2}. Note that this quantity is clearly a function of the available chemical space and the selected PS. By construction, an HND of 0 means the two elements belong in the same group, reinforcing the vertical similarity idea, while a larger distance implies a departure from this rule.
 
 \begin{figure}[h!]
   \centering
-	\includegraphics[width=14.0cm]{meanHND.png}
-	\caption{Mean HND for the elements in the PT.}
+	\includegraphics[width=16.0cm]{meanHND.png}
+	\caption{Mean horizontal neighboring distance (HND) for the elements in the PS. HND measures up to what degree elements are "misslocated" in the PS considering that similarity should be expressed as vertical relationships. }
 	\label{fig:fig2}
 \end{figure}
 
-The interpretation of this plot is somewhat tricky but it clearly shows that, overall, the vertical similarities do not occur throughout the whole PT and, furthermore, this occurs more frequently to the right of the PT. Groups 1 and 2 show surprisingly high HNDs considering how chemically similar these elements are inside their group. This is explained considering the metallic character of these elements, which is in some aspects similar to that of transition metals.
+Figure \ref{fig:fig2} clearly shows that, overall, the vertical similarities do not occur throughout the whole PS and, furthermore, this occurs more frequently to the right of the PT. Groups 1 and 2 show surprisingly high HNDs considering how chemically similar elements within these groups are expected to be (Na-K-Rb-Cs and Mg-Ca-Sr for instance). An initial explanation, for which more evidence will be shown further on, calls for the consideration of the metallic character of these elements which, in some aspects, resemble the chemistry of the transition metals (group 3-12) and thus are expected to appear in some of the tables, increasing the mean HND for the elements of these groups.
 
-We can calculate a number of other different distances, but I think this is the most important as the PT is constructed on the basis of order and similarity, with the similarity expresed as a strictly vertical one on this representation. We may now construct a new PT by optimization of this quantity, which would lead to a PT where HND is minimized while preserving atomic number ordering. This should naturally lead to a more complete PT, and would allow a comparison between systems.
-
-This might be done using genetic algorithms, which are perfect for these kind of problems where an exhaustive exploration of the space of configurations is impossible and the mixing of configurations is somewhat straightforward.
+A number of other different distances can be calculated as well, but this has been selected as the most descriptive as the PS is constructed on the basis of order and similarity, with the similarity expresed as a strictly vertical one on this representation, as already stated above. Given that HND is parametrically a function of the selected PS, a new PS may now be devised by optimization of this quantity, which would lead to one where HND is minimized while preserving some given elemental ordering (be it atomic weight, Pettifor's scale, etc), which should naturally lead to a more expressive PS at least, and would allow a comparison between systems. Optimization and comparison between systems is, however, a topic for the next section.
 
 \begin{figure}[h!]
   \centering
 	\includegraphics[width=13.0cm]{replace_H.png}
-	\caption{Replaceability of H in dataset. Both plots show the same data in different formats. a) PT format showing vertical relationships and b) Barplot showing elements in atomic number order, bar height is number of times H and this element appear in the same table.}
+	\caption{Replaceability of H in compounds in dataset. a) PS format showing periodic relationships and b) Barplot showing elements in atomic number order, bar height is number of times H and this element appear in the same table.}
 	\label{fig:fig3}
 \end{figure}
 
-A more individual exploration can be done using the same data. Particularly, the degree of replaceability was calculated for each pair of elements as the number of times both elements appear in the same table. From this, we can obtain some more detailed insights about the relationships between elements, as shown in figure \ref{fig:fig3}.
+\subsection{Replaceability of elements.}
 
-It can clearly be seen that H is, under our approximation, more similar to C, N and O, and the halogens (except F). A similarity with the halogens are expected, as in most of organic chemistry these appear as substituents of H, but the similarity to C, N and O must be further explored.
+Not only can we calculate how far away elements are from their neighbors, but we might as well ask who their neighbors are. From the way the data was preprocessed, the answer to latter question can be interpreted as a measure of replaceability, as elements in the same constructed set can be interchanged within this set's corresponding formula. For a given element, the calculation consists of taking all the tables that contain this element, and then for each other element count the number of times these are present in this subset of tables. From this, some more detailed insights can be obtained about the relationships between elements, as shown in figure \ref{fig:fig3} for hydrogen.
 
-As a quick comment, some of the substances responsible of the high H-O replaceability are: 
-$\ce{SX2}$, $\ce{OTlX}$, $\ce{NX3}$, $\ce{MoOX}$, $\ce{MnOX}$. These show that this result is actually due to the presence of metallic oxides, hydroxides and hydrides, and happens with elements with many oxidation states, such as transition metals and other non-metals such as S and N.
+It can clearly be seen that H is, under our approximation, more similar to C, N and O, and the halogens (except F). A similarity with the halogens are expected, as in most of organic chemistry these appear as substituents of H, but the resultant similarities to C, N and O must be further explored in order for it to chemically make sense.
+
+Although the relationship between O, C and N with H may seem weird, taking a look at the formulas responsible for this result it is found that $\ce{SX2}$, $\ce{OTlX}$, $\ce{NX3}$, $\ce{MoOX}$, $\ce{MnOX}$ and similar substances offer an explanation. These show that such a result is actually due to the presence of metallic oxides, hydroxides and hydrides, and happens in combination with elements with more than one oxidation state such as transition metals and other non-metals such as S and N, which allows them to combine in some compounds with a number $\textit{x}$ of Hs, while in other compounds with the same number of Os by doubling their oxidation state.
+
+The other important relation found here is that expressed with the halogens. It can clearly be seen that the H-to-halogens relations are much stronger (more than twice) than that with the alkaline elements (group 1). This is clearly an important result as it suggests that H should be nearer to the halogens in the PS, as opposed to being in group 1 and treated as an alkaline element.
 
 To show the power of these plots, another example is brought into play (figure \ref{fig:fig4}).
 
 \begin{figure}[h!]
   \centering
 	\includegraphics[width=13.0cm]{replace_Fe.png}
-	\caption{Replaceability of Fe in dataset.}
+	\caption{Replaceability of Fe in compounds in dataset.}
 	\label{fig:fig4}
 \end{figure}
 
-The replaceability plot for Fe shows that, for this element, the similarity is mostly horizontal along the 4th period transition metals, but it also shows a large similarity with alkaline earth elements. This result is, I think, non trivial and deserves a more in-depth exploration. Some questions arise as, for instance, can a new PT be constructed, in such a way that this information is mre explicitly given? If not, is there some particular reason (probably a topological one) for this?.
+The replaceability plot for Fe shows that, for this element, the similarity is mostly horizontal along the 4th period transition metals, as already expressed by Mendeleev on his original publication of the PS, but it also shows a comparable similarity with alkaline earth elements (group 2). Such a similarity is a non-trivial result and deserves a more in-depth exploration, as the PS expresses none of this information in it. Some questions arise as, for instance, can a new PS be constructed, in such a way that this information is more explicitly given? If not, is there some particular reason (probably a topological one) for this?. As an additional observation, the plots for alkaline elements (Supplementary Information) do not show such a marked similarity to transition metals and are instead more cluttered around group 1 of PS.
 
-As an additional observation, the plots for alkaline elements (Na for instance) do not show such a marked similarity to transition metals and are instead more cluttered around group 1 of PT.
+One of these plots could be drawn for each element, but this becomes quite tedious as it would imply the production and analysis of more than 90 of these individually. Instead, the PS representations can be unravelled into a 1-dimensional format and normalized, and finally concatenated into one large square matrix so as to be able to visualize all pairwise relative similarities between elements, as shown in figure \ref{fig:fig5}. This ultimately looks much like a correlation matrix as it states element-wise relationships between pairs of elements in a more concise format. It looses, however, the possibility of studying the PS on the light of these results, showing that both representations give different important information and none should be disregarded in favor of the other. To facilitate the visualization of the first kind of representation (figures \ref{fig:fig3} and \ref{fig:fig4}) an interactive webpage is to be constructed, where the similarities are calculated for an user-chosen element and shown in the PS representation.
+ 
+The details of the normalization are important as it determines what is shown on the figure and the way it should be interpreted. In this case each row of the matrix was divided by the maximum value of said row, which naturally corresponds to the same element as the row, justifying the observation that the diagonal of the matrix is all ones. Due to this normalization the matrix is not symmetric, meaning the information on the upper triangle is different than that shown on the lower triangle, which is the same as stating that the similarity relationship X $\rightarrow$ Y is not the same as Y $\rightarrow$ X. As an example, take the couple La-Fe. As can be seen, the row corresponding to La has a high value (near 1) at the Fe column, meaning La can be replaced by Fe most of the time (within this dataset). When we look at the Fe row, the value corresponding to La is one of the lowest, meaning Fe can not be replaced by La most of the time. 
 
-We could go on and do one of these plots for each element, but this becomes quite tedious as we would have to analize more than 90 of these individually. Instead we can unravel the periodic table representations into a 1-dimensional format, do some normalization on this replaceability measure, and procede to concatenate all 1-D arrays into one large square matrix, as shown in figure \ref{fig:fig5}. This ultimately looks much like a correlation matrix as it states element-wise relationships between pairs of elements in a more concise format.
-
-The details of the normalization are important as it determines what is shown on the figure. In this case each row of the matrix was divided by the maximum value of said row. This value naturally corresponds to the same element as the row, which justifies the observation that the diagonal of the matrix is all ones.
-
-Due to the normalization used, the matrix is not symmetric, which means the matrix doesn't equal its transpose. As an example, take the couple La-Fe. As can be seen, the row corresponding to La has a high value (near 1) at the Fe column, meaning La can be replaced by Fe most of the time (within this dataset). When we look at the Fe row, the value corresponding to 1 is one of the lowest, meaning Fe can not be replaced by La most of the time. 
-
-The unidirectionality of these relationships is important as it may lead to several conclusions (drawn naively only from this study), namely:
+The unidirectionality of these relationships is important as it may lead to several conclusions (drawn naively only from these results), namely:
 
 \begin{itemize}
 	\item The chemistry of La wasn't as explored as that of Fe at the time. This can be thought of in sociological terms, as an exploration of the new element (La) limited to trying to copy the chemistry of a seemingly similar element (Fe).
@@ -173,27 +157,15 @@ The unidirectionality of these relationships is important as it may lead to seve
 \begin{figure}[h!]
   \centering
 	\includegraphics[width=18.0cm]{matrix.png}
-	\caption{Replaceability of Fe in dataset.}
+	\caption{Replaceability matrix. Note that this matrix is not symmetric, meaning the relationship X $\rightarrow$ Y is not the same as Y $\rightarrow$ X.}
 	\label{fig:fig5}
 \end{figure}
 
-In more general terms, some substructures can be seen within the matrix such as, for instance, vertical, horizontal and diagonal lines, which explicitly suggest the higher structure the PT is intended to capture. Again, some optimization work can be performed on this matrix, similar to \cite{Glawe_2016}. The present paper could in fact be an extension of this, as it takes a very similar concept and extends it from inorganic solids to all known substances (up to some date).
-
-Aside from such loose statements, it has to be pointed out that this matrix gives important information about the dataset, which ultimately speaks about the chemistry of the moment. This must be more thoroughly analized, but I think it already is an important product of this project.
-
-\section{Further work}
-
-As already pointed out, the data preprocessing presented here represents a huge loss of data as it doesn't exploit the full structure of the chemical compositional formulas and disregards a number of formulas as these are unique in the sense that no replacement of any atom in the formula leads to another compound in the dataset. It must be noted, however, that this preprocesing was initially conceived for a tabular representation intended to feed a CNN. A different preprocessing would require a different algorithm.
-
-A new approach, one which takes into account these failures and aims to exploit the full structure of the dataset, relies on a similar idea as automatic computer text generation using recurrent neural networks (RNN). Under this approach, an RNN is exposed to a corpus of raw text and asked to predict what the next word will be, based on some current state. For instance, a state may be "Colombian people speak" and the algorithm would be expected to say "spanish" with high probability. More on this on \href{https://karpathy.github.io/2015/05/21/rnn-effectiveness/}{Karpathy} \cite{text_gen_rnn}.
-
-The power of this approach relies on the fact that the algorithm needs to learn to structure text in the given language, remember previous information, and be aware of context. A direct bridge to chemistry is constructed when we think of compositional formulas as a new language, where based on the context (e.g. some information about the formula) we'd like our model to predict what elements and in what quantities could complete them. An example of this is having "$\ce{H2}$" as an input. The output would be $\ce{H2O}$, or $\ce{H2S}$ with high probability, but other results such as $\ce{H2Br}$ shouldn't be as likely.
-
-It is in this sense that RNNs could help exploit the full structure of the dataset without the need of any additional data. Naturally, the interesting part comes after the algorithm has been trained. At this stage we have to analyze the strcuture of this network, the results it produces, among other tests.
+In more general terms, some substructures can be seen within the matrix such as, for instance, vertical, horizontal and diagonal lines, which explicitly suggest the higher structure the PS is intended to capture. Namely, diagonal relationships on this matrix establish vertical pair-wise element similarities in the periodic table, for instance As $\rightarrow$ P followed by Se $\rightarrow$ S, Br $\rightarrow$ Cl, and so on. Vertical and horizontal relationships represent horizontal similarities in the PS, as well as other hidden ones such as the one shown in \ref{fig:fig4} between group 2 elements and first row transition metal elements. In this sense, this matrix (and others of this kind) allow for a much high level visualization of all the general relationships between elements without an embedding in any arbitrary PS. Again, some optimization work can be performed on this matrix similar to \cite{Glawe_2016}, where a reformulation of the Pettifor's scale was done with a similar approach to that presented here, but using only a set of inorganic substances obtained from the \href{https://ucsd.libguides.com/crystallography/icsd}{ICSD}. The present article could in fact be an extension of this, as it takes a very similar concept and extends it from inorganic solids to all known substances (up to some date).
 
 
 
-\renewcommand\refname{Referencias}
+\renewcommand\refname{References}
 \bibliography{bib}
 \bibliographystyle{ieeetr}
 

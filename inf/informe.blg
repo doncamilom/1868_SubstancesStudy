@@ -3,47 +3,44 @@ Capacity: max_strings=100000, hash_size=100000, hash_prime=85009
 The top-level auxiliary file: informe.aux
 The style file: ieeetr.bst
 Database file #1: bib.bib
-Warning--entry type for "text_gen_rnn" isn't style-file defined
---line 31 of file bib.bib
-You've used 3 entries,
+You've used 1 entry,
             1876 wiz_defined-function locations,
-            499 strings with 4004 characters,
-and the built_in function-call counts, 822 in all, are:
-= -- 81
-> -- 29
+            487 strings with 3703 characters,
+and the built_in function-call counts, 333 in all, are:
+= -- 32
+> -- 14
 < -- 0
-+ -- 11
-- -- 8
-* -- 51
-:= -- 116
-add.period$ -- 3
-call.type$ -- 3
-change.case$ -- 3
++ -- 5
+- -- 4
+* -- 22
+:= -- 52
+add.period$ -- 1
+call.type$ -- 1
+change.case$ -- 1
 chr.to.int$ -- 0
-cite$ -- 3
-duplicate$ -- 43
-empty$ -- 74
-format.name$ -- 8
-if$ -- 205
+cite$ -- 1
+duplicate$ -- 20
+empty$ -- 23
+format.name$ -- 4
+if$ -- 80
 int.to.chr$ -- 0
-int.to.str$ -- 3
-missing$ -- 2
-newline$ -- 12
-num.names$ -- 3
-pop$ -- 11
+int.to.str$ -- 1
+missing$ -- 1
+newline$ -- 6
+num.names$ -- 1
+pop$ -- 2
 preamble$ -- 1
 purify$ -- 0
 quote$ -- 0
-skip$ -- 41
+skip$ -- 20
 stack$ -- 0
-substring$ -- 48
-swap$ -- 24
+substring$ -- 12
+swap$ -- 13
 text.length$ -- 0
 text.prefix$ -- 0
 top$ -- 0
 type$ -- 0
 warning$ -- 0
-while$ -- 6
-width$ -- 4
-write$ -- 29
-(There was 1 warning)
+while$ -- 2
+width$ -- 2
+write$ -- 12
