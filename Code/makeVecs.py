@@ -30,22 +30,29 @@ def getVec(tx,elemList,rank): #Tx = molecular formula, e.g. C4H2ClBr
         vec[elemList.index(elem)] += mul #Assign this index to the position of the element in elemList
 
     if np.all(vec == vec.astype(int)):     return vec
-    elif np.all(2*vec == (2*vec).astype(int)): return 2*vec  #If some n==0.5 then an integer composition is *2.
+    elif np.all(2*vec == (2*vec).astype(int)): 
+        print(f" * Duplicating indices of {tx}")
+        return 2*vec  #If some n==0.5 then an integer composition is *2.
 
     else:
         if rank==0: 
-            print(  f" *** Trouble {tx}" )
+            print(  f" *** Error processing {tx}" )
         return 0*vec   #Problem can't be easily solved
 
 def allVecs(DataFile,NMax,rank):
-    if NMax == 0:  df = pd.read_csv(DataFile,header=None,names=['year','form'])  #Load data
-    else:          df = pd.read_csv(DataFile,header=None,nrows=NMax,names=['year','form'])  #Load data
+    col_names = ['ID','year','formula']
+    sep = '\t'
 
-    df['form'] = df['form'].str.strip()   #Remove white spaces at begginning and end of string 
+    if NMax == 0:  df = pd.read_csv(DataFile,header=None,sep=sep,names=col_names)  #Load all data
+    else:          df = pd.read_csv(DataFile,header=None,sep=sep,nrows=NMax,names=col_names)  #Load data
+
+    df['formula'] = df['formula'].str.strip()   #Remove white spaces at begginning and end of string 
     
     elemList = getElemList(DataFile,NMax)     
-    totalVecs = np.array(list(map(lambda x: getVec(x,elemList,rank),df['form'].values)))
+    totalVecs = np.array(list(map(lambda x: getVec(x,elemList,rank),df['formula'].values)))
     totalVecs,index = np.unique(totalVecs,axis=0,return_index=True)
     years = df['year'].values[index]    
-    return totalVecs,years
+    subsID = df['ID'].values[index]    
+
+    return totalVecs,years,subsID
 

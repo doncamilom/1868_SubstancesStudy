@@ -20,7 +20,7 @@ def main():
     if len(sys.argv)<3:     NMax = 0   # If no max file length is passed, default to all
     else:                   NMax = int(sys.argv[2])
 
-    cmpnds,years = makeVecs.allVecs(DataFile,NMax,rank)  # List of vectors representing all compounds in dataset
+    cmpnds,years,subsID = makeVecs.allVecs(DataFile,NMax,rank)  # List of vectors representing all compounds in dataset
     FullElemntList = makeVecs.getElemList(DataFile,NMax) # List of all elements present in dataset.
 
     #Construct a dict to go from element symbol to an index
@@ -33,15 +33,15 @@ def main():
     TPshape = getTPShape()
     
     #### Make a template table so this doesn't have to be computed over and over
-    templateTable = np.zeros(TPshape)
+    templateTable = -np.ones(TPshape)
         # Map -1 for every element that is in DS 
     indexTempTab = np.array(list(map(lambda x: TP[x], FullElemntList)))
     templateTable[indexTempTab[:,0],indexTempTab[:,1]] = -1
 
     if rank==0:
         avgN = np.mean(np.sum(cmpnds,axis=1))
-        print("\n * Average num. of atoms per compound: ", round(avgN,4))
-        print(" * Max num. ligands R: ", avgN*cmpnds.shape[0])
+        print(f"\n * Average num. of atoms per compound: {round(avgN,4)}")
+        print(f" * Max number of fragments R: {avgN*cmpnds.shape[0]:.0f}")
         print()
 
         print("Finding unique Rs...")
@@ -52,7 +52,7 @@ def main():
 
     if rank==0: 
         print(f"\n * {cmpnds.shape[0]} unique compounds out of {NMax} requested.\n")
-        print(" Unique Rs: ", Rlist.shape[0])
+        print(" Total unique (usable) Rs: ", Rlist.shape[0])
 
     #################
     ## Following code taken from https://gist.github.com/krischer/2c7b95beed642248487a
@@ -68,7 +68,7 @@ def main():
 
 
     print(f"  -- P{rank} Finding commonalities...\n")
-    CommList,Rlist = getCommonal(Rlist,cmpnds,years,elemDict)
+    CommList,Rlist = getCommonal(Rlist,cmpnds,years,subsID,elemDict,useID=True)
     if rank==0:
         print(f"Time: {time()-t0:.3f} s\t NProc: {size}\t NMax: {NMax} ")
 
@@ -85,8 +85,8 @@ def main():
         # Mean number of element per list?
         LenR = [ len(set(x)) for x in CommListTotal ] 
         meanLen = sum(LenR)/len(LenR)
-        print("Mean number of compounds per R :",meanLen)
-        print("Max number of compounds per R :",max(LenR))
+        print("\tMean number of compounds per R :",meanLen)
+        print("\tMax number of compounds per R (first 3 max) :",sorted(set(LenR))[-3:])
 
 
 #        plotExample(CommList[np.argmax(LenR)],[TP],'H')
@@ -99,13 +99,18 @@ def getTPShape():
     return tuple(np.max(XY,axis=0) + 1)
     
 # Function to construct a TPR given a TP layout and a list of elements.
-def getTable(listElem,years):
+def getTable(listElem,years,subsID,useID=False):
     """This gets as input: a periodic system (table) and a list of elements. 
         Returns a 2D array coloured at the positions of these elements"""
     table = templateTable.copy()
+    
+    # What values to put in array. Either substance ID or year
+    if useID: dataArray = subsID
+    else:     dataArray = years
+ 
     for i,elem in enumerate(listElem):
         x,y = TP[elem]
-        table[x,y] = years[i]
+        table[x,y] = dataArray[i]
     return table
 
 def findRs(cmpnds):
@@ -133,7 +138,7 @@ def findRs(cmpnds):
     return Rs
  
     
-def getCommonal(Rs,cmpnds,years,elemDict):
+def getCommonal(Rs,cmpnds,years,subsID,elemDict,useID=False):
     """Get Commonalities. For each R(n) find all elements X such that compound R-Xn exists in dataset. 
     Build a list of these for each R(n)
     rank is the number of processors in which the operation is to be run"""
@@ -161,26 +166,41 @@ def getCommonal(Rs,cmpnds,years,elemDict):
 
         subsetCmpnds = cmpnds[cond1 & cond2]  # Select subset of cmpnds
         curr_years = years[cond1 & cond2]
+        curr_subsID = subsID[cond1 & cond2]
 
         cmpnds_no_R = (subsetCmpnds - R)
         # Now select only those cmpnds where residual is due to one element only (X_n)
         subsetCmpnds = subsetCmpnds[(cmpnds_no_R!=0).sum(axis=1)==1]
         curr_years = curr_years[(cmpnds_no_R!=0).sum(axis=1)==1]
+        curr_subsID = curr_subsID[(cmpnds_no_R!=0).sum(axis=1)==1]
 
         if subsetCmpnds.shape[0] > 1:
 
             curr_list = list(map(lambda x: elemDict[x]  , (subsetCmpnds - R).nonzero()[1] ))
-            #np.save(f'TPR1/R{j}.npy', getTable(curr_list,curr_years)) 
-            Table_list.append(getTable(curr_list,curr_years)) 
+            Table_list.append(getTable(curr_list,curr_years,curr_subsID,useID=useID)) 
             Comm_list.append(curr_list)
             R_list.append(R_)
             j+=1
 
-
     print(len(R_list))
     print("Saving...")
-    np.save(f'../Data/R_Tables_P{rank}_new.npy',np.array(Table_list))
-    np.save(f'../Data/R_Vector_P{rank}_new.npy',np.array(R_list))
+    np.save(f'../Data/TablesID_P{rank}.npy',np.array(Table_list))
+    np.save(f'../Data/RVector_P{rank}.npy',np.array(R_list))
+
+
+    ### Make a function here that produces a new array exchanging ID for year, just a mapping
+    if useID:
+        print("\n\tProducing array filled with years from ID array...")
+        
+        yearArray = np.array(Table_list)
+
+        # Mapping going from ID to year
+        mapping = dict(zip(list(subsID),list(years)))
+        mapping[-1] = -1
+        # Apply mapping 
+        yearArray = np.vectorize(mapping.__getitem__)(yearArray)
+        np.save(f'../Data/TablesYears_P{rank}.npy',np.array(Table_list))
+            
     return Comm_list,R_list  #This list contains lists (one for each R) of elements X such that R-X exist in dataset.
 
 
