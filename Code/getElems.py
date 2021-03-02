@@ -15,10 +15,13 @@ def getElems(DataFile,NMax):
     else:          df = pd.read_csv(DataFile,header=None,sep=sep,nrows=NMax,names=col_names)  #Load data
 
     df['formula'] = df['formula'].str.strip()   #Remove white spaces at begginning and end of string 
-    
-    text = ''.join(df['formula'])  #Join all compounds into one single string
-    
-    text2 = ''.join(re.findall(r'[A-z]',text))  #Remove all subindices (there must be a regex to this but who knows)
-    
-    elems = sorted(list(set(re.split(r"(?<!^)(?=[A-Z])",text2))))  #All unique elements found in dataset
+
+    elems = set([])
+
+    for cmpnd in df['formula']:
+        txt = ''.join(re.findall(r'[A-z]',cmpnd))   #Remove all subindices (there must be a regex to this but who knows)
+        elems = elems.union(  set(re.split(r"(?<!^)(?=[A-Z])",txt))  )  # Add elements of this set to the set of known elements
+
+    elems = sorted(list(elems)) # Convert to list and sort
+
     return elems
