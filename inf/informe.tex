@@ -17,6 +17,10 @@
 \usepackage{enumitem} % Customized lists
 \setlist[itemize]{noitemsep} % Make itemize lists more compact
 
+\usepackage{color}
+\newcommand{\red}[1]{\textcolor{red}{#1}} 
+\newcommand{\gr}[1]{{\color{red}#1}}
+
 \usepackage{abstract} % Allows abstract customization
 \renewcommand{\abstractnamefont}{\normalfont\bfseries} % Set the "Abstract" text to bold
 
@@ -38,6 +42,8 @@
 \noindent
 
 
+
+
 %% ######
 
 \end{abstract}
@@ -47,7 +53,7 @@
 
 \begin{document}
 
-\title{A computational approach to the periodic system.} 
+\title{A computational approach to the periodic system.}
 
 \author{%
 \textsc{Andr\'es Marulanda-Bran}\thanks{Corresponding author} \\[1ex]
@@ -61,16 +67,18 @@
 
 \section{Introduction}
 \label{sec:intro}
+\gr{The current title is too general.  But I think we can come back to this after getting results.  By that time we will know the clear message we want to pass with this document.}
+Mendeleev's periodic system is, and for the last 150 years has been, regarded as one of the most important discoveries/inventions\gr{I know you want to cover both things, but discoveries and inventions are different.  I would prefer to avoid entering in this discussion.  Therefore, I would sayt that the periodic system is an icon of chemistry or something similar.} in the history of chemistry and in general the natural sciences. It was conceived\gr{I woudl say formulated} after nearly one century of substantial efforts from the chemical community, remarkably from D\"obereiner, Meyer and Mendeleev himself\gr{This is also a difficult territory, which in history of science may be taken as whiggish history.  As written, it sounds like the chemical community was after the system, something like the idea of a system predates the system found by our 19th century chemist fellows.  What I have shown in several publications is that the system is the natural product of an expanding chemical space.  And if we go to the details of such an expansion, we see that it is expanding not only because of chemical reasons, but also because of social reasons too.}, the last of whom being the one that discovered and first used the periodic system as a predictive tool during the second half of the 18th century.\gr{Here you are entering in another difficult territory, which I think it is not the central part of your work.  You are here talking about the priority dispute between Meyer and Mendeleev.
 
-Mendeleev's periodic system is, and for the last 150 years has been, regarded as one of the most important discoveries/inventions in the history of chemistry and in general the natural sciences. It was conceived after nearly one century of substantial efforts from the chemical community, remarkably from D\"obereiner, Meyer and Mendeleev himself, the last of whom being the one that discovered and first used the periodic system as a predictive tool during the second half of the 18th century.
+So, in short, the first paragraph should go directly to relate the periodic system with the chemical space.}
 
-The periodic system (PS) was devised as a mean to systematize the generality of the chemical information of the time, which mainly consisted of chemical compositions of substances and their properties. To this time a few things were known about the elements and the way they gave rise to all the substances, the most relevant being that they can be sorted by weight, and that some of these show particular similarities such as the kinds of compounds they produce, and some chemical and physical properties of the substances they are present in. This allowed scientists to group some of the elements in small groups based on their similarity, giving rise to the question of whether the large set of known elements could be represented within a single system allowing to express and generalize this knowledge.
+The periodic system (PS) was devised as a mean to systematize\gr{sounds weird that he system systematises} the generality of the chemical information of the time, which mainly consisted of chemical compositions of substances and their properties\gr{chemical information included also reactions and other things.}. To this time a few things were known about the elements and the way they gave rise to all the substances\gr{One could also thing the other way rounds, i.e. that compounds gave rise to elements.  If you see our material world, we are surrounded by compounds much more than by elements.}, the most relevant being that they can be sorted by weight, and that some of these show particular similarities such as the kinds of compounds they produce, and some chemical and physical properties of the substances they are present in. This allowed scientists to group some of the elements in small groups based on their similarity, giving rise to the question of whether the large set of known elements could be represented within a single system allowing to express and generalize this knowledge.\gr{Again, this sounds as something they were looking for.  That was true for Mendeleev, but not for Meyer, for instance.}
 
-The main idea is to arrange the elements in a two-dimensional array, where the horizontal dimension expresses an order relationship, meaning an element is heavier than any element to its left, and strictly lighter than any element to its right (on the same row). Its vertical dimension expresses similarity in the sense that if two elements lie within the same column, they are -ought to be- chemically similar. Mendeleev's concept of similarity relies on the basis of the likeness of the chemical formulas the elements usually take part on, a concept very closely related to that of valence. One important note came with the first report of the PS, and is that not only vertical similarities occur throughout the table, such as for instance between K-Rb-Cs; but also horizontal ones, such as Pt-Ir-Os. It is important to note that this was a purely empirical approach and it depended on the known substances and elements of the time and, even further, depended on the substances a scientist knew at the time or even $\textit{decided}$ to use for her/his analysis. 
+The main idea is to arrange the elements in a two-dimensional array\gr{Depending on the final shape of this document, we could also include something about the mathematical dimension where the periodic system lives.}, where the horizontal dimension expresses an order relationship, meaning an element is heavier than any element to its left, and strictly lighter than any element to its right (on the same row).\gr{I would not distinguish horizontal from vertical and I would not say that the horizontal dimension is associated to order and that the vertical to similarity.  I would not say that, for you also have order in the vertical dimension.  That is why we write Li, Na, K, etc. and not Na, Li, K, etc.  Now, there are also similarities in the horizontal dimension.} Its vertical dimension expresses similarity in the sense that if two elements lie within the same column, they are -ought to be- chemically similar. \gr{see my comment before}Mendeleev's concept of similarity relies on the basis of the likeness of the chemical formulas the elements usually take part on, a concept very closely related to that of valence. One important note came with the first report of the PS, and is that not only vertical similarities occur throughout the table, such as for instance between K-Rb-Cs; but also horizontal ones, such as Pt-Ir-Os. It is important to note that this was a purely empirical approach and it depended on the known substances and elements of the time and, even further, depended on the substances a scientist knew at the time or even $\textit{decided}$ to use for her/his analysis. \gr{Excellent!}
 
-Mendeleev, however, didn't use the whole set of substances known at the time -the chemical space-; in fact, it has been reported that he used only very specific subsets of this chemical space, including hydrides, hydroxides, halogenides, oxydes, and some others. In comparison, it is now known that more than 11000 substances had been discovered to that time, suggesting that the known chemical space was very likely undersampled, only because of its unbearable extension. In addition to this, the last 150 years have brought with them a consistently exponential increase in the size of the chemical space, with some clearly distinguishable regimes characterized by the different kinds of substances produced. 
+Mendeleev, however, didn't use the whole set of substances known at the time -the chemical space-\gr{It is important to define this term as early as possible}; in fact, it has been reported that he used only very specific subsets of this chemical space, including hydrides, hydroxides, halogenides, oxydes, and some others. In comparison, it is now known that more than 11,000 substances had been discovered by that time, suggesting that the known chemical space was very likely undersampled, only because of its unbearable extension. In addition to this, the last 150 years have brought with them a consistently exponential increase in the size of the chemical space, with some clearly distinguishable regimes characterized by the different kinds of substances produced.\gr{Although this is right, the regimes are more associated to the annual variability of the number of new substances reported.}
 
-With this, the questions arise of whether the 1868's periodic system "fits" that time's data, and how it has been affected by the changes on the chemical space through time. All of this amounts to questioning the fitness of \textit{a} periodic system, on the basis of the foundations well established 150 years ago and the available chemical space. Going even further, having obtained a way of measuring the fitness of a PS, the next step is finding an optimal configuration for this fitness measure, leading possibly to a different and more expressive periodic system, yet following Mendeleev's data-driven approach but in a big data setting.
+With this, the questions arise of whether the 1868's periodic system "fits" that time's data, and how it has been affected by the changes on the chemical space through time.\gr{Here I am kind of puzzled.  I think we can judge how close was Meyer o Mendeleev, or any other of those fellows, to the periodic system of their times.  I mean, we assume that the actual periodic system was the one provided by the chemical space at a given time.  So we can contrast any periodic system reported at that time wit he actual one.  So, I think our question is about the best 2-dimensional representation of the system year after year and how stable has been such a representation.} All of this amounts to questioning the fitness of \textit{a} periodic system, on the basis of the foundations well established 150 years ago and the available chemical space. Going even further, having obtained a way of measuring the fitness of a PS, the next step is finding an optimal configuration for this fitness measure, leading possibly to a different and more expressive periodic system, yet following Mendeleev's data-driven approach but in a big data setting.
 
 To answer these, and other questions, this study makes use of the set of available substances discovered up to the year 2015, extracted from the Reaxys database. The article is structured as follows: Section II presents the general data-preprocessing procedure and the reasoning behind it. Section III, the calculations performed and an analysis and discussion of the results. Section IV presents an optimization setting for the PS with (probably, but not quite yet) possible candidate configurations and the analysis of these results.
 
@@ -79,12 +87,47 @@ To answer these, and other questions, this study makes use of the set of availab
 
 The compositional formulas of all the available compounds were extracted from the database in such a way that the data ends up being a collection of text strings such as for instance C6H12O. The main idea of our preprocessing is to convert this corpus of strings into a more meaningful and easy-to-analyze format, over which mathematical operations and statistical measures can be performed. For such a task, the underlying "grammar" behind each compound's composition is to be found, and for that matter the processing and analysis must be focused on interactions between compounds rather than the conversion of single compounds into machine-readable formats. Note that this approach differs from usual machine learning studies in that for these, the latter formats are constructed and given to an algorithm, having the structure of the data being looked for $\textit{after}$ the preprocessing; while the  approach presented here aims to directly extract structure from the data, allowing to make analyses and conclusions before any statistical learning is invoked.\\
 
-For that end, sets of elements were constructed in such a way that two elements X,Y appear in the same set only if there exist 2 compounds $A = R-X_n$ and $B = R-Y_n$, where if n atoms of X were replaced by n atoms of Y in compound A, the result would be compound B. A set was constructed for every possible (R,n) pair found in the original dataset, and only those sets containing at least 2 elements were considered. This processing naturally expresses a similarity relationship between all the elements within a single set. An example of the computation is as follows: assuming the compounds $\ce{KOH}$, $\ce{NaOH}$ and $\ce{H2O}$ exist, then by this treatment a set {K,Na,H} will be formed corresponding to the formula OH-X. For this particular example, R = OH and n = 1.
+For that end, sets of elements were constructed in such a way that two elements X,Y appear in the same set only if there exist 2\gr{typically one writhes the number ``in words'' when the number is lower than 10, otherwise one write the number as a number.} compounds $A = R-X_n$ and $B = R-Y_n$, where if n atoms of X were replaced by n atoms of Y in compound A, the result would be compound B. A set was constructed for every possible (R,n) pair found in the original dataset, and only those sets containing at least 2 elements were considered. This processing naturally expresses a similarity relationship between all the elements within a single set. An example of the computation is as follows: assuming the compounds $\ce{KOH}$, $\ce{NaOH}$ and $\ce{H2O}$ exist, then by this treatment a set {K,Na,H} will be formed corresponding to the formula OH-X. For this particular example, R = OH and n = 1.
 
-Note that this approach assumes that n is an integer, that is, there's a problem when treating non-stoichiometric compounds. In the given dataset there are actually examples of such non-stoichiometric compounds, and so this case needs to be properly handled. This was solved in the following way: if upon duplication of all subindices in the given compound this compound is stoichiometric, we work with the new, index-duplicated compound (this works for subindices n=x/2, x $\in \mathbb{N}$). Otherwise the compound is discarded. This first consideration should be studied in more detail as these compounds may correspond to, for instance, crystalline phases with non-stoichiometric amounts of water molecules.
+Note that this approach assumes that n is an integer, that is, there's a problem when treating non-stoichiometric compounds. In the given dataset there are actually examples of such non-stoichiometric compounds, and so this case needs to be properly handled.\gr{Now we need to say what we did.  I think the decision was getting rid of them.} This was solved in the following way: if upon duplication of all subindices in the given compound this compound is stoichiometric, we work with the new, index-duplicated compound (this works for subindices n=x/2, x $\in \mathbb{N}$). Otherwise the compound is discarded. This first consideration should be studied in more detail as these compounds may correspond to, for instance, crystalline phases with non-stoichiometric amounts of water molecules.
 It is worthwhile noting that this approximation ignores every structural factor and relies only on compositional data.
 
-For the purpose of visualization and analysis, such sets can then be conveniently represented in a 2-dimensional representation so as to include the information of some periodic system, that is, the relative positions of the elements in a given set, within the given PS. Examples of such a representation are shown in figure \ref{fig:fig1} where, for each element of a given set, its corresponding position in the given PS is pictured white. 
+For the purpose of visualization and analysis, such sets can then be conveniently represented in a 2-dimensional representation\gr{thinking in most abstract terms, those sets correspond to hyperedges of a hypergraph.  What I like of this abstraction is that we are ignoring any position of the elements on a give space.  Of course, this is not what we want, but it is worth thinking in this direction.} so as to include the information of some periodic system, that is, the relative positions of the elements in a given set, within the given PS. Examples of such a representation are shown in figure \ref{fig:fig1} where, for each element of a given set, its corresponding position in the given PS is pictured white. 
+
+\gr{Let us think a bit about the mathematics of this:
+In a chapter I wrote some years ago, that I will send by email, I wrote this:
+
+Every similarity study looks for a classification of a set X of elements. The
+question that arises is whether it is possible to know the maximum number of
+classifications that may result given the number of elements in $X$. In other
+words, how many classifications are possible? A first approach is counting all
+possible subsets of X (power set of $X$); this is given by $2n$, with $n$ the number of
+elements in $X$. Thus, for 118 elements, about $10^{35}$ subsets are possible. But in
+this counting there are subsets that may share elements, such as {Ga, Tc, Fr}
+and {Tc, Fr, Sb}. If one wants to avoid overlapping subsets and wants the
+union of subsets to build up the whole set, one is interested in counting the
+partitions16 of $X$; which is given by the Bell numbers that grow faster than $2n$.
+A further refinement of this counting results when one has a rough idea of the
+number of classes of a particular size one is interested in—for example, the number of classes of four elements ($k = 4$) in a set of 10 elements. This is
+given by the Stirling numbers of the second kind $S(n,k)$. If we
+assume that the number of classes of chemical elements is about the number
+of columns in the conventional medium-long form table plus
+the lanthanoids and actinoids, the possible number of classifications is $S(118,
+20) \simeq 10^{135}$, but if one is just interested in metals and non-metals, then $S(118,
+2) \simeq 10^{35}$ and if semimetals are included $S(118, 3) \simeq 10^{55}$. This gives an account
+of the colossal number of classifications of chemical elements that may result.
+
+But let us consider in earnest the partition possibilities.  Let us suppose that we a set of four objects, so $n=4$.  The number of partitions ($p(n)$) for this $n$ is $p(4)=5$.  They come from partitioning 4 into 1+1+1+1, 3+1, 2+2, 2+1+1, 4.  In general, $p(n)$ is given by an approximation that Hardy and Ramanujan found in 1918 (when $n$ approaches infinity):
+
+\[
+p(n)\sim \frac{1}{4n\sqrt{3}}e^{\pi\sqrt{\frac{2n}{3}}}
+\]
+
+Well, let us see how big is this number for the 60 elements known by 1869:  $p(60)=966,467$.  But OK, now we have compounds of about 100 elements, that is $p(100)=190,569,292$.  The question is whether those numbers are too dramatic for our computational capacity.
+
+If they are not, we could then take all these possible periodic tables as the basis of our optimisation.
+
+}
 
 Starting from 11356 substances known to the year 1868, a total of 6145 said tables were produced. The PT used is the \href{https://www.chemicool.com/longperiodictable.html}{standard long-version of the PT}.
 
