@@ -6,5 +6,5 @@
 
 for i in 50000 100000 300000 500000 1000000
 do
-    mpiexec -n $2 python3 MPIgetTabs_v2.py $1 $i >> ./logs/NProc"$2"_NMaxData_"$i".log
+    ./MPIgetTabs_v2.py $1 $2 $i >> ./logs/NProc"$2"_NMaxData_"$i".log
 done
