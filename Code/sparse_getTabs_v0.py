@@ -17,11 +17,11 @@ def main():
 
     DataFile = sys.argv[1]
     size = int(sys.argv[2])
-    if len(sys.argv)<4:     NMax = 0   # If no max file length is passed, default to all
+    if len(sys.argv)<4:     NMax = None   # If no max file length is passed, default to all
     else:                   NMax = int(sys.argv[3])
 
     # Preprocess compound data (make cmpnd vecs, years and ID) + produce element list.
-    cmpnds,years,subsID, FullElemntList,NMax  = makeVecs.allVecs(DataFile,NMax) 
+    cmpnds,years,subsID, FullElemntList  = makeVecs.allVecs(DataFile,NMax) 
 
 
     #Construct a dict to go from element symbol to an index
@@ -130,10 +130,48 @@ def getTable(listElem,years,subsID,useID=False):
     return table
 
 def getRepeated(Rs):
-    #global new_rs   # Making it global so it avoids pickling crashes
     new_rs , c = np.unique(Rs,axis=0, return_counts=True)
     new_rs = new_rs[c > 1]
     return new_rs
+
+
+def distribRs_forUnique(Rs,max_n):
+    # Create data chunks so that resulting chunks weigh at most 700 MB so that pickling isn't a problem when using Pool.
+ 
+    # Go through each of the created chunks and, if any is above 700 MB, further split it.
+
+    # Define recursive function to further split chunks
+    def split_chunk(chunk,i):
+        maxSplit = 10  # Maximum number of subsplits you want 
+
+        # Split using ith index:
+        split = []
+        for j in range(1,maxSplit,2):
+            if j < maxSplit-1:         tmp_splt = chunk[(chunk[:,i]==j) | (chunk[:,i]==j+1)]]  # Entries that are either j or j+1
+            else:                      tmp_splt = chunk[(chunk[:,i]>=j)]]   # Entries that are maxSplit-1 or larger
+            split.append(tmp)
+
+        # Now recursively further split here
+        newList = []
+        for l in split:
+            if l.nbytes/1e6 > 700.:
+                newList = newList + split_chunk(l,i+1)  # Further split l by next i
+            else:   newList.append(l)
+
+        return newList
+
+
+    # First split by n, the most natural choice.
+    dis_list = [Rs[Rs[:,-1]==i] for i in range(1,max_n)]
+
+    new_chunks = []
+    for l in dis_list:
+        if l.nbytes/1e6 > 700.:
+            new_chunks = new_chunks + split_chunk(l,0)
+        else:        new_chunks.append(l)
+    
+    return new_chunks
+
     
 def findRs(cmpnds):
     # Find all unique Rs
@@ -159,15 +197,10 @@ def findRs(cmpnds):
     # Split by n (R[-1])
 
     Rs = np.array(Rs)
-    max_n = 40               # Choose wisely, this may bias results a little (the bigger the better). Read next comment
+    max_n = 60               # Choose wisely, this may bias results a little (the bigger the better). Read next comment
     Rs = Rs[Rs[:,-1]<max_n]  # Cut Rs by the n. If n>max_n it's very (very) likely no two compounds share it
 
-    global Rs_distrib_list   # Making it global so it avoids pickling crashes
-    # Create data chunks
-    Rs_distrib_list = [Rs[Rs[:,-1]==i] for i in range(1,max_n)]
-    
-    for i in Rs_distrib_list:
-        print(i.shape)
+    Rs_distrib_list = distribRs_forUnique(Rs,max_n)
 
     with mp.Pool(processes=size) as pool:
         # starts the sub-processes without blocking

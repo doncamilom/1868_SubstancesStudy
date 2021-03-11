@@ -162,7 +162,8 @@ def distribRs_forUnique(Rs,max_n):
             if l.nbytes/1e6 > maxWeightArray:
                 print("\t** Found a very large chunk! (Inside recursive function)")
                 newList = newList + split_chunk(l,i+1)  # Further split l by next i
-            else:   newList.append(l)
+            elif l.shape[0]>1:      newList.append(l)  # Append only if chunk contains more than one entry
+        #    else:   newList.append(l)  # Append only if chunk contains more than one entry
 
         return newList
 
@@ -180,6 +181,7 @@ def distribRs_forUnique(Rs,max_n):
         else:        new_chunks.append(l)
     
     print("Ended recursion")
+
     return new_chunks
 
     
@@ -204,13 +206,12 @@ def findRs(cmpnds):
     # Get only the Rs that were produced more than once (meaning it's guaranteed at least 2 elems per R)
 
     # Split Rs so np.unique runs in parallel + faster as new subprocesses are much lighter
-    # Split by n (R[-1])
 
     Rs = np.array(Rs)
-    max_n = 60               # Choose wisely, this may bias results a little (the bigger the better). Read next comment
+    max_n = 160               # Choose wisely, this may bias results a little (the bigger the better). Read next comment
     Rs = Rs[Rs[:,-1]<max_n]  # Cut Rs by the n. If n>max_n it's very (very) likely no two compounds share it
 
-    Rs_distrib_list = distribRs_forUnique(Rs,max_n)
+    Rs_distrib_list = distribRs_forUnique(Rs,max_n)  # Create chunks of Rs for parallel processing
 
     print("\n\t Let's see how big our chunks are:")
     for r in Rs_distrib_list:

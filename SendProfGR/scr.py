@@ -1,9 +1,10 @@
 #! /usr/bin/env python3
 
 # Instructions: Run as
-# ./MPIgetTabs_v2.py <datafile.tsv> NP NC
-# With NP=Number of processors to run in parallel
+# ./MPIgetTabs_v2.py <datafile.tsv> NP MaxMemMP NC
+# NP=Number of processors to run in parallel
 # NC=Number of compunds to use from dataset
+# MaxMemMP=Maximum size of the data being transfered among subprocesses, in MB. It should be about 700
 
 import multiprocessing as mp
 from time import time
@@ -13,15 +14,17 @@ import TPs   #import periodic tables
 import sys
 
 def main():
-    global TP, TPshape, templateTable, NMax, size
+    global TP, TPshape, templateTable, NMax, size, maxWeightArray
+    global allCmpnds,years,subsID,elemDict
 
     DataFile = sys.argv[1]
     size = int(sys.argv[2])
-    if len(sys.argv)<4:     NMax = 0   # If no max file length is passed, default to all
-    else:                   NMax = int(sys.argv[3])
+    maxWeightArray = float(sys.argv[3])
+    if len(sys.argv)<5:     NMax = 0   # If no max file length is passed, default to all
+    else:                   NMax = int(sys.argv[4])
 
     # Preprocess compound data (make cmpnd vecs, years and ID) + produce element list.
-    cmpnds,years,subsID, FullElemntList,NMax  = makeVecs.allVecs(DataFile,NMax) 
+    allCmpnds,years,subsID, FullElemntList , NMax = makeVecs.allVecs(DataFile,NMax) 
 
 
     #Construct a dict to go from element symbol to an index
@@ -39,24 +42,26 @@ def main():
     indexTempTab = np.array(list(map(lambda x: TP[x], FullElemntList)))
     templateTable[indexTempTab[:,0],indexTempTab[:,1]] = -1
 
-    avgN = np.mean(np.sum(cmpnds,axis=1))
+    avgN = np.mean(np.sum(allCmpnds,axis=1))
     print(f"\n * Average num. of atoms per compound: {round(avgN,4)}")
-    print(f" * Max number of fragments R: {avgN*cmpnds.shape[0]:.0f}")
+    print(f" * Max number of fragments R: {avgN*allCmpnds.shape[0]:.0f}")
+    print(f"\n * {allCmpnds.shape[0]} unique compounds out of {NMax} requested...")
+    print(f"\t Which means we dropped {NMax-allCmpnds.shape[0]} compounds for being non-stoichiometric.\n")
     print()
 
     print("Finding unique Rs...")
 
     t0=time()
-    Rlist = findRs(cmpnds)
+    R_distrib = [0] + findRs(allCmpnds)
 
-    print(f"\n * {cmpnds.shape[0]} unique compounds out of {NMax} requested.\n")
-    print(" Total unique (usable) Rs: ", Rlist.shape[0])
+#    suma = 0
+#    for r in R_distrib:
+#        suma += r.shape[0]
+#    print(suma)
 
     print(f"\nStarting finding commonalities. Time so far: {time()-t0}")
 
-
-    R_distrib = distributeRs(Rlist,size)
-    CommList, Rlist = run_getCommonal_distrib([R_distrib,cmpnds,years,subsID,elemDict,True])
+    CommList, Rlist = run_getCommonal_distrib([R_distrib,allCmpnds,years,subsID,elemDict,True])
 
     print("Done!")
     print(f"Time: {time()-t0:.3f} s\t NProc: {size}\t NMax: {NMax} ")
@@ -80,15 +85,23 @@ def main():
 
 def run_getCommonal_distrib(args):
     # Run getCommonal in parallel for the distributed array
-    with mp.Pool(processes=size) as pool:
-        # starts the sub-processes without blocking
-        # pass the chunk to each worker process
-        R_results = [pool.apply_async(getCommonal,
-                                      args=(Rlist_i,rank,*args[1:],))
-                     for rank,Rlist_i in enumerate(args[0])]
 
-        # blocks until all results are fetched
-        R_results_get = [r.get() for r in R_results]   # A list [  [CommList0, Rlist0] , [CommList1, Rlist1]  ]
+#    with mp.Pool(proxesses=size) as pool:
+#        # starts the sub-processes without blocking
+#        # pass the chunk to each worker process
+#
+#        R_results = [pool.apply_async(getCommonal,
+#                                      args=(Rlist_i,rank,*args[1:],))
+#                     for rank,Rlist_i in enumerate(args[0])]
+#
+#        # blocks until all results are fetched
+#        R_results_get = [r.get() for r in R_results]   # A list [  [CommList0, Rlist0] , [CommList1, Rlist1]  ]
+
+    po = mp.Pool()
+    res = po.imap_unordered(getCommonal,[Rlist_i for Rlist_i in args[0]])
+    for i,j in res:
+        print(i)
+    #R_results_get = list(res)#.get()
 
     # Recover all results into a couple lists:   CommList,Rlist
     CommList, Rlist = [],[]
@@ -130,10 +143,55 @@ def getTable(listElem,years,subsID,useID=False):
     return table
 
 def getRepeated(Rs):
-    #global new_rs   # Making it global so it avoids pickling crashes
-    new_rs , c = np.unique(Rs,axis=0, return_counts=True)
-    new_rs = new_rs[c > 1]
-    return new_rs
+    Rs , c = np.unique(Rs,axis=0, return_counts=True)
+    Rs = Rs[c > 1]
+    if Rs.shape[0] > 0:    return Rs
+
+
+def distribRs_forUnique(Rs,max_n):
+    # Create data chunks so that resulting chunks weigh at most 700 MB so that pickling isn't a problem when using Pool.
+ 
+    # Go through each of the created chunks and, if any is above 700 MB, further split it.
+
+    # Define recursive function to further split chunks
+    def split_chunk(chunk,i):
+        maxSplit = 5  # Maximum number of subsplits you want 
+
+        # Split using ith index:
+        split = []
+        step = 2
+        for j in range(maxSplit):
+            lower,upper = j*step,(j+1)*step 
+            if j < maxSplit-1:         tmp_splt = chunk[(chunk[:,i]>=lower) & (chunk[:,i]<upper)]  # Entries that are either j or j+1
+            else:                      tmp_splt = chunk[chunk[:,i]>=lower]   # Entries that are maxSplit-1 or larger
+            split.append(tmp_splt)
+
+        # Now recursively further split here
+        newList = []
+        for l in split:
+            if l.nbytes/1e6 > maxWeightArray:
+                newList = newList + split_chunk(l,i+1)  # Further split l by next i
+            elif l.shape[0]>1:      newList.append(l)  # Append only if chunk contains more than one entry
+        #    else:   newList.append(l)  # Append only if chunk contains more than one entry
+
+        return newList
+
+
+    # First split by n, the most natural choice.
+    dis_list = [Rs[Rs[:,-1]==i] for i in range(1,max_n)]
+
+    print("\nStarting recursive splitting of Rs")
+
+    new_chunks = []
+    for l in dis_list:
+        if l.nbytes/1e6 > maxWeightArray:
+            new_chunks = new_chunks + split_chunk(l,0)
+        else:        new_chunks.append(l)
+    
+    print("Ended recursion")
+
+    return new_chunks
+
     
 def findRs(cmpnds):
     # Find all unique Rs
@@ -156,18 +214,16 @@ def findRs(cmpnds):
     # Get only the Rs that were produced more than once (meaning it's guaranteed at least 2 elems per R)
 
     # Split Rs so np.unique runs in parallel + faster as new subprocesses are much lighter
-    # Split by n (R[-1])
 
     Rs = np.array(Rs)
-    max_n = 40               # Choose wisely, this may bias results a little (the bigger the better). Read next comment
+    max_n = 160               # Choose wisely, this may bias results a little (the bigger the better). Read next comment
     Rs = Rs[Rs[:,-1]<max_n]  # Cut Rs by the n. If n>max_n it's very (very) likely no two compounds share it
 
-    global Rs_distrib_list   # Making it global so it avoids pickling crashes
-    # Create data chunks
-    Rs_distrib_list = [Rs[Rs[:,-1]==i] for i in range(1,max_n)]
-    
-    for i in Rs_distrib_list:
-        print(i.shape)
+    Rs_distrib_list = distribRs_forUnique(Rs,max_n)  # Create chunks of Rs for parallel processing
+
+    #print("\n\t Let's see how big our chunks are:")
+    #for r in Rs_distrib_list:
+    #    print(f"{r.shape}, {r.nbytes/1e6} MB")
 
     with mp.Pool(processes=size) as pool:
         # starts the sub-processes without blocking
@@ -178,18 +234,20 @@ def findRs(cmpnds):
                      for Rs_i in Rs_distrib_list]
 
         # blocks until all results are fetched
-        R_results_get = [r.get() for r in R_results]   # A list of arrays
+        R_results_get = [r.get() for r in R_results if r.get() is not None]   # A list of arrays
 
     # Merge filtered Rs by concatenating the resulting list
-    Rs = np.concatenate(R_results_get,axis=0)
+    Rs = R_results_get #np.concatenate(R_results_get,axis=0)
 
     return Rs
  
-def getCommonal(Rs,rank,cmpnds,years,subsID,elemDict,useID=False):
+def getCommonal(Rs,useID=False):
     """Get Commonalities. For each R(n) find all elements X such that compound R-Xn exists in dataset. 
     Build a list of these for each R(n)
     rank is the number of processors in which the operation is to be run"""
     
+    rank=1
+
     if rank==0:   print("\n Finding commonalities (finding sets for each (R,n) pair)...\n")
     Comm_list = []
     R_list = []
@@ -197,7 +255,7 @@ def getCommonal(Rs,rank,cmpnds,years,subsID,elemDict,useID=False):
     # Now generate the R representations on TP (TPR).
 
     j=0 #Counter for Rs with more than one appearence
-    sumCmpnds = cmpnds.sum(axis=1)
+    sumCmpnds = allCmpnds.sum(axis=1)
 
     for i,R_ in enumerate(Rs):
         if i%1000==0 and rank==0:       print( f"\t{i}th R evaluated..." )
@@ -208,11 +266,11 @@ def getCommonal(Rs,rank,cmpnds,years,subsID,elemDict,useID=False):
         
         # Encode a condition to search only within a subset of compounds fulfulling certain conditions based on R
         # 1. R is contained in compound
-        cond1 = ((cmpnds - R) >= 0).all(axis=1)        
+        cond1 = ((allCmpnds - R) >= 0).all(axis=1)        
         # 2. sum of atoms in cmpnd == sum of atoms in R_ (sum(R) + n)
-        cond2 = (cmpnds.sum(axis=1) == R_.sum())
+        cond2 = (allCmpnds.sum(axis=1) == R_.sum())
 
-        subsetCmpnds = cmpnds[cond1 & cond2]  # Select subset of cmpnds
+        subsetCmpnds = allCmpnds[cond1 & cond2]  # Select subset of cmpnds
         curr_years = years[cond1 & cond2]
         curr_subsID = subsID[cond1 & cond2]
 
