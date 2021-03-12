@@ -33,6 +33,7 @@ def main():
     # DEV ###  In real DS, isomers are cleaned already so there's no need to do np.unique on cmpnds
 
     cmpnds = sp.csr_matrix(np.unique(cmpnds.toarray(),axis=0))
+    years , subsID = years[:cmpnds.shape[0]] , subsID[:cmpnds.shape[0]] 
 
     #########
 
@@ -66,20 +67,28 @@ def main():
     sz = sum([i.shape[0] for i in Rs_uniq])
     print(f" * Found a total of {sz} non-unique Rs in {t:.3f} s")
 
-    ########### DEV
-    return Rs_uniq
+    print(f"\nStarting finding commonalities.")
 
-
-
-    print(f"\nStarting finding commonalities. Time so far: {time()-t0}")
-
-
-    R_distrib = distributeRs(Rlist,size)
-    CommList, Rlist = run_getCommonal_distrib([R_distrib,cmpnds,years,subsID,elemDict,True])
+    t0 = time()
+    Matches = list(chain(*[get_matches(rs,cmpnds,years,subsID,elemDict) for rs in Rs_uniq]))
 
     print("Done!")
     print(f"Time: {time()-t0:.3f} s\t NProc: {size}\t NMax: {NMax} ")
 
+
+
+    ##### Calculate stats
+    print(len(Matches))
+    lensR = [len(x[0]) for x in Matches]
+    print(sum(lensR)/len(Matches))
+        
+    ########### DEV
+    return Matches
+
+
+
+    R_distrib = distributeRs(Rlist,size)
+    CommList, Rlist = run_getCommonal_distrib([R_distrib,cmpnds,years,subsID,elemDict,True])
 
 
 
@@ -163,6 +172,56 @@ def unique_mp(Rs,size):
 
     return Rs_get
 
+def get_matches(Rs,cmpnds,years,subsID,elemDict):
+    """Get matches. For each R(n) find all elements X such that compound R-Xn exists in dataset. 
+    Build an element set for each R(n).
+    """
+    ns = Rs[:,-1].data
+    R  = Rs[:,:-1]
+    
+    sumCmpnds = cmpnds.sum(axis=1)
+    sumRaxis1 = np.array(    R.sum(axis=1).flatten() + ns    ).flatten()
+    
+    Matches = []
+    for i,n in enumerate(ns):
+        if i%1000==0:       print( f"\t{i}th R evaluated..." )
+            
+        r = R[i] #The actual R
+        
+        """Encode a condition to search only within a subset of compounds
+        fulfulling certain conditions based on R"""
+        # 1. R is contained in compound        
+        cond1 = ((cmpnds - r.toarray())>=0).all(axis=1)
+        # 2. sum of atoms in cmpnd == sum of atoms in R_ (sum(R) + n)
+        cond2 = (sumCmpnds == sumRaxis1[i])
+        
+        cond = np.array(cond1 & cond2).flatten()  # Combine conditions
+        subsetCmpnds = cmpnds[cond]  # Select subset of cmpnds
+        curr_years = years[cond]
+        curr_subsID = subsID[cond]
+        
+        cmpnds_no_R = (subsetCmpnds - r.toarray())
+        
+        # Now select only those cmpnds where residual is due to one element only (X_n)
+        # Only useful for n!=1
+        if n!=1:
+            cond = np.array((cmpnds_no_R!=0).sum(axis=1)==1).flatten()
+            subsetCmpnds = subsetCmpnds[cond]
+            curr_years = curr_years[cond]
+            curr_subsID = curr_subsID[cond]
+            
+        # At this point, subsetCmpnds contains all compounds that match with R(n).
+        elemIndex = (subsetCmpnds - r.toarray()).nonzero()[1]
+        curr_list = set(map(lambda x: elemDict[x]  , elemIndex))  # Map dict to above list of elems
+
+        Matches.append( [curr_list, curr_years, curr_subsID] )
+
+        ###########
+        ## Deal with this after you get all data created above
+        #Table_list.append(getTable(curr_list,curr_years,curr_subsID,useID=useID))      
+        ###########
+    return Matches      # [list_elems,list_years, list_ids] for each R(n)
+
 
 ###########################
 
@@ -170,51 +229,7 @@ def unique_mp(Rs,size):
 
 
 
-def distribRs_forUnique(Rs,max_n):
-    # Create data chunks so that resulting chunks weigh at most 700 MB so that pickling isn't a problem when using Pool.
- 
-    # Go through each of the created chunks and, if any is above 700 MB, further split it.
 
-    # Define recursive function to further split chunks
-    def split_chunk(chunk,i):
-        maxSplit = 5  # Maximum number of subsplits you want 
-
-        # Split using ith index:
-        split = []
-        step = 2
-        for j in range(maxSplit):
-            lower,upper = j*step,(j+1)*step 
-            if j < maxSplit-1:         tmp_splt = chunk[(chunk[:,i]>=lower) & (chunk[:,i]<upper)]  # Entries that are either j or j+1
-            else:                      tmp_splt = chunk[chunk[:,i]>=lower]   # Entries that are maxSplit-1 or larger
-            split.append(tmp_splt)
-
-        # Now recursively further split here
-        newList = []
-        for l in split:
-            if l.nbytes/1e6 > maxWeightArray:
-                print("\t** Found a very large chunk! (Inside recursive function)")
-                newList = newList + split_chunk(l,i+1)  # Further split l by next i
-            elif l.shape[0]>1:      newList.append(l)  # Append only if chunk contains more than one entry
-        #    else:   newList.append(l)  # Append only if chunk contains more than one entry
-
-        return newList
-
-
-    # First split by n, the most natural choice.
-    dis_list = [Rs[Rs[:,-1]==i] for i in range(1,max_n)]
-
-    print("\nStarting recursive splitting of Rs")
-
-    new_chunks = []
-    for l in dis_list:
-        if l.nbytes/1e6 > maxWeightArray:
-            print("\t** Found a very large chunk!")
-            new_chunks = new_chunks + split_chunk(l,0)
-        else:        new_chunks.append(l)
-    
-    print("Ended recursion")
-
-    return new_chunks
 
 
 def run_getCommonal_distrib(args):
@@ -267,11 +282,6 @@ def getTable(listElem,years,subsID,useID=False):
         x,y = TP[elem]
         table[x,y] = dataArray[i]
     return table
-
-def getRepeated(Rs):
-    new_rs , c = np.unique(Rs,axis=0, return_counts=True)
-    new_rs = new_rs[c > 1]
-    return new_rs
 
 
 
@@ -342,6 +352,55 @@ def getCommonal(Rs,rank,cmpnds,years,subsID,elemDict,useID=False):
         np.save(f'./Data/TablesYears_NMax{NMax}_P{rank}.npy',np.array(yearArray,dtype=np.short))
             
     return Comm_list,R_list  #This list contains lists (one for each R) of elements X such that R-X exist in dataset.
+
+
+
+
+def distribRs_forUnique(Rs,max_n):
+    # Create data chunks so that resulting chunks weigh at most 700 MB so that pickling isn't a problem when using Pool.
+ 
+    # Go through each of the created chunks and, if any is above 700 MB, further split it.
+
+    # Define recursive function to further split chunks
+    def split_chunk(chunk,i):
+        maxSplit = 5  # Maximum number of subsplits you want 
+
+        # Split using ith index:
+        split = []
+        step = 2
+        for j in range(maxSplit):
+            lower,upper = j*step,(j+1)*step 
+            if j < maxSplit-1:         tmp_splt = chunk[(chunk[:,i]>=lower) & (chunk[:,i]<upper)]  # Entries that are either j or j+1
+            else:                      tmp_splt = chunk[chunk[:,i]>=lower]   # Entries that are maxSplit-1 or larger
+            split.append(tmp_splt)
+
+        # Now recursively further split here
+        newList = []
+        for l in split:
+            if l.nbytes/1e6 > maxWeightArray:
+                print("\t** Found a very large chunk! (Inside recursive function)")
+                newList = newList + split_chunk(l,i+1)  # Further split l by next i
+            elif l.shape[0]>1:      newList.append(l)  # Append only if chunk contains more than one entry
+        #    else:   newList.append(l)  # Append only if chunk contains more than one entry
+
+        return newList
+
+
+    # First split by n, the most natural choice.
+    dis_list = [Rs[Rs[:,-1]==i] for i in range(1,max_n)]
+
+    print("\nStarting recursive splitting of Rs")
+
+    new_chunks = []
+    for l in dis_list:
+        if l.nbytes/1e6 > maxWeightArray:
+            print("\t** Found a very large chunk!")
+            new_chunks = new_chunks + split_chunk(l,0)
+        else:        new_chunks.append(l)
+    
+    print("Ended recursion")
+
+    return new_chunks
 
 if __name__ == '__main__':
     t0 = time()
