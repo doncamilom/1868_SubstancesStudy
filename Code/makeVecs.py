@@ -48,9 +48,9 @@ def getVec(tx,elemList): #Tx = molecular formula, e.g. C4H2ClBr
         vec[elemList.index(elem)] += mul #Assign this index to the position of the element in elemList
 
     if np.all(vec == vec.astype(int)):     return vec
-    elif np.all(2*vec == (2*vec).astype(int)): 
-        #print(f" * Duplicating indices of *some substance*")#{tx}")
-        return 2*vec  #If some n==0.5 then an integer composition is *2.
+#    elif np.all(2*vec == (2*vec).astype(int)): 
+#        #print(f" * Duplicating indices of *some substance*")#{tx}")
+#        return 2*vec  #If some n==0.5 then an integer composition is *2.
 
     else:
         return 0*vec   #Problem can't be easily solved
@@ -63,12 +63,13 @@ def allVecs(DataFile,NMax):
     else:          df = pd.read_csv(DataFile,header=None,sep=sep,nrows=NMax,names=col_names)  #Load data
 
     df['formula'] = df['formula'].str.strip()   #Remove white spaces at begginning and end of string 
-    
+    NMax = df.shape[0]
+
     elemList = getElems(DataFile,NMax)     
     totalVecs = np.array(list(map(lambda x: getVec(x,elemList),df['formula'].values)),dtype=np.short)
     totalVecs,index = np.unique(totalVecs,axis=0,return_index=True)
     years = df['year'].values[index]    
     subsID = df['ID'].values[index]    
 
-    return totalVecs,years,subsID, elemList
+    return totalVecs,years,subsID, elemList, NMax
 

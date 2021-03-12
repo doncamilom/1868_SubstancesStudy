@@ -63,6 +63,7 @@ def allVecs_sparse(DataFile,NMax=None):
     colXdata = list(map(lambda x: getVec_sparse(x,elemList) , df['formula'].values))
     index = [i for i, l in enumerate(colXdata) if l is not None]
     colXdata = [l for l in colXdata if l is not None]
+    # DB is assumed to be already cleaned for repeated entries. That is, we already got rid of isomers.
     
     # See docs for scipy.sparse.csr_matrix to understand the syntaxis
     indptr = np.cumsum([0]+list(map(lambda x: len(x[0]) , colXdata)))
@@ -75,7 +76,5 @@ def allVecs_sparse(DataFile,NMax=None):
        
     years = df['year'].values[index]
     subsID = df['ID'].values[index]
-    
-    del indptr, indices, data, df, index, colXdata
 
     return cmpnds,years,subsID, elemList, NMax

@@ -1,28 +1,40 @@
 #! /usr/bin/env python3
 
 # Instructions: Run as
-# ./MPIgetTabs_v2.py <datafile.tsv> NP NC
-# With NP=Number of processors to run in parallel
+# ./MPIgetTabs_v2.py <datafile.tsv> NP MaxMemMP NC
+# NP=Number of processors to run in parallel
 # NC=Number of compunds to use from dataset
+# MaxMemMP=Maximum size of the data being transfered among subprocesses, in MB. It should be about 700
 
 import multiprocessing as mp
+from scipy import sparse as sp
 from time import time
+from itertools import chain
 import numpy as np
-import makeVecs
+from makeVecs_sparse import allVecs_sparse
 import TPs   #import periodic tables
 import sys
 
 def main():
-    global TP, TPshape, templateTable, NMax, size
+    global TP, TPshape, templateTable, NMax, size, maxWeightArray
 
     DataFile = sys.argv[1]
     size = int(sys.argv[2])
-    if len(sys.argv)<4:     NMax = None   # If no max file length is passed, default to all
-    else:                   NMax = int(sys.argv[3])
+    maxWeightArray = float(sys.argv[3])
+    if len(sys.argv)<5:     NMax = None   # If no max file length is passed, default to all
+    else:                   NMax = int(sys.argv[4])
 
     # Preprocess compound data (make cmpnd vecs, years and ID) + produce element list.
-    cmpnds,years,subsID, FullElemntList  = makeVecs.allVecs(DataFile,NMax) 
+    cmpnds,years,subsID, FullElemntList , NMax = allVecs_sparse(DataFile,NMax) 
 
+    #########
+    # DEV ###
+
+    print(cmpnds.shape)
+    print(np.unique(cmpnds.toarray(),axis=0).shape)
+    cmpnds = sp.csr_matrix(np.unique(cmpnds.toarray(),axis=0))
+
+    #########
 
     #Construct a dict to go from element symbol to an index
     elemDict = {}
@@ -32,12 +44,6 @@ def main():
     #### Load periodic table schemes for building representation
     TP = TPs.TP
     TPshape = getTPShape()
-    
-    #### Make a template table so this doesn't have to be computed over and over
-    templateTable = -np.ones(TPshape,dtype=np.intc)
-        # Map -1 for every element that is in DS 
-    indexTempTab = np.array(list(map(lambda x: TP[x], FullElemntList)))
-    templateTable[indexTempTab[:,0],indexTempTab[:,1]] = -1
 
     avgN = np.mean(np.sum(cmpnds,axis=1))
     print(f"\n * Average num. of atoms per compound: {round(avgN,4)}")
@@ -47,10 +53,17 @@ def main():
     print("Finding unique Rs...")
 
     t0=time()
-    Rlist = findRs(cmpnds)
+    R_sparse = findRs(cmpnds)  # Returns a scipy.sparse.csr_matrix containing all possible (R,n)s.
 
-    print(f"\n * {cmpnds.shape[0]} unique compounds out of {NMax} requested.\n")
-    print(" Total unique (usable) Rs: ", Rlist.shape[0])
+    print(f"\n * {cmpnds.shape[0]} unique compounds out of {NMax} requested...")
+    print(f"\t Which means we dropped {NMax-cmpnds.shape[0]} compounds for being non-stoichiometric.\n")
+    print(" Total unique (usable) Rs: ", R_sparse.shape[0])
+    print(time()-t0)
+
+    ########### DEV
+    return R_sparse
+
+
 
     print(f"\nStarting finding commonalities. Time so far: {time()-t0}")
 
@@ -76,6 +89,102 @@ def main():
     print("\tMax number of compounds per R (first 3 max) :",sorted(set(LenR))[-3:])
 
     # End of main program
+
+#######################
+# Auxiliary functions #
+#######################
+
+def findRs(cmpnds):
+    indices = cmpnds.indices
+    data = cmpnds.data
+    indptr = cmpnds.indptr
+    
+    sz_cols = cmpnds.shape[1] # Number of elements
+    
+    Rs = []  
+    cmpnd_num_Rs = []
+    
+    for c in range(indptr.shape[0]-1):
+        indx = indices[indptr[c]:indptr[c+1]]
+        sub_dat = data[indptr[c]:indptr[c+1]]
+        
+        for i in range(indx.shape[0]):
+            c_data = sub_dat.copy()
+            n = int(c_data[i])          
+            
+            for j in range(n):   #Loop through ith element's subindex
+                c_data[i] -= 1   #Remove one
+                n = j+1          #How many atoms of this element have been removed 
+
+                #Append compound data with a reduced entry (R-X n-1)
+                Rs.append(  np.append(c_data.copy(),n)  )
+
+        cmpnd_num_Rs.append((sub_dat.sum(),indx))
+   
+    # Construct sparse matrix
+    for_indics = list(chain(*[l[0]*[l[1]] for l in cmpnd_num_Rs]) )
+
+    indptr = np.cumsum([0]+list(map(lambda x: len(x)+1 , for_indics)))
+    indices = np.array(list(chain(*[list(l)+[sz_cols] for l in for_indics])))
+    data = np.array(list(chain(*[l for l in Rs])))
+
+    Rs = sp.csr_matrix((data, indices, indptr),
+                        shape=(len(Rs), sz_cols+1),
+                        dtype=np.short)
+
+    return Rs
+
+
+
+
+###########################
+
+
+def distribRs_forUnique(Rs,max_n):
+    # Create data chunks so that resulting chunks weigh at most 700 MB so that pickling isn't a problem when using Pool.
+ 
+    # Go through each of the created chunks and, if any is above 700 MB, further split it.
+
+    # Define recursive function to further split chunks
+    def split_chunk(chunk,i):
+        maxSplit = 5  # Maximum number of subsplits you want 
+
+        # Split using ith index:
+        split = []
+        step = 2
+        for j in range(maxSplit):
+            lower,upper = j*step,(j+1)*step 
+            if j < maxSplit-1:         tmp_splt = chunk[(chunk[:,i]>=lower) & (chunk[:,i]<upper)]  # Entries that are either j or j+1
+            else:                      tmp_splt = chunk[chunk[:,i]>=lower]   # Entries that are maxSplit-1 or larger
+            split.append(tmp_splt)
+
+        # Now recursively further split here
+        newList = []
+        for l in split:
+            if l.nbytes/1e6 > maxWeightArray:
+                print("\t** Found a very large chunk! (Inside recursive function)")
+                newList = newList + split_chunk(l,i+1)  # Further split l by next i
+            elif l.shape[0]>1:      newList.append(l)  # Append only if chunk contains more than one entry
+        #    else:   newList.append(l)  # Append only if chunk contains more than one entry
+
+        return newList
+
+
+    # First split by n, the most natural choice.
+    dis_list = [Rs[Rs[:,-1]==i] for i in range(1,max_n)]
+
+    print("\nStarting recursive splitting of Rs")
+
+    new_chunks = []
+    for l in dis_list:
+        if l.nbytes/1e6 > maxWeightArray:
+            print("\t** Found a very large chunk!")
+            new_chunks = new_chunks + split_chunk(l,0)
+        else:        new_chunks.append(l)
+    
+    print("Ended recursion")
+
+    return new_chunks
 
 
 def run_getCommonal_distrib(args):
@@ -135,88 +244,10 @@ def getRepeated(Rs):
     return new_rs
 
 
-def distribRs_forUnique(Rs,max_n):
-    # Create data chunks so that resulting chunks weigh at most 700 MB so that pickling isn't a problem when using Pool.
- 
-    # Go through each of the created chunks and, if any is above 700 MB, further split it.
 
-    # Define recursive function to further split chunks
-    def split_chunk(chunk,i):
-        maxSplit = 10  # Maximum number of subsplits you want 
-
-        # Split using ith index:
-        split = []
-        for j in range(1,maxSplit,2):
-            if j < maxSplit-1:         tmp_splt = chunk[(chunk[:,i]==j) | (chunk[:,i]==j+1)]]  # Entries that are either j or j+1
-            else:                      tmp_splt = chunk[(chunk[:,i]>=j)]]   # Entries that are maxSplit-1 or larger
-            split.append(tmp)
-
-        # Now recursively further split here
-        newList = []
-        for l in split:
-            if l.nbytes/1e6 > 700.:
-                newList = newList + split_chunk(l,i+1)  # Further split l by next i
-            else:   newList.append(l)
-
-        return newList
-
-
-    # First split by n, the most natural choice.
-    dis_list = [Rs[Rs[:,-1]==i] for i in range(1,max_n)]
-
-    new_chunks = []
-    for l in dis_list:
-        if l.nbytes/1e6 > 700.:
-            new_chunks = new_chunks + split_chunk(l,0)
-        else:        new_chunks.append(l)
-    
-    return new_chunks
 
     
-def findRs(cmpnds):
-    # Find all unique Rs
-    n = len(cmpnds[0])
-    Rs = []
-    
-    cShape = cmpnds.shape[1]
-    for c in cmpnds:
-        indx = np.nonzero(c)  #Get index of non-zero entries
-        for i in indx[0]:     #Loop through these
-            c_ = np.zeros(cShape+1,dtype=np.short)
-            c_[:-1] = c
-            n = int(c_[i])
-            for j in range(n):  #Loop through ith element's subindex
-                c_[i] -= 1      #Remove one
-                c_[-1] = j+1    #How many atoms of this element have been removed 
 
-                Rs.append(c_.copy())  #Append the compound with a reduced entry (R-Xn-1)
-
-    # Get only the Rs that were produced more than once (meaning it's guaranteed at least 2 elems per R)
-
-    # Split Rs so np.unique runs in parallel + faster as new subprocesses are much lighter
-    # Split by n (R[-1])
-
-    Rs = np.array(Rs)
-    max_n = 60               # Choose wisely, this may bias results a little (the bigger the better). Read next comment
-    Rs = Rs[Rs[:,-1]<max_n]  # Cut Rs by the n. If n>max_n it's very (very) likely no two compounds share it
-
-    Rs_distrib_list = distribRs_forUnique(Rs,max_n)
-
-    with mp.Pool(processes=size) as pool:
-        # starts the sub-processes without blocking
-        # pass the chunk to each worker process
-
-        R_results = [pool.apply_async(getRepeated,
-                                      args=(Rs_i,))
-                     for Rs_i in Rs_distrib_list]
-
-        # blocks until all results are fetched
-        R_results_get = [r.get() for r in R_results]   # A list of arrays
-
-    # Merge filtered Rs by concatenating the resulting list
-    Rs = np.concatenate(R_results_get,axis=0)
-
-    return Rs
  
 def getCommonal(Rs,rank,cmpnds,years,subsID,elemDict,useID=False):
     """Get Commonalities. For each R(n) find all elements X such that compound R-Xn exists in dataset. 

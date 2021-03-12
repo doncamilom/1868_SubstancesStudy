@@ -1,9 +1,10 @@
 #! /usr/bin/env python3
 
 # Instructions: Run as
-# ./MPIgetTabs_v2.py <datafile.tsv> NP NC
-# With NP=Number of processors to run in parallel
+# ./MPIgetTabs_v2.py <datafile.tsv> NP MaxMemMP NC
+# NP=Number of processors to run in parallel
 # NC=Number of compunds to use from dataset
+# MaxMemMP=Maximum size of the data being transfered among subprocesses, in MB. It should be about 700
 
 import multiprocessing as mp
 from time import time
@@ -13,16 +14,19 @@ import TPs   #import periodic tables
 import sys
 
 def main():
-    global TP, TPshape, templateTable, NMax, size
+    global TP, TPshape, templateTable, NMax, size, maxWeightArray
 
     DataFile = sys.argv[1]
     size = int(sys.argv[2])
-    if len(sys.argv)<4:     NMax = 0   # If no max file length is passed, default to all
-    else:                   NMax = int(sys.argv[3])
+    maxWeightArray = float(sys.argv[3])
+    if len(sys.argv)<5:     NMax = 0   # If no max file length is passed, default to all
+    else:                   NMax = int(sys.argv[4])
 
     # Preprocess compound data (make cmpnd vecs, years and ID) + produce element list.
-    cmpnds,years,subsID, FullElemntList  = makeVecs.allVecs(DataFile,NMax) 
+    cmpnds,years,subsID, FullElemntList , NMax = makeVecs.allVecs(DataFile,NMax) 
 
+    print(cmpnds.shape)
+    print(NMax)
 
     #Construct a dict to go from element symbol to an index
     elemDict = {}
@@ -46,10 +50,12 @@ def main():
 
     print("Finding unique Rs...")
 
+    return 0
     t0=time()
     Rlist = findRs(cmpnds)
 
-    print(f"\n * {cmpnds.shape[0]} unique compounds out of {NMax} requested.\n")
+    print(f"\n * {cmpnds.shape[0]} unique compounds out of {NMax} requested...")
+    print(f"\t Which means we dropped {NMax-cmpnds.shape[0]} compounds for being non-stoichiometric.\n")
     print(" Total unique (usable) Rs: ", Rlist.shape[0])
 
     print(f"\nStarting finding commonalities. Time so far: {time()-t0}")
@@ -142,21 +148,25 @@ def distribRs_forUnique(Rs,max_n):
 
     # Define recursive function to further split chunks
     def split_chunk(chunk,i):
-        maxSplit = 10  # Maximum number of subsplits you want 
+        maxSplit = 5  # Maximum number of subsplits you want 
 
         # Split using ith index:
         split = []
-        for j in range(1,maxSplit,2):
-            if j < maxSplit-1:         tmp_splt = chunk[(chunk[:,i]==j) | (chunk[:,i]==j+1)]]  # Entries that are either j or j+1
-            else:                      tmp_splt = chunk[(chunk[:,i]>=j)]]   # Entries that are maxSplit-1 or larger
-            split.append(tmp)
+        step = 2
+        for j in range(maxSplit):
+            lower,upper = j*step,(j+1)*step 
+            if j < maxSplit-1:         tmp_splt = chunk[(chunk[:,i]>=lower) & (chunk[:,i]<upper)]  # Entries that are either j or j+1
+            else:                      tmp_splt = chunk[chunk[:,i]>=lower]   # Entries that are maxSplit-1 or larger
+            split.append(tmp_splt)
 
         # Now recursively further split here
         newList = []
         for l in split:
-            if l.nbytes/1e6 > 700.:
+            if l.nbytes/1e6 > maxWeightArray:
+                print("\t** Found a very large chunk! (Inside recursive function)")
                 newList = newList + split_chunk(l,i+1)  # Further split l by next i
-            else:   newList.append(l)
+            elif l.shape[0]>1:      newList.append(l)  # Append only if chunk contains more than one entry
+        #    else:   newList.append(l)  # Append only if chunk contains more than one entry
 
         return newList
 
@@ -164,12 +174,17 @@ def distribRs_forUnique(Rs,max_n):
     # First split by n, the most natural choice.
     dis_list = [Rs[Rs[:,-1]==i] for i in range(1,max_n)]
 
+    print("\nStarting recursive splitting of Rs")
+
     new_chunks = []
     for l in dis_list:
-        if l.nbytes/1e6 > 700.:
+        if l.nbytes/1e6 > maxWeightArray:
+            print("\t** Found a very large chunk!")
             new_chunks = new_chunks + split_chunk(l,0)
         else:        new_chunks.append(l)
     
+    print("Ended recursion")
+
     return new_chunks
 
     
@@ -194,13 +209,16 @@ def findRs(cmpnds):
     # Get only the Rs that were produced more than once (meaning it's guaranteed at least 2 elems per R)
 
     # Split Rs so np.unique runs in parallel + faster as new subprocesses are much lighter
-    # Split by n (R[-1])
 
     Rs = np.array(Rs)
-    max_n = 60               # Choose wisely, this may bias results a little (the bigger the better). Read next comment
+    max_n = 160               # Choose wisely, this may bias results a little (the bigger the better). Read next comment
     Rs = Rs[Rs[:,-1]<max_n]  # Cut Rs by the n. If n>max_n it's very (very) likely no two compounds share it
 
-    Rs_distrib_list = distribRs_forUnique(Rs,max_n)
+    Rs_distrib_list = distribRs_forUnique(Rs,max_n)  # Create chunks of Rs for parallel processing
+
+    print("\n\t Let's see how big our chunks are:")
+    for r in Rs_distrib_list:
+        print(f"{r.shape}, {r.nbytes/1e6} MB")
 
     with mp.Pool(processes=size) as pool:
         # starts the sub-processes without blocking
