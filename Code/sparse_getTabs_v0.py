@@ -27,14 +27,16 @@ def main():
     # Preprocess compound data (make cmpnd vecs, years and ID) + produce element list.
     cmpnds,years,subsID, FullElemntList , NMax = allVecs_sparse(DataFile,NMax) 
 
-    #########
-    # DEV ###
 
-    print(cmpnds.shape)
-    print(np.unique(cmpnds.toarray(),axis=0).shape)
+
+    #########
+    # DEV ###  In real DS, isomers are cleaned already so there's no need to do np.unique on cmpnds
+
     cmpnds = sp.csr_matrix(np.unique(cmpnds.toarray(),axis=0))
 
     #########
+
+
 
     #Construct a dict to go from element symbol to an index
     elemDict = {}
@@ -48,20 +50,24 @@ def main():
     avgN = np.mean(np.sum(cmpnds,axis=1))
     print(f"\n * Average num. of atoms per compound: {round(avgN,4)}")
     print(f" * Max number of fragments R: {avgN*cmpnds.shape[0]:.0f}")
-    print()
-
-    print("Finding unique Rs...")
+    print(f"\n * {cmpnds.shape[0]} unique compounds out of {NMax} requested...")
+    print(f"\t Which means we dropped {NMax-cmpnds.shape[0]} compounds for being non-stoichiometric.\n")
 
     t0=time()
     R_sparse = findRs(cmpnds)  # Returns a scipy.sparse.csr_matrix containing all possible (R,n)s.
 
-    print(f"\n * {cmpnds.shape[0]} unique compounds out of {NMax} requested...")
-    print(f"\t Which means we dropped {NMax-cmpnds.shape[0]} compounds for being non-stoichiometric.\n")
-    print(" Total unique (usable) Rs: ", R_sparse.shape[0])
-    print(time()-t0)
+    print(f" * All possible Rs were produced in: {time()-t0:.3f} s")
+
+    t0 = time()
+    print("Finding unique Rs...")
+    Rs_uniq = unique_mp(R_sparse,size)
+    t = time()-t0
+
+    sz = sum([i.shape[0] for i in Rs_uniq])
+    print(f" * Found a total of {sz} non-unique Rs in {t:.3f} s")
 
     ########### DEV
-    return R_sparse
+    return Rs_uniq
 
 
 
@@ -134,10 +140,34 @@ def findRs(cmpnds):
 
     return Rs
 
+def validRs(Rs):
+    """Get all non-unique R-n vectors out of a chunk Rs."""
+    new_rs , c = np.unique(Rs.toarray(),axis=0, return_counts=True)
+    new_rs = new_rs[c > 1]
+    return sp.csr_matrix(new_rs,dtype=np.short)
 
+def unique_mp(Rs,size):
+    """Create data chunks for finding non-unique Rs in parallel.
+    Test how this does on full DS. If pickling errors, implement recursive spliting.
+    """
+    max_n = 4
+    # First split by n, the most natural choice.
+    dist_list = [Rs[(Rs[:,-1]==i).toarray()[:,-1] ]
+                  for i in range(1,max_n)]   + [Rs[(Rs[:,-1]>=max_n).toarray()[:,-1]]]
+
+    with mp.Pool(processes=size) as pool:
+        R_results = [pool.apply_async(validRs,args=(r,))
+                     for r in dist_list]        
+
+        Rs_get = [r.get() for r in R_results]
+
+    return Rs_get
 
 
 ###########################
+
+
+
 
 
 def distribRs_forUnique(Rs,max_n):
@@ -313,31 +343,9 @@ def getCommonal(Rs,rank,cmpnds,years,subsID,elemDict,useID=False):
             
     return Comm_list,R_list  #This list contains lists (one for each R) of elements X such that R-X exist in dataset.
 
-
-
-def plotExample(listElem,TPs=[],IncognElem='H'):
-    """ This code generates an example image of the representation we're looking for
-    Expects as inputs:
-        TP: A list of periodic tables
-        IncognElem: An element to ask for prediction. e.g. does R-(this element) exist?"""
-
-    import matplotlib.pyplot as plt
-    
-    if len(TPs)>1:
-        fig,ax = plt.subplots(len(TPs),1)
-        for i,TPi in enumerate(TPs):
-            arr = getTable(TPi,listElem,IncognElem)
-            ax[i].imshow(arr)
-            ax[i].axis('off')
-    else:
-        fig,ax = plt.subplots()
-        arr = getTable(TPs[0],listElem,IncognElem)
-        ax.imshow(arr)
-        ax.axis('off')
-    plt.show()
-
-
 if __name__ == '__main__':
+    t0 = time()
     main()
-
+    print(f"\n\nTotal runtime: {time()-t0:.3f} s")
+    
 
