@@ -25,8 +25,6 @@ def main():
     # Preprocess compound data (make cmpnd vecs, years and ID) + produce element list.
     cmpnds,years,subsID, FullElemntList , NMax = makeVecs.allVecs(DataFile,NMax) 
 
-    print(cmpnds.shape)
-    print(NMax)
 
     #Construct a dict to go from element symbol to an index
     elemDict = {}
@@ -50,7 +48,6 @@ def main():
 
     print("Finding unique Rs...")
 
-    return 0
     t0=time()
     Rlist = findRs(cmpnds)
 
