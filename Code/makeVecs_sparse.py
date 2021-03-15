@@ -44,7 +44,7 @@ def getVec_sparse(tx,elemList): #Tx = molecular formula, e.g. C4H2ClBr
     
     for i in data:
         if float(i)!=int(i):
-            return None  # Return empty lists or better None?
+            return [],[]  # Return empty lists or better None?
     return col,data
 
 
@@ -56,13 +56,18 @@ def allVecs_sparse(DataFile,NMax=None):
     NMax = df.shape[0]
 
     df['formula'] = df['formula'].str.strip()   #Remove white spaces at begginning and end of string 
+    years = df['year'].values
+    subsID = df['ID'].values
 
     elemList = getElems(DataFile,NMax)
     
     # List of lists [col,data]
     colXdata = list(map(lambda x: getVec_sparse(x,elemList) , df['formula'].values))
-    index = [i for i, l in enumerate(colXdata) if l is not None]
-    colXdata = [l for l in colXdata if l is not None]
+    #index = [i for i, l in enumerate(colXdata)]#  if l is not None]
+    colXdata = [l for l in colXdata]# if l is not None]
+
+    #years = df['year'].values[index]
+    #subsID = df['ID'].values[index]
     # DB is assumed to be already cleaned for repeated entries. That is, we already got rid of isomers.
     
     # See docs for scipy.sparse.csr_matrix to understand the syntaxis
@@ -73,8 +78,12 @@ def allVecs_sparse(DataFile,NMax=None):
     cmpnds = sp.csr_matrix((data, indices, indptr), 
                            shape=(len(colXdata), len(elemList)),
                            dtype=np.short)
-       
-    years = df['year'].values[index]
-    subsID = df['ID'].values[index]
 
-    return cmpnds,years,subsID, elemList, NMax
+    ## There may still be repeated formulas
+    cmpnds,index = np.unique(cmpnds.toarray(),axis=0, return_inverse=True)
+    cmpnds = sp.csr_matrix(cmpnds)
+
+    subsID = [subsID[index==i][np.argmin(years[index == i])] for i in range(max(index)+1)]
+    years = [min(years[index == i]) for i in range(max(index)+1)]
+
+    return cmpnds,np.array(years),np.array(subsID), elemList, NMax

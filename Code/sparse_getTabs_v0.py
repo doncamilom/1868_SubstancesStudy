@@ -12,6 +12,8 @@ from scipy import sparse as sp
 from time import time
 from itertools import chain
 from makeVecs_sparse import allVecs_sparse
+import pickle
+import bz2
 import sys
 
 def main():
@@ -26,17 +28,6 @@ def main():
     # Preprocess compound data (make cmpnd vecs, years and ID) + produce element list.
     cmpnds,years,subsID, FullElemntList , NMax = allVecs_sparse(DataFile,NMax) 
 
-
-
-    #########
-    # DEV ###  In real DS, isomers are cleaned already so there's no need to do np.unique on cmpnds
-    cmpnds = sp.csr_matrix(np.unique(cmpnds.toarray(),axis=0))
-    years , subsID = years[:cmpnds.shape[0]] , subsID[:cmpnds.shape[0]] 
-
-    #########
-
-
-
     #Construct a dict to go from element symbol to an index
     elemDict = {}
     for i,elem in enumerate(FullElemntList):
@@ -45,8 +36,8 @@ def main():
     avgN = np.mean(np.sum(cmpnds,axis=1))
     print(f"\n * Average num. of atoms per compound: {round(avgN,4)}")
     print(f" * Max number of fragments R: {avgN*cmpnds.shape[0]:.0f}")
-    print(f"\n * {cmpnds.shape[0]} unique compounds out of {NMax} requested...")
-    print(f"\t Which means we dropped {NMax-cmpnds.shape[0]} compounds for being non-stoichiometric.\n")
+    print(f"\n * {cmpnds.shape[0]} unique compounds out of {NMax} provided...")
+    print(f"\t Which means we dropped {NMax-cmpnds.shape[0]} compounds for being non-stoichiometric or being repeated (isomers).\n")
 
     t0=time()
     R_sparse = findRs(cmpnds)  # Returns a scipy.sparse.csr_matrix containing all possible (R,n)s.
@@ -54,14 +45,14 @@ def main():
     print(f" * All possible Rs were produced in: {time()-t0:.3f} s")
 
     t0 = time()
-    print("Finding unique Rs...")
+    print("Finding unique Rs...\n")
     Rs_list = unique_mp(R_sparse,size,maxLenArray)
 
     sz = sum([i.shape[0] for i in Rs_list])     # Calculate total amount of Rs.
     Rs_list = rejoin_chunks(Rs_list,sz)         # Rejoin some chunks
 
     t = time()-t0
-    print(f" * Found a total of {sz} non-unique Rs in {t:.3f} s")
+    print(f"\n * Found a total of {sz} non-unique Rs in {t:.3f} s")
     print(f"\nStarting finding commonalities.\n")
     t = time()
     
@@ -71,6 +62,7 @@ def main():
         R_get = [r.get() for r in R_results]
     
     Matches = list(chain(*R_get))
+    Rs = sp.vstack(Rs_list)
 
     print("\nDone!")
     print(f"Time: {time()-t0:.3f} s\t NProc: {size}\t NMax: {NMax} ")
@@ -82,7 +74,7 @@ def main():
     print(f"\tMean number of compounds per R: {meanLen}. Total R(n)s found: {len(Matches)}")  
     print(f"\tMax number of compounds per R (first 3 max) : {sorted(set(lensR))[-3:]}")
         
-    return Matches
+    return Matches,Rs
 
 
 #######################
@@ -251,7 +243,7 @@ def get_matches(Rs,cmpnds,years,subsID,elemDict):
             
         # At this point, subsetCmpnds contains all compounds that match with R(n).
         elemIndex = (subsetCmpnds - r.toarray()).nonzero()[1]
-        curr_list = set(map(lambda x: elemDict[x]  , elemIndex))  # Map dict to above list of elems
+        curr_list = list(map(lambda x: elemDict[x]  , elemIndex))  # Map dict to above list of elems
 
         Matches.append( [curr_list, curr_years, curr_subsID] )
 
@@ -264,7 +256,10 @@ def get_matches(Rs,cmpnds,years,subsID,elemDict):
 
 if __name__ == '__main__':
     t0 = time()
-    main()
+    Matches,Rs = main()
     print(f"\n\nTotal runtime: {time()-t0:.3f} s")
-    
 
+    sfile = bz2.BZ2File('./Data/AllMatches.bin', 'w')
+    pickle.dump(Matches, sfile)
+
+    sp.save_npz('./Data/AllRs.npz',Rs)
