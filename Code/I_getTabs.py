@@ -1,10 +1,9 @@
 #! /usr/bin/env python3
 
 # Instructions: Run as
-# ./I_getTabs.py <datafile.tsv> NP MaxNRowsMP NC
-# NP=Number of processors to run in parallel
-# NC=Number of compunds to use from dataset
+# ./I_getTabs.py <datafile.tsv> MaxNRowsMP NC
 # MaxNRowsMP=Maximum number of rows of the data being transfered among subprocesses. It should be about 1000000
+# NC=Number of compunds to use from dataset
 
 # This program gets all Rs found (dirty). 
 # Hopefully returns as well a list of these splitted in chunks
@@ -21,13 +20,12 @@ import sys
 import os
 
 def main():
-    global NMax, size, maxLenArray
+    global NMax, maxLenArray
 
     DataFile = sys.argv[1]
-    size = int(sys.argv[2])
-    maxLenArray = int(sys.argv[3])
-    if len(sys.argv)<5:     NMax = None   # If no max file length is passed, default to all
-    else:                   NMax = int(sys.argv[4])
+    maxLenArray = int(sys.argv[2])
+    if len(sys.argv)<4:     NMax = None   # If no max file length is passed, default to all
+    else:                   NMax = int(sys.argv[3])
 
     # Preprocess compound data (make cmpnd vecs, years and ID) + produce element list.
     cmpnds,years,subsID, FullElemntList , NMax = allVecs_sparse(DataFile,NMax) 

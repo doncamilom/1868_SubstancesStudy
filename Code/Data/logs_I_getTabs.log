@@ -4,9 +4,9 @@
  * 9361 unique compounds out of 9362 provided...
 	 Which means we dropped 1 compounds for being non-stoichiometric or being repeated (isomers).
 
- * All possible Rs were produced in: 3.077 s
+ * All possible Rs were produced in: 3.204 s
 Finding unique Rs...
 
-Rs successfully splited in 1398 chunks. Time: 3.376188039779663 s
+Rs successfully splited in 1398 chunks. Time: 3.509479284286499 s
 
-Total runtime: 7.004 s
+Total runtime: 7.278 s
