@@ -1,0 +1,12 @@
+
+ * Average num. of atoms per compound: 22.5857
+ * Max number of fragments R: 211425
+ * 9361 unique compounds out of 9362 provided...
+	 Which means we dropped 1 compounds for being non-stoichiometric or being repeated (isomers).
+
+ * All possible Rs were produced in: 3.077 s
+Finding unique Rs...
+
+Rs successfully splited in 1398 chunks. Time: 3.376188039779663 s
+
+Total runtime: 7.004 s
