@@ -1,7 +1,7 @@
 #! /usr/bin/env python3
 
 # Instructions: Run as
-# ./II_getTabs.py NP
+# ./III_getTabs.py NP
 # NP=Number of processors to run in parallel
 # This script continues the work of the second part, where all non-unique Rs were found.
 

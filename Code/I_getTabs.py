@@ -8,7 +8,6 @@
 # This program gets all Rs found (dirty). 
 # Hopefully returns as well a list of these splitted in chunks
 
-import multiprocessing as mp
 import numpy as np
 from scipy import sparse as sp
 from time import time
@@ -19,7 +18,7 @@ import bz2
 import sys
 import os
 
-def main():
+def main(t0):
     global NMax, maxLenArray
 
     DataFile = sys.argv[1]
@@ -27,8 +26,10 @@ def main():
     if len(sys.argv)<4:     NMax = None   # If no max file length is passed, default to all
     else:                   NMax = int(sys.argv[3])
 
+    writeLogs('\nStarting run: Getting all compound data')
     # Preprocess compound data (make cmpnd vecs, years and ID) + produce element list.
     cmpnds,years,subsID, FullElemntList , NMax = allVecs_sparse(DataFile,NMax) 
+    writeLogs(f'\nAll compounds loaded, saving... Total time: {time()-t0}')
 
     sp.save_npz('./Data/Cmpnds_sparse.npz',cmpnds)
     with bz2.BZ2File('./Data/year_ID_elems_nmax.bin', 'w') as f:
@@ -40,14 +41,14 @@ def main():
     writeLogs(f"\n * {cmpnds.shape[0]} unique compounds out of {NMax} provided...")
     writeLogs(f"\n\t Which means we dropped {NMax-cmpnds.shape[0]} compounds for being non-stoichiometric or being repeated (isomers).\n")
 
-    t0=time()
+    writeLogs(f"\n Starting finding all Rs. Total time: {time()-t0}")
+    
     R_sparse = findRs(cmpnds)  # Returns a scipy.sparse.csr_matrix containing all possible (R,n)s.
     sp.save_npz('./Data/AllRs_dirty.npz',R_sparse)
 
     writeLogs(f"\n * All possible Rs were produced in: {time()-t0:.3f} s")
 
-    t0 = time()
-    writeLogs("\nFinding unique Rs...\n")
+    writeLogs("\nFinding non-unique Rs...\n")
 
     Rs_list = split_chunk(R_sparse,0,maxLenArray)
 
@@ -140,5 +141,6 @@ if __name__ == '__main__':
     # Remove log file if it existed before this execution
     if 'logs_I_getTabs.log' in os.listdir('./Data/'):    os.remove('./Data/logs_I_getTabs.log')
     
-    main()
+    writeLogs(f"Entering program\n\n")
+    main(t0)
     writeLogs(f"\n\nTotal runtime: {time()-t0:.3f} s")

@@ -17,7 +17,7 @@ import sys
 import os
 
 def main():
-    global size
+    global size,last_chunk_processed
 
     size = int(sys.argv[1])
     if len(sys.argv)<3: last_chunk_processed = 0
@@ -44,7 +44,7 @@ def main():
 #######################
     
 def writeLogs(string):
-    with open('./Data/logs_II_getTabs.log','a') as f:
+    with open(f'./Data/logs_II_getTabs_{last_chunk_processed}_.log','a') as f:
         f.write(string)
 
 def validRs(Rs,ids,start_from_id=0):
@@ -59,7 +59,7 @@ def validRs(Rs,ids,start_from_id=0):
             writeLogs(f"\t{shap1}\t{new_rs.shape[0]}\n")
 
             ## Save as results are produced.
-            sp.save_npz(f"./Data/scr/CleanRs_{ids}.npz",new_rs)
+            sp.save_npz(f"./Data/scr/CleanRs_{ids}_.npz",new_rs)
             return new_rs
 
 def unique_mp(dist_list,size,t0,last_chunk_processed):
@@ -84,9 +84,6 @@ def unique_mp(dist_list,size,t0,last_chunk_processed):
 if __name__ == '__main__':
     t0 = time()
 
-    # Remove log file if it existed before this execution
-    if 'logs_II_getTabs.log' in os.listdir('./Data/'):    os.remove('./Data/logs_II_getTabs.log')
-    
     main()
 
     writeLogs(f"\n\nTotal runtime: {time()-t0:.3f} s")
