@@ -3,6 +3,7 @@
 # Concatenate all resulting files
 
 cat ./Data/strs_*_.txt > ./Data/AllRs_strs.txt
+rm ./Data/strs_*_.txt
 
 awk '
 BEGIN {}

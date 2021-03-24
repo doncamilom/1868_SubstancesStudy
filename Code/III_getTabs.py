@@ -15,11 +15,10 @@ import bz2
 import sys
 import os
 import glob
-
+import re
 
 def main():
     global size
-
     size = int(sys.argv[1])
 
     t0=time()
@@ -29,24 +28,22 @@ def main():
     with bz2.BZ2File('./Data/year_ID_elems_nmax.bin', 'r') as f:
         years,subsID, FullElemntList , NMax = pickle.load(f)
 
+    # Load clean Rs and build sparse matrix (do this in parallel, so actually get a list of Rs chunks)
+    Rs_list = load_Rs('./Data/AllRs_clean_strs.txt', FullElemntList)
+    with bz2.BZ2File('./Data/AllRs_clean_sparse.npz', 'w') as f:
+        pickle.dump(Rs_list,f)
+
+    writeLogs(f"\nRs loaded and saved as sparse matrix. Time: {time()-t0:.3f} s")
+
     #Construct a dict to go from element symbol to an index
     elemDict = {i:elem for i,elem in enumerate(FullElemntList)}
-
-    ###############
-    # From part II, we got a bunch of files named `` in Data/, which contain all Rs of interest
-    # So we have to load all of them.
-    ###############
-    file_list = glob.glob('Data/scr/CleanRs*.npz')
-    Rs_list = [sp.load_npz(f) for f in file_list]
 
     writeLogs(f"\n * Everything loaded in: {time()-t0:.3f} s")
 
     t0 = time()
     sz = sum([i.shape[0] for i in Rs_list])     # Calculate total amount of Rs.
-    Rs_list = rejoin_chunks(Rs_list,sz)         # Rejoin some chunks
 
-    t = time()-t0
-    writeLogs(f"\n * Found a total of {sz} non-unique Rs in {t:.3f} s")
+    writeLogs(f"\n * Found a total of {sz} non-unique Rs in {time()-t0:.3f} s")
     writeLogs(f"\nStarting finding matchings.\n")
     t = time()
     
@@ -78,35 +75,56 @@ def main():
 def writeLogs(string):
     with open('./Data/logs_III_getTabs.log','a') as f:
         f.write(string)
-         
-def rejoin_chunks(Rs_uniq,sz):
-    """ Rejoin some of the chunks produced.
-    Some are very small and it's inefficient to call one single process for such small chunk"""
-    final_chunk_sz = sz//size
+
+def get_sparse_vecs(tx, elemList):
+
+    Li = re.split(r"(?<!^)(?=[A-Z])",tx)  #Split as ['H2','O']
     
-    Rs_lists = []    
-    curr_pointer = 0
-    exhausted = False
-    for i in range(size):
-        if i+1<size:
-            curr_len = 0
-            curr_list = []
+    # Adds 1 if no subindex. Result is ['H2','O1']. 
+    # Right after, split chem symbol from subindex as [['H',2],['O',1]]
+    
+    li = [re.split(r"([A-z]+)(([0-9]*[.])?[0-9]+)",i)
+          if bool(re.match(r'[A-z]*([0-9]*[.])?[0-9]+',i))
+          else re.split(r"([A-z]+)(([0-9]*[.])?[0-9]+)",i+'1') for i in Li]  
+    
+    # Construct two lists: input for sparse matrix construction
+    col  = [elemList.index(i[1]) for i in li]  # Index of element i to put correspondent data
+    data = [int(i[2]) for i in li]           # Num. atoms of element i
+    return col,data
 
-            for j,l in enumerate(Rs_uniq[curr_pointer:]):
-                if curr_len < final_chunk_sz:
-                    curr_list.append(l)
-                    curr_len += l.shape[0]
-                    exhausted = True
-                else:
-                    curr_pointer += j
-                    exhausted = False
-                    break
-            Rs_lists.append(sp.vstack(curr_list))  # Make a new concatentated chunk of approx size of totalRs/size 
-            if exhausted: break
 
-        elif not exhausted:    Rs_lists.append(sp.vstack(Rs_uniq[curr_pointer:]))  # Append a chunk of anything left
+def Rs_str_to_sparse(rs_str,elemList):
+    
+    # List of lists [col,data]
+    colXdata = list(map(lambda x: get_sparse_vecs(x,elemList) , rs_str))
 
-    return Rs_lists
+    # See docs for scipy.sparse.csr_matrix to understand the syntaxis
+    indptr = np.cumsum([0]+list(map(lambda x: len(x[0]) , colXdata)))
+    indices = np.array(list(chain(*[l[0] for l in colXdata])))
+    data = np.array(list(chain(*[l[1] for l in colXdata])))
+
+    return sp.csr_matrix((data, indices, indptr), 
+                         shape=(len(colXdata), len(elemList)),
+                         dtype=np.short)
+
+         
+def load_Rs(path,elemList):
+    
+    with open(path,'r') as f:
+        rs_strs = f.read().splitlines()
+
+    chunk_sz = len(rs_strs)//size
+    Rs_lists_strs = [rs_strs[chunk_sz*i:chunk_sz*(i+1)] if i<size-1 else rs_strs[chunk_sz*i:] for i in range(size)  ]
+    
+    # Process these strs in parallel to get sparse matrices
+    _elemList = elemList + ['X']
+    with mp.Pool(processes=size) as pool:
+        R_results = [pool.apply_async(Rs_str_to_sparse,args=(rs,_elemList,))
+                     for rs in Rs_lists_strs ]
+        R_get = [r.get() for r in R_results]
+    
+    return R_get
+
 
 def get_matches(Rs,cmpnds,years,subsID,elemDict):
     """Get matches. For each R(n) find all elements X such that compound R-Xn exists in dataset. 
