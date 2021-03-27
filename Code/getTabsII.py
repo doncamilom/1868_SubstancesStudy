@@ -1,9 +1,9 @@
 #! /usr/bin/env python3
 
 # Instructions: Run as
-# ./III_getTabs.py NP
+# ./getTabsII.py NP
 # NP=Number of processors to run in parallel
-# This script continues the work of the second part, where all non-unique Rs were found.
+# This script loads clean Rs and compounds, and finishes the job.
 
 import multiprocessing as mp
 import numpy as np
@@ -32,8 +32,6 @@ def main():
     Rs_list = load_Rs('./Data/AllRs_clean_strs.txt', FullElemntList)
     ## Save concat version of this
     sp.save_npz('./Data/AllRs_clean_sparse.npz',sp.vstack(Rs_list))
-    #with bz2.BZ2File(, 'w') as f:
-    #    pickle.dump(Rs_list,f)
 
     writeLogs(f"\nRs loaded and saved as sparse matrix. Time: {time()-t0:.3f} s")
 

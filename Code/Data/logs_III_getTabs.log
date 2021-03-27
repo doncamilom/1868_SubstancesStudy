@@ -1,6 +1,6 @@
 
-Rs loaded and saved as sparse matrix. Time: 0.162 s
- * Everything loaded in: 0.162 s
+Rs loaded and saved as sparse matrix. Time: 0.137 s
+ * Everything loaded in: 0.137 s
  * Found a total of 6114 non-unique Rs in 0.000 s
 Starting finding matchings.
 
@@ -13,8 +13,8 @@ Starting finding matchings.
 	1000/1528	 R(n)s evaluated...
 	1000/1530	 R(n)s evaluated...
 Done!
-Time: 3.518 s	 NProc: 4	 NMax: 9362 
+Time: 4.135 s	 NProc: 4	 NMax: 9362 
 	Mean number of compounds per R: 2.626431141642133. Total R(n)s found: 6114
 	Max number of compounds per R (first 3 max) : [32, 39, 58]
 
-Total runtime: 3.681 s
+Total runtime: 4.275 s

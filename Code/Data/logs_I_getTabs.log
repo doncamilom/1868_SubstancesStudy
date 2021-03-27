@@ -2,15 +2,15 @@ Entering program
 
 
 Starting run: Getting all compound data
-All compounds loaded, saving... Total time: 0.4990193843841553
+All compounds loaded, saving... Total time: 0.5398755073547363
  * Average num. of atoms per compound: 22.5857
  * Max number of fragments R: 211425
  * 9361 unique compounds out of 9362 provided...
 	 Which means we dropped 1 compounds for being non-stoichiometric or being repeated (isomers).
 
- Starting finding all Rs. Total time: 0.5478410720825195
- * All possible Rs were produced in: 3.668 s
+ Starting finding all Rs. Total time: 0.575798511505127
+ * All possible Rs were produced in: 3.934 s
 Writing Rs as strings into 4 files
-All Rs converted. Time = 5.897 s
+All Rs converted. Time = 6.260 s
 
-Total runtime: 5.899 s
+Total runtime: 6.261 s
