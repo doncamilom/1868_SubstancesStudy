@@ -86,29 +86,6 @@ def getFormula(R,elemList):
     return form + f'X{int(R.data[-1]) if R.data[-1]!=1 else ""}'
 
 # Do stats
-def meanDist(dt):
-    Vert = dt.copy()*0.
-    Horiz = dt.copy()*0.
-    Euclid = dt.copy()*0.
-    norm = dt.copy()*0.
-    
-    for exam in range(dt.shape[0]):    #For each table in DS
-        ys,xs = np.nonzero(dt[exam]==1)  #Determ. which entries correspond to a positive
-
-        for ex,ey in zip(xs,ys):        #Calc distance from each positive element in this table
-            for i in range(xs.shape[0]):   #Loop through all other elements
-
-                Vert[exam,ey,ex] += abs(ey - ys[i]) /6  #Calc vert distance
-                Horiz[exam,ey,ex] += abs(ex - xs[i])#/20  #Calc horiz distance
-                Euclid[exam,ey,ex] += np.sqrt(((ey - ys[i])/6)**2 + ((ex - xs[i])/20)**2)   #Calc euclid distance
-                
-                norm[exam,ey,ex] += 1
-         
-    with np.errstate(invalid='ignore'):
-        Vert /= norm
-        Horiz /= norm
-        Euclid /= norm
-    return Vert,Horiz,Euclid,norm
 
 def makeBoxPlot(dt,TP):
     """ Use redefined PT, so that it matches with dt dimensions"""
@@ -227,6 +204,23 @@ def animate_func(i,data,ax,cbar_ax):
     putLabelsInTables(~np.isnan(data[i]),ax,fs=18,pt=TP,pathEffects=True)
     ax.set_xticks([])
     ax.set_yticks([])
+
+def makeBoxPlot(dt,TP):
+    dataList = []
+    elems = []
+    # Extract distance data for every element
+    for el in TP.keys():
+        x,y=TP[el]
+        dt_i = dt[:,x,y]
+        # Only append if there is at least a non-nan entry
+        if np.isnan(dt_i).sum()<dt_i.shape[0]: 
+            dataList.append(dt_i) 
+            elems.append(el)
+            
+    dt = pd.DataFrame(np.array(dataList).T,columns=elems)
+    fig,ax = plt.subplots(figsize=(18,5))
+    sns.boxplot(data=dt,ax=ax)#,saturation=1,fliersize=4)
+    plt.show()
 
 if __name__ == '__main__':
     main()
