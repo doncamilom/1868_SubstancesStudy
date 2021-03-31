@@ -42,7 +42,7 @@ def main():
     ####### Done loading data
 
     # Generate data for animation
-    year_span = 100
+    year_span = 30
     dataGIF = np.zeros((year_span,7,32))
     for i in range(year_span):
         dataGIF[i] = getmat_heat(Matches,i*2+1700)
@@ -52,7 +52,7 @@ def main():
 
     grid_kws = {'width_ratios': (0.99, 0.01), 'wspace': 0.0}
     fig, (ax, cbar_ax) = plt.subplots(1, 2, gridspec_kw = grid_kws, figsize = (18, 4.5))
-    anim = FuncAnimation(fig = fig, func = animate_func, fargs = (dataGIF,ax,cbar_ax,) ,frames = 100, interval = 50, blit = False)
+    anim = FuncAnimation(fig = fig, func = animate_func, fargs = (dataGIF,ax,cbar_ax,) ,frames = year_span, interval = 50, blit = False)
 
     writer = PillowWriter(fps=2)  
     anim.save("./PT_evol.gif", writer=writer) 
