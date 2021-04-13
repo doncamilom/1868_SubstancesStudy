@@ -20,42 +20,51 @@ def main():
 
     ####### First load all the data that was produced during preprocessing.
     #######
-    dataPath = "./Data/"
+    dataPath = "../Code/OnlyStrs/Data/"
+#    dataPath = "./Data/"
 
-    # Load AllMatches.bin
-    Match_file = bz2.BZ2File(dataPath+'AllMatches.bin', 'r')
+    # Load matches_pickle.bin
+    Match_file = bz2.BZ2File(dataPath+'matches_pickle.bin', 'r')
     Matches = pickle.load(Match_file)
 
-    # Load AllRs.npz
-    Rs = sp.load_npz(dataPath+'AllRs_clean_sparse.npz')
+    # Load Rs_sparse.npz
+    Rs = sp.load_npz(dataPath+'Rs_sparse.npz')
 
     print(Rs.shape)
+
     # Load element list
     elemList = []
     with open(f"{dataPath}/ElementList.txt",'r') as f:
         for line in f:
             elemList.append(line.strip())
-            
-    print(elemList[:10])
 
     #######
     ####### Done loading data
 
-    # Generate data for animation
-    year_span = 100
-    dataGIF = np.zeros((year_span,7,32))
-    for i in range(year_span):
-        dataGIF[i] = getmat_heat(Matches,i*2+1700)
+    miny,maxy = getMinMax(Matches)
+    print(miny,maxy)
 
+    # Generate data for animation
+    year_span = maxy-miny+1
+    dataGIF = np.zeros((year_span,7,32))
+
+    for i,yr in enumerate(range(miny,maxy+1)):
+        dataGIF[i] = getmat_heat(Matches,yr)
+
+    np.save(dataPath+'history_HND.npy',dataGIF)
 
     
-
-    grid_kws = {'width_ratios': (0.99, 0.01), 'wspace': 0.0}
-    fig, (ax, cbar_ax) = plt.subplots(1, 2, gridspec_kw = grid_kws, figsize = (18, 4.5))
-    anim = FuncAnimation(fig = fig, func = animate_func, fargs = (dataGIF,ax,cbar_ax,) ,frames = 100, interval = 50, blit = False)
-
-    writer = PillowWriter(fps=2)  
-    anim.save("./PT_evol.gif", writer=writer) 
+#    grid_kws = {'width_ratios': (0.99, 0.01), 
+#                'height_ratios':(0.3,0.7),
+#                'wspace': 0.05,'hspace':0.23}
+#    fig, ax = plt.subplots(2, 2, gridspec_kw = grid_kws, figsize = (13, 4))
+#
+#    anim = FuncAnimation(fig = fig, func = animate_func, fargs = (dataGIF,ax,np.nanmin(dataGIF),np.nanmax(dataGIF),) ,
+#                            frames = 100, interval = 50, blit = False)
+#
+#    print("Saving animation...")
+#    writer = PillowWriter(fps=2)  
+#    anim.save("./PT_evol.gif", writer=writer) 
 
 
 
@@ -86,29 +95,6 @@ def getFormula(R,elemList):
     return form + f'X{int(R.data[-1]) if R.data[-1]!=1 else ""}'
 
 # Do stats
-def meanDist(dt):
-    Vert = dt.copy()*0.
-    Horiz = dt.copy()*0.
-    Euclid = dt.copy()*0.
-    norm = dt.copy()*0.
-    
-    for exam in range(dt.shape[0]):    #For each table in DS
-        ys,xs = np.nonzero(dt[exam]==1)  #Determ. which entries correspond to a positive
-
-        for ex,ey in zip(xs,ys):        #Calc distance from each positive element in this table
-            for i in range(xs.shape[0]):   #Loop through all other elements
-
-                Vert[exam,ey,ex] += abs(ey - ys[i]) /6  #Calc vert distance
-                Horiz[exam,ey,ex] += abs(ex - xs[i])#/20  #Calc horiz distance
-                Euclid[exam,ey,ex] += np.sqrt(((ey - ys[i])/6)**2 + ((ex - xs[i])/20)**2)   #Calc euclid distance
-                
-                norm[exam,ey,ex] += 1
-         
-    with np.errstate(invalid='ignore'):
-        Vert /= norm
-        Horiz /= norm
-        Euclid /= norm
-    return Vert,Horiz,Euclid,norm
 
 def makeBoxPlot(dt,TP):
     """ Use redefined PT, so that it matches with dt dimensions"""
@@ -127,30 +113,63 @@ def makeBoxPlot(dt,TP):
     sns.boxplot(data=dt,ax=ax)#,saturation=1,fliersize=4)
     plt.show()
     
-def makeTPPlot(dt,norm,title="Mean Euclidean Distance",save=False,elementLabels=False,fs=22,PT=TP):
-    with np.errstate(invalid='ignore'):
-        dt = np.nan_to_num(dt*norm).sum(axis=0)/norm.sum(axis=0)
-        
-    grid_kws = {'width_ratios': (0.99, 0.01), 'wspace': 0.0}
-    fig, (ax, cbar_ax) = plt.subplots(1, 2, gridspec_kw = grid_kws, figsize = (18, 4.5))
+
+def makeTPPlot(dt,title="Mean Euclidean Distance",save=False,elementLabels=False,fs=22,PT=TP,min_scale=0,max_scale=10,ax=0):
+
+    cmap = sns.color_palette("magma", as_cmap=True)
     
-    if title:     ax.set_title(title,fontsize=20)
-        
+    # Make boxplot
+    epc = np.sum(~np.isnan(dt),axis=0) # epc: number of elements per column
+    ys = np.nan_to_num(dt).sum(axis=0)/(epc+(epc==0))
+
+    # Plot barplot
+    df = (pd.Series(ys)
+          .reset_index()
+          .rename(columns={'index':'Element',
+                           0:'Mean'}))
+    
+    df['color'] = (df['Mean']/max_scale).apply(cmap)
+    ax[0,0].clear()
+    ax[0,0].bar(x=range(df.shape[0]) ,
+            height=df['Mean'],
+            color=df['color'],edgecolor = "k")
+    ax[0,0].set_ylim(0,max_scale)
+    
+    # Invisibilize ax[0,1]
+    ax[0,1].set_xticks([])
+    ax[0,1].set_yticks([])
+    ax[0,1].axis('off')
+    
+    # Labels for boxplot
+    labels = ['IA','IIA','   l- - -']+ ['- - -']*6 + ['-IIIB-'] +['- - -']*6 + \
+                ['- - -l  ','IVB','VB','VIB','VIIB','  l- -','-VIIIB-', '- -l  ','IB','IIB','IIIA',\
+                'IVA','VA','VIA','VIIA','VIIIA']
+    
+    ax[0,0].set_xticks(range(32))
+    ax[0,0].set_xticklabels(labels,fontsize=9,color='k')
+    ax[0,0].set_xlim(-0.5,31.5)
+    
+    if title:     ax[0,0].set_title(title,fontsize=20)
+    
     sns.heatmap(dt,
-        ax = ax,
+        ax = ax[1,0],
         cbar = True,
-        cbar_ax = cbar_ax,
-        vmin = np.nanmin(dt),  #max and min ignoring nans
-        vmax = np.nanmax(dt))
+        cbar_ax = ax[1,1],
+        vmin = min_scale,  #max and min ignoring nans
+        vmax = max_scale,
+        cmap = cmap)
 
-    putLabelsInTables(~np.isnan(dt),ax,fs=18,pt=TP,pathEffects=True)
-    ax.set_xticks([])
-    ax.set_yticks([])
+    putLabelsInTables(~np.isnan(dt),ax[1,0],fs=12,pt=TP,pathEffects=True)
+    ax[1,0].set_xticks([])
+    ax[1,0].set_yticks([])
 
-    plt.tight_layout()
-    ax.axis('off')
+    ax[0,0].spines['top'].set_visible(False)
+    ax[0,0].spines['right'].set_visible(False)
+    ax[0,0].spines['left'].set_visible(False)
+    
+    
     if save:    plt.savefig(save,dpi=300,bbox_inches='tight')
-    plt.show()
+    #plt.show()
 
 def putLabelsInTables(ta,ax,fs=11,pt=TP,pathEffects=False):
     """
@@ -172,10 +191,13 @@ def meanDist(Matches,max_year):
     """For more efficiency, compute only one of the distances instead of both.
     For that, function has to be changed."""
     # First, filter out data. We only care about cmpnds discovered before max_year
-    filt_mat = list(map(lambda x: [x[0][i] for i in range(len(x[0])) if x[1][i] <= max_year] 
-                       if (x[1]<=max_year).sum()>1 else None,   Matches))
-    filt_mat = [i for i in filt_mat if i is not None]
-    
+    if max_year>0:
+        filt_mat = list(map(lambda x: [x[0][i] for i in range(len(x[0])) if int(x[1][i]) <= max_year] 
+                           if (np.array(x[1],dtype=np.int)<=max_year).sum()>1 else None,   Matches))
+        filt_mat = [i for i in filt_mat if i is not None]
+    else:
+        filt_mat = [x[0] for x in Matches]
+
     def dists(match):
         """Get a mapping [elems] --> [distances]"""
         # /np.array([6,32]) is an optional normalization
@@ -211,22 +233,19 @@ def getmat_heat(Matches,i):
     vert,hori = dis
     with np.errstate(invalid='ignore'):
         dt = np.nan_to_num(hori*norm).sum(axis=0)/norm.sum(axis=0)
+
     return dt
 
-def animate_func(i,data,ax,cbar_ax):
-    ax.cla()
-    ax.set_title(f"Mean Horizontal Distance. Year = {i*2+1700}",fontsize=20)
+def animate_func(i,data,ax,min_scale,max_scale):
     
-    sns.heatmap(data[i, ...],
-            ax = ax,
-            cbar = True,
-            cbar_ax = cbar_ax,
-            vmin = np.nanmin(data),  #max and min ignoring nans
-            vmax = np.nanmax(data))
+    makeTPPlot(data[i],title=f"Mean Horizontal Distance {i*2+1700}",PT=TP,fs=18,max_scale=max_scale,min_scale=min_scale,ax=ax)
 
-    putLabelsInTables(~np.isnan(data[i]),ax,fs=18,pt=TP,pathEffects=True)
-    ax.set_xticks([])
-    ax.set_yticks([])
+def getMinMax(Matches):
+    years = list(chain(*[x[1] for x in Matches] ))
+    years = list(map(int,years))
+
+    return min(years),max(years)
+
 
 if __name__ == '__main__':
     main()
