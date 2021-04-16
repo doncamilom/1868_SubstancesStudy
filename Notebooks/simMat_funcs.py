@@ -5,7 +5,7 @@ from Analysis import *
 def main():
     global elemList
     
-    dataPath = "../OnlyStrsCode/Data/"
+    dataPath = "../Data/"
 
     # Load element list
     elemList = []
@@ -22,7 +22,7 @@ def getSimilarities_yr(Tyr,element,mask,year):
     """Get array of the similarities between elements and the given element
     based on 'replaceability' in chemical formulas, for the CS existent at a given year."""
     # Filter out by year
-    T = (Tyr < year)&(Tyr>0)
+    T = (Tyr <= year)&(Tyr>0)
     
     # Now start actually calculating simMats
     X,Y = TP[element] # Get coords of elem in PT
@@ -36,7 +36,7 @@ def getSimilarities_yr(Tyr,element,mask,year):
     data_arr = {e:simil[TP[e][0],TP[e][1]] for e in TP.keys() if e in elemList}
 
     data_arr = pd.Series(data_arr).rename(element)
-    return data_arr/np.nanmax(data_arr)
+    return data_arr
 
 def simMat(Tyr,mask,year):
     mat = pd.DataFrame(columns=[e for e in TP.keys() if e in elemList])
