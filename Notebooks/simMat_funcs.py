@@ -5,7 +5,7 @@ from Analysis import *
 def main():
     global elemList
     
-    dataPath = "../Data/"
+    dataPath = "./Data/"
 
     # Load element list
     elemList = []

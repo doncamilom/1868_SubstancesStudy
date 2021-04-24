@@ -26,21 +26,21 @@ def main():
     hnd = np.load(dataPath+'history_HND.npy')
     min_yr,max_yr = 1771,2017
     
-    #make_animation(init_i,year_span)
+    make_animation(1800-min_yr,100)
     #plot_count_elems_w_matches(min_yr,max_yr,hnd)
 
 
     ### Let's now see how mean HND evolves with time
 
     #print(hnd[17])
-    fig, ax = plt.subplots(figsize=(10,4))
+    #fig, ax = plt.subplots(figsize=(10,4))
 
-    mhnd = np.nanmean(hnd,axis=(1,2))
-    years = np.arange(min_yr,max_yr+1,1)
-    sns.lineplot(years,mhnd,color='k')
-    ax.grid()
-    plt.show()
-    print(mhnd)
+    #mhnd = np.nanmean(hnd,axis=(1,2))
+    #years = np.arange(min_yr,max_yr+1,1)
+    #sns.lineplot(years,mhnd,color='k')
+    #ax.grid()
+    #plt.show()
+    #print(mhnd)
     
 
     
@@ -279,7 +279,7 @@ def make_animation(init_i,year_span):
 
     print("Saving animation...")
     writer = PillowWriter(fps=3)  
-    anim.save(f"{dataPath}Results/PT_evol_real.gif", writer=writer) 
+    anim.save(f"{dataPath}Results/PT_evol_{min_yr+init_i}_{min_yr+year_span}.gif", writer=writer) 
 
 
 def plot_count_elems_w_matches(min_yr,max_yr,hnd):

@@ -11,9 +11,9 @@ import re
 import bz2
 import pickle
 
-from matplotlib.animation import FuncAnimation, PillowWriter
+#from matplotlib.animation import FuncAnimation, PillowWriter
 from scipy import sparse as sp
-import matplotlib.patheffects as PathEffects
+#import matplotlib.patheffects as PathEffects
 
 def main():
     global Matches

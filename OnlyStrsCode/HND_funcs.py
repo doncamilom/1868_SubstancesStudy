@@ -18,6 +18,7 @@ import matplotlib.patheffects as PathEffects
 def main():
     ### To generate array with HNDs yearly:
     #global Matches
+    global hnd,min_yr,max_yr,dataPath
     #calc_dists_yearly('./Data')
 
     ### Load the data and work with that: 
@@ -25,22 +26,25 @@ def main():
     dataPath = "../Data/"
     hnd = np.load(dataPath+'history_HND.npy')
     min_yr,max_yr = 1771,2017
+
+    init_i = 1800-min_yr
+    year_span = 100
     
-    #make_animation(init_i,year_span)
+    make_animation(init_i,year_span)
     #plot_count_elems_w_matches(min_yr,max_yr,hnd)
 
 
     ### Let's now see how mean HND evolves with time
 
     #print(hnd[17])
-    fig, ax = plt.subplots(figsize=(10,4))
+    #fig, ax = plt.subplots(figsize=(10,4))
 
-    mhnd = np.nanmean(hnd,axis=(1,2))
-    years = np.arange(min_yr,max_yr+1,1)
-    sns.lineplot(years,mhnd,color='k')
-    ax.grid()
-    plt.show()
-    print(mhnd)
+    #mhnd = np.nanmean(hnd,axis=(1,2))
+    #years = np.arange(min_yr,max_yr+1,1)
+    #sns.lineplot(years,mhnd,color='k')
+    #ax.grid()
+    #plt.show()
+    #print(mhnd)
     
 
     
@@ -215,8 +219,8 @@ def getmat_heat(Matches,i):
 
     return dt
 
-def animate_func(i,data,ax,min_scale,max_scale,min_yr,yr=False):
-    if not yr: yr = i + min_yr
+def animate_func(i,data,ax,min_scale,max_scale,min_yr,init_i=0,yr=False):
+    if not yr: yr = i + min_yr + init_i
 
     makeTPPlot(data[i],title=f"Mean Horizontal Distance. Year {yr}",PT=TP,fs=18,max_scale=max_scale,min_scale=min_scale,ax=ax)
 
@@ -274,12 +278,12 @@ def make_animation(init_i,year_span):
     min_scale = np.nanmin(hnd_sample)
     max_scale = np.nanmax(hnd_sample)
 
-    anim = FuncAnimation(fig = fig, func = animate_func, fargs = (hnd_sample,ax,min_scale,max_scale,min_yr,),
+    anim = FuncAnimation(fig = fig, func = animate_func, fargs = (hnd_sample,ax,min_scale,max_scale,min_yr,init_i),
                             frames = year_span, interval = 100, blit = False)
 
     print("Saving animation...")
     writer = PillowWriter(fps=3)  
-    anim.save(f"{dataPath}Results/PT_evol_real.gif", writer=writer) 
+    anim.save(f"{dataPath}Results/PT_evolReal{init_i+min_yr}_{year_span+min_yr+init_i}.gif", writer=writer) 
 
 
 def plot_count_elems_w_matches(min_yr,max_yr,hnd):
