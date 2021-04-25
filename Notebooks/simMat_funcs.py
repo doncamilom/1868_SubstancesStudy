@@ -6,6 +6,7 @@ def main():
     global elemList
     
     dataPath = "./Data/"
+#    dataPath = "../OnlyStrsCode/Data/"
 
     # Load element list
     elemList = []
@@ -17,13 +18,15 @@ def main():
     np.save(dataPath+'history_simMat.npy',sim_mat)
 
 
-
 def getSimilarities_yr(Tyr,element,mask,year):
     """Get array of the similarities between elements and the given element
     based on 'replaceability' in chemical formulas, for the CS existent at a given year."""
     # Filter out by year
     T = (Tyr <= year)&(Tyr>0)
     
+    # When filtering by year, we need only sum over those tables where at least 1 element is present!!!
+    T = T[T.sum(axis=(1,2))>1]
+
     # Now start actually calculating simMats
     X,Y = TP[element] # Get coords of elem in PT
     # similarity: number of times other elements appear in same table
@@ -43,7 +46,7 @@ def simMat(Tyr,mask,year):
     for e in TP.keys():
         if e in elemList: # Calculate in order, but subjected to what's in elemList
             mat[e] = getSimilarities_yr(Tyr,e,mask,year)
-    return mat
+    return mat  # Better return array, not dataframe
 
 def calc_simMats_yearly(dataPath = "../OnlyStrsCode/Data/"):
     """Calculate all simMats yearly.
@@ -61,7 +64,7 @@ def calc_simMats_yearly(dataPath = "../OnlyStrsCode/Data/"):
         getTable(TP, match[0], match[1], Tyr[i] )  # Match[1] to fill with years
 
 
-    # mask: make 0 all entries where no element exists.
+    # mask: 7x32 bool: If at x,y an element exists, mask[x,y]=1. Else, mask[x,y]=0
     mask = (Tyr>0).sum(axis=0)>0
 
     # Generate data yearly
