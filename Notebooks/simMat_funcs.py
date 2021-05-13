@@ -1,12 +1,13 @@
 #! /usr/bin/env python3
 
 from Analysis import *
+from time import time
 
 def main():
     global elemList
     
-    dataPath = "./Data/"
-#    dataPath = "../OnlyStrsCode/Data/"
+#    dataPath = "./Data/"
+    dataPath = "../OnlyStrsCode/Data/"
 
     # Load element list
     elemList = []
@@ -14,7 +15,10 @@ def main():
         for line in f:
             elemList.append(line.strip())
     print(f"Number of elements: {len(elemList)}")
+
+    t0 = time()
     sim_mat = calc_simMats_yearly(dataPath)
+    print(time()-t0)
     np.save(dataPath+'history_simMat.npy',sim_mat)
 
 
