@@ -3,6 +3,24 @@
 from Analysis import *
 from time import time
 
+def getElemList(dataPath):
+    elemList = []
+    with open(f"{dataPath}/ElementList.txt",'r') as f:
+        for line in f:
+            elemList.append(line.strip())
+    return elemList
+
+
+dataPath = '../Data/'
+elemList = getElemList(dataPath)
+
+elemList_AO = [] # Atomic weight ordered element list
+for e in TP.keys():
+    if e in elemList:
+        elemList_AO.append(e)
+
+        
+        
 def main():
     global elemList
     
@@ -10,16 +28,14 @@ def main():
     dataPath = "../OnlyStrsCode/Data/"
 
     # Load element list
-    elemList = []
-    with open(f"{dataPath}/ElementList.txt",'r') as f:
-        for line in f:
-            elemList.append(line.strip())
+    elemList = getElemList(dataPath)
     print(f"Number of elements: {len(elemList)}")
 
     t0 = time()
     sim_mat = calc_simMats_yearly(dataPath)
     print(time()-t0)
     np.save(dataPath+'history_simMat.npy',sim_mat)
+
 
 
 def getSimilarities_yr(Tyr,element,mask,year):
@@ -80,6 +96,141 @@ def calc_simMats_yearly(dataPath = "../OnlyStrsCode/Data/"):
         simMats_yr[i] = simMat(Tyr,mask,yr)
 
     return simMats_yr
+
+
+def plot_SimPTBar(simMat_yr,year,element,min_yr):
+    # Select simMat for this year
+    arr_yr = simMat_yr[year-min_yr].copy()
+    # Select a particular element
+    X,Y = TP[element]
+
+    # Generate a list of elements present at the given year
+    c,elems_yr = 0,[]  # counter, element list
+    for e in TP.keys():
+        if e in elemList:
+            # If all entries at this place are nan: they don't exist
+            if (~np.isnan(arr_yr[:,c].all())): 
+                c+=1
+                elems_yr.append(e)
+
+    # Select the array for the given element, for the given year
+    arr_thisElem = arr_yr[:,elems_yr.index(element)]
+    arr_thisElem[elems_yr.index(element)] = 0  # Remove this element's value, so it's white as well
+
+    img = np.zeros((7,32))
+    mask = img.copy()
+    # Create a mask to wipe out nan entries, so they appear as white
+    c = 0
+    for e in elems_yr:
+        x,y = TP[e]
+        mask[x,y] = 1
+        if ~np.isnan(arr_thisElem[c]):
+            img[x,y] = arr_thisElem[c]
+            c+=1
+
+    mask[X,Y] = 0
+    with np.errstate(invalid='ignore',divide='ignore'):
+        img /= mask
+
+    # Plot similarity PT for elem
+    fig = plt.figure(figsize=(18,7))
+    gs = fig.add_gridspec(2,2,  width_ratios=(99, 1), height_ratios=(6, 4),
+                  #    left=0, right=0.9, bottom=0.1, top=0.9,
+                      wspace=0, hspace=0.2)
+
+    ax = fig.add_subplot(gs[0, :])
+    ax1 = fig.add_subplot(gs[1, :])
+    cbar = fig.add_subplot(gs[0,1])
+
+    cmap = sns.color_palette("magma", as_cmap=True)
+    sns.heatmap(img,ax=ax,cbar_ax=cbar,
+                vmin=0,vmax=np.nanmax(img),
+                cmap=cmap)
+
+    ax.set_title(f'Replaceability of {element} in chemical formulas, Year = {year}', fontsize=20)
+
+    ax.axis('off')
+
+    ax1.spines['top'].set_visible(False)
+    ax1.spines['right'].set_visible(False)
+    #ax1.spines['bottom'].set_visible(False)
+    ax1.spines['left'].set_visible(False)
+
+    # Plot barplot
+    df = (pd.Series(arr_thisElem,index=elems_yr)
+          .reset_index()
+          .rename(columns={'index':'Element',
+                           0:'Occurences'}))
+    df = df[df.Element != element]
+
+    df['color'] = (df['Occurences']/df['Occurences'].max()).apply(cmap)
+    ax1.bar(x=range(df.shape[0]) ,
+            height=df['Occurences'],
+            color=df['color'],edgecolor = "k")
+
+    ax1.set_xticks(range(df.shape[0]))
+    ax1.set_xticklabels(df['Element'],fontsize=8)
+    ax1.set_xlim(-1,df.shape[0])
+
+    # Put the element's symbol at it's position
+    if len(element)==1:  tab = 0.2
+    else:                tab = 0.02
+    ax.text(Y+tab,X+0.7,element,fontsize=17)
+    
+def plot_simMat_yr(simMat_yr,year,min_yr,save=False,raw=True,palette='magma_r',ordering=False,scale=15):
+    """Plot similarity matrix for a given year
+    year: which year to plot
+    raw:  plot the raw normalized matrix (non-symmetric)
+        if raw=False: plot symmetrized version
+    ordering: lists position of elements ordered by atomic number. 
+        e.g. [40,21,10] means H is in position 40, He in 21 and Li is 10th.
+    """
+    S = simMat_yr[year - min_yr].copy()
+    
+    # First change order, then clean empty rows + cols
+    if type(ordering)!=bool: # Use new order
+        indices = ['_' for i in range(103)]
+        labels = indices.copy()
+        for i,idx in enumerate(ordering):
+            indices[idx] = i
+            labels[idx] = elemList_AO[i]
+        S = S[indices][:,indices]
+        
+    else: labels = elemList_AO
+    
+    # Remove non-existent elements (diag==0)
+    diag = np.diag(S)
+    isn = diag!=0
+    S = S[isn][:,isn]
+    n = isn.sum()
+    diag = diag[isn]
+    
+    if raw:    P = (S/diag).T        
+    else:
+        Sum0 = S.sum(axis=0).reshape(-1,1).repeat(n,axis=1)
+        Sum1 = S.sum(axis=1).reshape(1,-1).repeat(n,axis=0)
+        P = np.sqrt(S**2/(Sum0*Sum1))
+        
+    ## Replace diagonal with 0, so that important features are evident
+    inds = np.arange(0,n)
+    P[inds,inds] = 0
+    
+    
+    fig,ax = plt.subplots(figsize=(scale,scale))
+    ax.set_title(f"Similarity matrix between elements ordered by atomic number, Year = {year}",
+                 fontsize=20)
+    sns.heatmap(P,ax=ax,cbar=False,
+                cmap=sns.color_palette(palette, as_cmap=True))
+    
+    labl = np.array(labels)[isn]      
+    tick = [i+0.5 for i in range(len(labl))]
+    ax.set_xticks(tick)
+    ax.set_yticks(tick)
+    ax.set_xticklabels(labl,fontsize=8)
+    ax.set_yticklabels(labl,fontsize=8)
+    
+    if save: plt.savefig(save,dpi=400,bbox_inches='tight')
+
 
 
 if __name__ == '__main__':
