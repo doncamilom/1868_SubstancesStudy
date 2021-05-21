@@ -8,8 +8,8 @@ import sys
 import pickle
 
 global dataPath
-dataPath = '../Data/'
-#dataPath = "./Data/"
+#dataPath = '../Data/'
+dataPath = "./Data/"
 
 def main():
     global P, elemList
@@ -20,12 +20,12 @@ def main():
     simMat_yr = np.load(dataPath + 'history_simMat.npy')
     min_yr = 1771
 
-    popSize, NGens = 1000, 100
+    popSize, NGens = 2500, 300
 
     t0 = time()
 
     results_total = {}
-    for i in range(1800-min_yr+5, 40):# simMat_yr.shape[0]): # Do this for every year (starting 1800)
+    for i in range(1800-min_yr, simMat_yr.shape[0],2): # Do this for every year (starting 1800)
         print(f"Year: {i+min_yr}")
 
         S = simMat_yr[i].copy()
@@ -51,11 +51,15 @@ def main():
                 filled_genes = completeList(genToElem(pop.bestIndiv.gen,ref=elems_i))
             else: filled_genes = pop.bestIndiv.gen
 
+            print(pop.bestIndiv.cost)
             bestIndivs_yr.append(filled_genes)
+
+        print(f"\tTime:  {time()-t0}")
 
         results_total[i+min_yr]=bestIndivs_yr
     
     # Save results
+    os.makedirs('./Genetic/', exist_ok=True)
     filehandler = open(f'./Genetic/bestIndivs_yearly.gen', 'wb') 
     pickle.dump(results_total, filehandler)
  
@@ -236,7 +240,7 @@ class Population:
                 self.bestCost = self.bestIndiv.cost
                 
             if i%50==0:
-                print(f"Iter No. {i}, Mean = {meanc:.3f}, Min = {minc:.3f}, P{self.seed}")
+                print(f"** Iter No. {i}, Mean = {meanc:.3f}, Min = {minc:.3f}, P{self.seed}")
         return self
 
 # Utility to convert gen into element list
