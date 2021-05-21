@@ -1,6 +1,0 @@
-
-I've been checking some crossover operators, this is a list of the ones I've found more interesting for my application:
-    OX2: This sort of preserves order information from one parent into the other
-    POS: Forces to preserve the positions of elements in one of the parents, while filling other positions with the other parent.
-    VR: voting recombination, p-sexual op. Select a set of p parents, and each position is exactly copied into the offspring iff a number n<=p of parents have the same element in that position. Else, fill randomly.
- 
