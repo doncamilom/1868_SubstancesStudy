@@ -1,17 +1,26 @@
-Index:
+Index 
 
-    Files
-        sample.csv          |  dataset of known compounds up to 1868
-        ex1TPR.png          |  example of periodic table representation (image)
-        getTables.py        |  Script to find all unique Rs, and construct respective TPRs  
-        getElems.py         |  Script to obtain a list of all unique elements present in dataset
-        makeVecs.py         |  Script to convert compounds into vectors. Used in findR.py
-        TPs.py              |  Datafile. This is where periodic tables can be defined (as dictionaries)
-        scratch.py          |  File to store code produced but not longer used
-        MPIgetTabs.py       |  Parallelized implementation of getTables.py
+/Preprocess/
+    - TPs.py            Definition of sample Periodic Table
+    - format.pl         Transform csv data into new format for next processing
+    - getAllRs.awk      Make all possible rewrittings of formulas.
+    - nonUniqRs.awk     Find all similarity relationships.
+    - runAll.sh         Run the three scripts above in sequence.
+    - dataToPy.py       Convert above data into numpy readable format.
+    - Data/             Dir. Contains results of various steps of preprocessing.
+    - datasets/         Dir. Contains original (toy) datasets in various formats
+        - cleanDS.awk   Clean raw dataset from bad entries + fabricate test years.
 
+/CoreCalcs/             
+    - TPs.py            Definition of sample Periodic Table
+    - playgrnd.ipynb    Notebook for exploration of in-depth aspects of data.
+    - Similarity.ipynb  NB with analysis of similarity matrices. Everything reduces to this one. Organize and publish
+    - simMat.py         Calculate similarity matrices yearly. Also contains support modules for above NB. 
+    - HND.py            Supporting functions for plotting HND.
+    - genetic.py        Implementation of GA for opt of 1D PT.
+    - Genetic/          Contains results of optimization with GA
 
-    Directories
-        Data                |  Where to store all data I'm producing
-        inf                 |  Directory to hold files relevant to the main report (LaTeX, etc)
-        timeExperim         |  Contains files prepared for estimation of running time of code on whole DS
+/inf/                   All files regarding written report of activities and results.
+
+/Data/                  Contains the real results, ran at Leipzig.
+    - Results/          Contains plots obtained from results on all data.
