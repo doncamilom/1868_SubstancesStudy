@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns; sns.set() ; sns.set_style('white')
 import pandas as pd
 from itertools import chain
+from TPs import TP
 
 import re
 import bz2

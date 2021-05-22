@@ -8,8 +8,8 @@ import sys
 import pickle
 
 global dataPath
-#dataPath = '../Data/'
-dataPath = "./Data/"
+dataPath = '../Data/'
+#dataPath = "./Data/"
 
 def main():
     global P, elemList
@@ -40,7 +40,7 @@ def main():
         # Evolve all populations in parallel for the given year
         with mp.Pool(processes=size) as pool:
             results = [pool.apply_async(optPop,
-                                        args=(popSize,NGens,i,elems_i.shape[0]) )
+                                        args=(popSize,NGens,i,elems_i.shape[0],P) )
                        for i in range(size)]
             results_get = [r.get() for r in results]   
 
@@ -64,10 +64,10 @@ def main():
     pickle.dump(results_total, filehandler)
  
 
-def optPop(popSize,NGens,i,lenElems):
+def optPop(popSize,NGens,i,lenElems,Pi):
     T = 0.7#np.random.random()*0.35 + 0.35 # Random T between 0.35 and 0.7
     mutRate = 0.3#np.random.random()*0.2 + 0.2 # Random mutRate btwn 0.2 and 0.4
-    breed = Population(popSize,lenElems,seed=i).evolve(NGens,T=T,mutRate=mutRate)
+    breed = Population(popSize,lenElems,seed=i,P=Pi).evolve(NGens,T=T,mutRate=mutRate)
     for i in range(2):
         T = 0.7*T
         breed = breed.evolve(NGens,T=T,mutRate=mutRate)
@@ -113,11 +113,12 @@ def cost(P, order):
     return F
 
 class Individual:
-    def __init__(self,N,gen=False):
+    def __init__(self,N,gen=False,P=False):
         self.N = N
+        self.P = P
         if type(gen)!=bool:            self.gen = gen
         else:              self.gen = np.random.permutation(self.N)
-        self.cost = cost(P,self.gen)
+        self.cost = cost(self.P,self.gen)
 
     def PMX(self,parent):
         """Partially-mapped crossover (PMX)
@@ -154,7 +155,7 @@ class Individual:
             while offsp[1,i] in m0:
                 offsp[1,i] = map1[offsp[1,i]]
                 
-        return [Individual(self.N,gen=offsp[i]) for i in range(2)]
+        return [Individual(self.N,gen=offsp[i],P=self.P) for i in range(2)]
     
     def mutate(self):
         """Move a random slice of the genes to a random place"""
@@ -167,19 +168,20 @@ class Individual:
         move_to = np.random.randint(0,Left.shape[0])
         
         self.gen = np.concatenate([Left[:move_to],Slice,Left[move_to:]]) 
-        self.cost = cost(P,self.gen) # Update cost
+        self.cost = cost(self.P,self.gen) # Update cost
     
 class Population:
-    def __init__(self,size,N,NParents=2,gens = False,Indivs=False,bestIndiv=False,seed=0):
+    def __init__(self,size,N,NParents=2,gens = False,Indivs=False,bestIndiv=False,seed=0,P=False):
         self.size = size  # Number of individuals
         self.N = N        # Number of elements in dataset
         self.NParents = NParents # Number of parents for a single breed
         self.seed = seed
+        self.P = P
         
         np.random.seed(int(time()+seed))
         if not Indivs:
-            if gens:        self.indivs = [Individual(N,gen=gens[i]) for i in range(size)]
-            else:           self.indivs = [Individual(N) for i in range(size)]
+            if gens:        self.indivs = [Individual(N,gen=gens[i],P=self.P) for i in range(size)]
+            else:           self.indivs = [Individual(N,P=self.P) for i in range(size)]
         else:               self.indivs = Indivs
             
         self.costs = [i.cost for i in self.indivs]
@@ -232,7 +234,7 @@ class Population:
             self.probs = self.probs/Z
 
             self = Population(self.size,self.N,bestIndiv=self.bestIndiv,seed=self.seed,
-                              Indivs=self.newBreed(crossover,mutRate))
+                              Indivs=self.newBreed(crossover,mutRate),P=self.P)
             
             minc,meanc = self.minCost(), self.meanCost()
             if minc < self.bestCost:

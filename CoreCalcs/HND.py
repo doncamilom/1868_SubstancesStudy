@@ -172,12 +172,11 @@ def make_animation(init_i,year_span):
     anim.save(f"{dataPath}Results/PT_evol_{min_yr+init_i}_{min_yr+year_span}.gif", writer=writer) 
 
 
-def plot_count_elems_w_matches(min_yr,max_yr,hnd):
+def plot_count_elems_w_matches(min_yr,max_yr,elem_count):
     fig, ax = plt.subplots(figsize=(10,4))
 
+    print(elem_count)
     years = np.arange(min_yr,max_yr+1,1)
-    elem_count = (~np.isnan(hnd)).sum(axis=(1,2) )
-
     sns.lineplot(x=years,y=elem_count,ax=ax,color='k')
     
     ax.set_xlabel("Year")
