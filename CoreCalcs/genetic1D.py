@@ -6,6 +6,8 @@ from TPs import TP
 import multiprocessing as mp
 import sys
 import pickle
+import os
+
 
 global dataPath
 dataPath = '../Data/'
@@ -13,6 +15,7 @@ dataPath = '../Data/'
 
 def main():
     global P, elemList
+    os.makedirs('./Genetic1D/', exist_ok=True)
     size = int(sys.argv[1])
 
     # Load element list
@@ -20,13 +23,13 @@ def main():
     simMat_yr = np.load(dataPath + 'history_simMat.npy')
     min_yr = 1771
 
-    popSize, NGens = 2500, 300
+    popSize, NGens = 1500, 200
 
     t0 = time()
 
     results_total = {}
-    for i in range(1800-min_yr, simMat_yr.shape[0],2): # Do this for every year (starting 1800)
-        print(f"Year: {i+min_yr}")
+    for i in range(1800-min_yr, 1901-min_yr,2):#: simMat_yr.shape[0],2): # Do this for every year (starting 1800)
+        logs(f"Year: {i+min_yr}")
 
         S = simMat_yr[i].copy()
         P = symmetrize(S)    
@@ -51,16 +54,16 @@ def main():
                 filled_genes = completeList(genToElem(pop.bestIndiv.gen,ref=elems_i))
             else: filled_genes = pop.bestIndiv.gen
 
-            print(pop.bestIndiv.cost)
+            logs(pop.bestIndiv.cost)
             bestIndivs_yr.append(filled_genes)
 
-        print(f"\tTime:  {time()-t0}")
+        logs(f"\tTime:  {time()-t0}")
 
         results_total[i+min_yr]=bestIndivs_yr
     
     # Save results
-    os.makedirs('./Genetic/', exist_ok=True)
-    filehandler = open(f'./Genetic/bestIndivs_yearly.gen', 'wb') 
+
+    filehandler = open(f'./Genetic1D/bestIndivs_yearly_til1900.gen', 'wb') 
     pickle.dump(results_total, filehandler)
  
 
@@ -242,7 +245,7 @@ class Population:
                 self.bestCost = self.bestIndiv.cost
                 
             if i%50==0:
-                print(f"** Iter No. {i}, Mean = {meanc:.3f}, Min = {minc:.3f}, P{self.seed}")
+                logs(f"** Iter No. {i}, Mean = {meanc:.3f}, Min = {minc:.3f}, P{self.seed}")
         return self
 
 # Utility to convert gen into element list
@@ -269,6 +272,10 @@ def completeList(incomp):
             new_list[i] = sample_perm[j] # Else, fill with random index
             j+=1
     return np.array(new_list)
+
+def logs(text):
+    with open('./Genetic1D/logs_genetic1D.log','a') as f:
+        f.write(str(text)+'\n')
 
 
 if __name__ == '__main__':
