@@ -191,7 +191,7 @@ def plot_SimPTBar(simMat_yr,year,element,min_yr):
     else:                tab = 0.02
     ax.text(Y+tab,X+0.7,element,fontsize=17)
     
-def plot_simMat_yr(simMat_yr,year,min_yr,save=False,raw=True,palette='magma_r',ordering=False,scale=15):
+def plot_simMat_yr(simMat_yr,year,min_yr,save=False,raw=True,palette='magma_r',ordering=False,scale=15,show=True):
     """Plot similarity matrix for a given year
     year: which year to plot
     raw:  plot the raw normalized matrix (non-symmetric)
@@ -229,21 +229,23 @@ def plot_simMat_yr(simMat_yr,year,min_yr,save=False,raw=True,palette='magma_r',o
     inds = np.arange(0,n)
     P[inds,inds] = 0
     
-    
-    fig,ax = plt.subplots(figsize=(scale,scale))
-    ax.set_title(f"Similarity matrix between elements ordered by atomic number, Year = {year}",
-                 fontsize=20)
-    sns.heatmap(P,ax=ax,cbar=False,
-                cmap=sns.color_palette(palette, as_cmap=True))
-    
-    labl = np.array(labels)[isn]      
-    tick = [i+0.5 for i in range(len(labl))]
-    ax.set_xticks(tick)
-    ax.set_yticks(tick)
-    ax.set_xticklabels(labl,fontsize=8)
-    ax.set_yticklabels(labl,fontsize=8)
-    
-    if save: plt.savefig(save,dpi=400,bbox_inches='tight')
+    if show: 
+        fig,ax = plt.subplots(figsize=(scale,scale))
+        ax.set_title(f"Similarity matrix between elements ordered by atomic number, Year = {year}",
+                     fontsize=20)
+        sns.heatmap(P,ax=ax,cbar=False,
+                    cmap=sns.color_palette(palette, as_cmap=True))
+        
+        labl = np.array(labels)[isn]      
+        tick = [i+0.5 for i in range(len(labl))]
+        ax.set_xticks(tick)
+        ax.set_yticks(tick)
+        ax.set_xticklabels(labl,fontsize=8)
+        ax.set_yticklabels(labl,fontsize=8)
+        
+        if save: plt.savefig(save,dpi=400,bbox_inches='tight')
+
+    return P
 
 
 
