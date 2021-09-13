@@ -112,7 +112,7 @@ def calc_simMats_yearly(dataPath = "../OnlyStrsCode/Data/"):
     return simMats_yr
 
 
-def plot_SimPTBar(simMat_yr,year,element,min_yr):
+def plot_SimPTBar(simMat_yr,year,element,min_yr,save=False):
     # Select simMat for this year
     arr_yr = simMat_yr[year-min_yr].copy()
     # Select a particular element
@@ -190,6 +190,8 @@ def plot_SimPTBar(simMat_yr,year,element,min_yr):
     if len(element)==1:  tab = 0.2
     else:                tab = 0.02
     ax.text(Y+tab,X+0.7,element,fontsize=17)
+    
+    if save: plt.savefig(save,dpi=400,bbox_inches='tight')
     
 def plot_simMat_yr(simMat_yr,year,min_yr,save=False,raw=True,palette='magma_r',ordering=False,scale=15,show=True):
     """Plot similarity matrix for a given year
