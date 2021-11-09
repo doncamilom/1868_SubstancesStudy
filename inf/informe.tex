@@ -205,6 +205,7 @@ Many things can be said just from these results. The lanthanides are observed to
 Many questions arise on the light of these results. Importantly, the focus of this work is on PSs and their evolution, and as such the interest relies on automatic extraction of such systems, and the analysis of their time evolution. This will be the topic for the following sections.
 
 \subsection{Automatic generation of periodic system representations}
+\label{sec:geneticAlgo}
 
 On the previous section it was shown how similarity matrices, framed within the methodology for assessment of similarities introduced by the present work, do indeed uncover patterns that can be correlated with the observations of, for instance, the MPT. The question that arises is, however, whether it is possible to automatically extract a periodic system representation (PTR) out of such results. This is important for a number of reasons, but more importantly, it would allow a direct \say{mapping} from CS to PTR, which could then be applied to the evolving CS to address the question about the historical evolution of the PS. On the other hand, the \textit{stability} of the PS may be investigated in a similar way, in that case by introducing perturbations to the CS and evaluating the variation on the resulting PS.
 
@@ -293,7 +294,6 @@ Notice that the number of known elements increases with time, and that it is con
 
 As explained, the similarities are normalized by the year displayed on the vertical axis. A conceptual distinction must be made between the values above and below the diagonal. In particular, values below the diagonal correspond to a comparison from the point of view of the earliest year, which helps address the question: Up to what extent do relationships found in year $Y_1$ (past) are preserved in the future years?. Meanwhile, above the diagonal the opposite is found. In this region we find a comparison from the privileged point of view of the future observer, against previous years. The question here would then be: What proportion of the relationships found in year $Y_2$ were already known years before? This part of the plot naturally contains lower values, a fact mainly driven by the lack of information about newer elements that existed in previous years, as compared to more recent years.\\
 
-
 \begin{figure}[h!]
   \centering
 	\includegraphics[width=18.0cm]{history_mat.png}
@@ -304,8 +304,22 @@ As explained, the similarities are normalized by the year displayed on the verti
 This plot is one of the most important results of this work, and represents one of the largest scale computational historical analyses performed to this date, both for the length of the period under consideration, and the amount of data effectively used each year, this last point being possible thanks to the size of the dataset itself, but also to the methodology used for its exploitation (Section \ref{sec:preprocessing}). 
 
 As general conclusions from this plot it is observed that, very importantly, the PS indeed tends to converge to some stable form. This is reflected by the fact that, as the reader goes up observing the lower triangle, horizontal lines form with incresingly higher values, with no apparent significant variation on trends. That is what the bright triangle below the diagonal represents.
-Second, the PS does indeed evolve, and some points in history can be found where somewhat abrupt changes occur. In particular, it is observed that before 1826, PSs would change rather randomly from year to year, as can be seen from the dark band on the bottom of the plot. In 1826, however, the picture changes rather abruptly, and the relationships found in this year are found to be preserved quite well along the history of the PS, particularly during the first ~150 years, but still being mantained up to 2016, the most recent year under study.\\
+Second, the PS does indeed evolve, and some points in history can be found where somewhat abrupt changes occur. In particular, it is observed that before 1826, PSs would change rather randomly from year to year, as can be seen from the dark band to the bottom of the plot. In 1826, however, the picture changes rather abruptly, and the relationships found in this year are found to be preserved quite well along the history of the PS, particularly during the first ~150 years, but still being mantained up to 2016, the most recent year under study.\\
 The conclusion here is that, given enough access to chemical data, processing capability and theoretical ideas, the chemical space had been explored well enough by 1826, to allow for a somewhat robust formulation of the periodic system; this is nearly 40 years before Mendeleev's and Meyer's independent publications of their systems.
+
+
+\begin{figure}[h!]
+  \centering
+	\includegraphics[width=18.0cm]{numberElems.png}
+	\caption{Number of known elements as a function of time. Obtained from the database.}
+	\label{fig:numElems_evol}
+\end{figure}
+
+
+Having found out that the PS tends to preserve a considerable amount of relationships between elements or groups of elements as it evolves with time, the question now is what, in particular, are these relationships that appear and are preserved throughout the history of the PS. In the same spirit of this work, the objective will now be to automatically extract groups of elements out of some given CS. Once such goal is achieved, history may be explored in a similar way, this time by exploring the evolution of each particular group and their relative importance in the structural stability of the PS, which may be assessed by means of the cost function devised for section \ref{sec:geneticAlgo}
+
+\subsection{Automatic extraction of PS groups.}
+
 
 
 
