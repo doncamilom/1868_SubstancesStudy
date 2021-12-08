@@ -99,7 +99,8 @@ class HistGraph():
             showlegend=False,
             plot_bgcolor='white',
             yaxis=dict(showticklabels=False)),
-            layout_xaxis_range=[1840,1860])
+            layout_xaxis_range=[1840,1860],
+            layout_yaxis_range=[0,2])
             
         # Draw edges.
         quer1 = (edges.yr1>=MIN_YR)&(edges.yr2>=MIN_YR)
@@ -138,7 +139,6 @@ class HistGraph():
                                      ids=nodes.loc[nodes.yr==yr,'name'].values))  
     
         fig.layout.clickmode = 'event+select'
-
         return fig
         
     def __queryOnSeed(self,seed,THRESH): 
@@ -149,7 +149,7 @@ class HistGraph():
         All nodes in `seed` should be in the same year (for now at least)
         """
         yr_seed = int(seed[0].split("_")[0]) # Extract year of selection
-        keep_nodes = seed   # List to store nodes that "pass" selection
+        keep_nodes = seed.copy()   # List to store nodes that "pass" selection
 
         # First take all edges with relevant M2
         edges = self.edges[self.edges['m2']>THRESH].copy()
@@ -184,7 +184,7 @@ class HistGraph():
 
         keep_nodes = np.unique(list(edges.yr_id1.values)+ list(edges.yr_id2.values))
         nodes = self.node_df[self.node_df.name.isin(keep_nodes)].copy()
-        print(nodes.shape)
+        #print(nodes.shape)
         
         return yr_seed,edges, nodes
         

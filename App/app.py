@@ -68,17 +68,26 @@ def fig_updater(applyB,resetB,THRESH,sel_data,fig):
     if ctx_trig['prop_id']!='.':
 
         if ctx_trig["prop_id"]=="apply-button.n_clicks":
-            print(sel_data)
             seed = [grp['id'] for grp in sel_data['points']] # Extract information about selected points from `sel_data`
             fig = graph.plotGraph(1840,1860,THRESH=THRESH,seed = seed)
 
         elif ctx_trig["prop_id"]=="reset-button.n_clicks":
+            seed = False
             fig = OriginalFig
 
         elif ctx_trig["prop_id"]=="Thresh-slider.value":
             fig = graph.plotGraph(1840,1860,THRESH=THRESH,seed = seed)
 
     return fig
+
+
+@app.callback(
+    Output("Thresh-slider","value"),
+    [Input("reset-button","n_clicks")],
+)
+def reset_slider(butt):
+    return 0.
+    
 
 # TO-DO: Add a slider for changing THRESH.
 
