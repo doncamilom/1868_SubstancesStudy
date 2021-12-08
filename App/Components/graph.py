@@ -112,7 +112,7 @@ class HistGraph():
             yr1,yr2,x1,x2,k = plot_edges.iloc[e].loc[["yr1","yr2","x1","x2","k"]].values
             
             if yr1!=yr2 and 1-(k-1.2)>THRESH: # plot edges only between different years. and sim>THRESH
-                alpha = (1-(k-1.2)-THRESH)/(1-THRESH)#*(1-k>THRESH)
+                alpha = round((1-(k-1.2)-THRESH)/(1-THRESH),5)
                 fig.add_trace(go.Scatter(x=[yr1,yr2],y=[x1,x2],
                                          mode='lines',
                                          marker_color='rgba(0, 0, 0, 0)', # Invisible markers (alpha=0)
@@ -134,8 +134,11 @@ class HistGraph():
             #Plot groups for this year, represented each as a point
             fig.add_trace(go.Scatter(x=ys,y=xs,mode='markers',**kwargs,
                                      hovertemplate='%{text}<extra></extra>',
-                                     text=nodes.loc[nodes.yr==yr,'elems'].astype(str).str.replace("'|{|}","")))  
+                                     text=nodes.loc[nodes.yr==yr,'elems'].astype(str).str.replace("'|{|}",""),
+                                     ids=nodes.loc[nodes.yr==yr,'name'].values))  
     
+        fig.layout.clickmode = 'event+select'
+
         return fig
         
     def __queryOnSeed(self,seed,THRESH): 
@@ -149,7 +152,7 @@ class HistGraph():
         keep_nodes = seed   # List to store nodes that "pass" selection
 
         # First take all edges with relevant M2
-        edges = self.edges[self.edges['m2']>THRESH]
+        edges = self.edges[self.edges['m2']>THRESH].copy()
         # Take only edges associated with nodes in seed
         relev_ed = edges[(edges.yr_id1.isin(seed) | edges.yr_id2.isin(seed))]
 
@@ -178,7 +181,10 @@ class HistGraph():
         edges = self.edges[(self.edges.yr_id1.isin(keep_nodes) & 
                             self.edges.yr_id2.isin(keep_nodes) & 
                             self.edges.m2>THRESH)].copy()
+
+        keep_nodes = np.unique(list(edges.yr_id1.values)+ list(edges.yr_id2.values))
         nodes = self.node_df[self.node_df.name.isin(keep_nodes)].copy()
+        print(nodes.shape)
         
         return yr_seed,edges, nodes
         
