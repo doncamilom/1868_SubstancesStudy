@@ -26,7 +26,7 @@ class HistGraph():
                                      "x":np.random.random(len(node_id))*2,
                                      "elems":node_unwr,
                                      "yr":node_yr})
-        self.node_df["z"] = np.random.random(len(node_id))*2 # Add z var for flexibility
+        self.node_df["z"] = np.random.random(len(node_id))*4 # Add z var for flexibility
         map_name_ind = dict(zip(node_id,self.node_df.index))
         
         # Second, df for edges
@@ -47,7 +47,7 @@ class HistGraph():
                     id2+=1
                     # Add 0.05 so groups are still distinguishable.
                     m2=M2(gr1,gr2)
-                    dist = 1-m2 + 0.05
+                    dist = (1-m2)**10 + 0.4
                     v = [f"{yr}_{id1}",f"{yr}_{id2}",yr,yr,dist,m2] 
                     edges.append(v)   
         
@@ -56,32 +56,64 @@ class HistGraph():
         self.edges["grp1_ind"] = self.edges["yr_id1"].apply(lambda x: map_name_ind[x])
         self.edges["grp2_ind"] = self.edges["yr_id2"].apply(lambda x: map_name_ind[x])  
 
-    def Optimize(self,MIN_YR,MAX_YR,EPOCHS=1000,LR=1e-3,v=500):
+    def Optimize(self,MIN_YR,MAX_YR,seed,THRESH,EPOCHS=1000,lr=1e-3,v=500):
         """Optimize locally points in the range [MIN_YR,MAX_YR] (including both!)
         v controls verbosity: Frequency of output, cost is printed every `v` iterations.
         v=0: no output"""
+        # Gradient of energy w.r.t. xs
+        gradient = jit(grad(energy))
         
+        ## Query on seed: get only relevant nodes+edges
+        yr_seed, edges, nodes = self.__queryOnSeed(seed,THRESH)
+        nodes = self.node_df.copy()  # Don't change the node base, only edges
+
         # Query only edges involving the year range of interest
-        quer1 = (self.edges.yr1>=MIN_YR)&(self.edges.yr2>=MIN_YR)
-        quer2 = (self.edges.yr1<=MAX_YR)&(self.edges.yr2<=MAX_YR)
-        opt_edges = self.edges[quer1&quer2]
-        
+        quer1 = (edges.yr1>=MIN_YR)&(edges.yr2>=MIN_YR)
+        quer2 = (edges.yr1<=MAX_YR)&(edges.yr2<=MAX_YR)
+        opt_edges = edges[quer1&quer2].copy()
+
         # Get inputs for energy
         grp1_ind,grp2_ind = opt_edges.loc[:,["grp1_ind","grp2_ind"]].values.T
         yr1,yr2 = opt_edges.loc[:,['yr1','yr2']].values.T  #ys
-        z1,z2 = self.node_df["z"].values[grp1_ind],self.node_df["z"].values[grp2_ind]
+        z1,z2 = nodes["z"].copy().values[grp1_ind],nodes["z"].copy().values[grp2_ind]
         ks = opt_edges.loc[:,'k'].values
-
-        # Opt loop (just basic grad descent) ## modify to use more powerful methods
+        args = (grp1_ind,grp2_ind,yr1,yr2,z1,z2,ks)
+        
+        # Opt loop (just basic grad descent)
         costs = []
-        for e in range(EPOCHS):
-            df = dEdx(self.node_df["x"].values,grp1_ind,grp2_ind,yr1,yr2,z1,z2,ks)  # Calc grad
-            self.node_df["x"] -= LR*df  # Update xs_all using grad
+        best_cost,best_xs=np.inf,None
+        xs = nodes["x"].copy().values
 
-            E = energy(self.node_df["x"].values,grp1_ind,grp2_ind,yr1,yr2,z1,z2,ks)
-            costs.append(E)
+        CHECK_FREQ,tol = 50,10
+        for e in range(EPOCHS):
+            df = gradient(xs,*args)  # Calc grad
+            # Normalize gradient and multiply by constant
+            df = 10.*df/np.linalg.norm(df)
+
+
+            xs -= lr*df  # Update xs_all using grad
+            E = energy(xs,*args)
+            
+            ## Handle E = nan
+            if np.isnan(E):
+                xs = best_xs
+                lr /= 5
+            
+            if E<best_cost:
+                best_cost = E
+                best_xs = xs
+
+            # Break loop if in plateau
+            if e%CHECK_FREQ==0:    costs.append(E)            
+            if len(costs)>4:
+                dif = np.abs(np.diff(costs[-5:])) # Check last 4 costs
+                if np.mean(dif)<tol:    break
+                
             if v!=0: 
-                if e%v==0:  print(e,E)
+                if e%v==0:  print(e,E); lr/=2
+                    
+        print(f"Best cost = {best_cost}")
+        self.node_df.loc[:,"x"] = np.array(best_xs)  # Set best solution
 
     def plotGraph(self,MIN_YR,MAX_YR,THRESH=0.0,seed=False,
                   figsize=(20,5),title="",save=False):
@@ -99,8 +131,8 @@ class HistGraph():
             showlegend=False,
             plot_bgcolor='white',
             yaxis=dict(showticklabels=False)),
-            layout_xaxis_range=[1840,1860],
-            layout_yaxis_range=[0,2])
+            layout_xaxis_range=[1840,1860],)
+        #    layout_yaxis_range=[0,2])
             
         # Draw edges.
         quer1 = (edges.yr1>=MIN_YR)&(edges.yr2>=MIN_YR)
@@ -139,9 +171,10 @@ class HistGraph():
                                      ids=nodes.loc[nodes.yr==yr,'name'].values))  
     
         fig.layout.clickmode = 'event+select'
+        fig.update_layout(margin={"l":0.,"r":0.,"b":50.,"t":0.})
         return fig
         
-    def __queryOnSeed(self,seed,THRESH): 
+    def __queryOnSeed(self,seed,THRESH,forOpt=False): 
         """    Return new graph specification (edges,nodes) 
         containing only edges+nodes connected significantly to nodes specified in `seed`.
         `Significantly` meaning there's a chain of edges with M2>THRESH, 
@@ -178,13 +211,21 @@ class HistGraph():
             if len(futr_seed)==0: break
 
         # Now query edges, such that both nodes are in keep_nodes
-        edges = self.edges[(self.edges.yr_id1.isin(keep_nodes) & 
-                            self.edges.yr_id2.isin(keep_nodes) & 
-                            self.edges.m2>THRESH)].copy()
+        query_keep_nodes = (self.edges.yr_id1.isin(keep_nodes) & 
+                            self.edges.yr_id2.isin(keep_nodes))
+
+        edges = self.edges[query_keep_nodes & (self.edges.m2>THRESH)].copy()
+
+        if forOpt:  #include edges between nodes of same year
+            edges = pd.concat((edges,
+                              self.edges[query_keep_nodes & 
+                                         (self.edges.yr_id1==self.edges.yr_id2)]
+                             ))
 
         keep_nodes = np.unique(list(edges.yr_id1.values)+ list(edges.yr_id2.values))
+
+        # Now query edges, such that both nodes are in keep_nodes
         nodes = self.node_df[self.node_df.name.isin(keep_nodes)].copy()
-        #print(nodes.shape)
         
         return yr_seed,edges, nodes
         
@@ -205,6 +246,3 @@ def energy(xs,grp1_ind,grp2_ind,yr1,yr2,z1,z2,ks):
     dists = (grp1_x - grp2_x)**2 + (yr1 - yr2)**2 + (z1-z2)**2
     energ = np.sum(2*dists/ks + ks**2/(dists)**2)  
     return energ
-
-# Gradient of energy w.r.t. xs
-dEdx = jit(grad(energy))

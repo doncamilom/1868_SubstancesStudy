@@ -27,13 +27,16 @@ server = flask.Flask(__name__)
 app = dash.Dash(__name__,title="Evolution of element families")
 
 app.layout = html.Div([html.H1("Evolution of element families",
-                               style={
-                                      "textAlign": "center",
+                               style={"textAlign": "center",
                                       "background": "yellow"}),
-                       dcc.Graph(figure=OriginalFig,id="mainGraph"),
+
+                       html.Div(dcc.RangeSlider(id="year-slider",min=1800,max=2016,step=2,value=[1840,1860],
+                                        tooltip={"placement": "bottom", "always_visible": True})),
+                        dcc.Graph(figure=OriginalFig,id="mainGraph",style={"height":"400px","margin-top":"10px"}),
 
                         html.Div([html.Button("Apply selection",id="apply-button"),
                                   html.Button("Reset plot",id="reset-button"),
+                                  html.Button("Optimize layout",id="opt-button"),
                                  ],style={"text-align":"center"}
                                 ),
 
@@ -55,28 +58,36 @@ seed = False      # If seed is not defined, use everything
 
 @app.callback(
     Output("mainGraph","figure"),
-    [Input("apply-button","n_clicks"),Input("reset-button","n_clicks"),Input("Thresh-slider","value")],
+    [Input("year-slider","value"),Input("apply-button","n_clicks"),Input("reset-button","n_clicks"),
+     Input("opt-button","n_clicks"),Input("Thresh-slider","value")],
     [State("mainGraph","selectedData"),State("mainGraph","figure")],
 )
-def fig_updater(applyB,resetB,THRESH,sel_data,fig):
+def fig_updater(year_range,applyB,resetB,optB,THRESH,sel_data,fig):
     global OriginalFig,seed
 
     ctx_trig = dash.callback_context.triggered[0]
 
-
-
     if ctx_trig['prop_id']!='.':
+        minyr,maxyr=year_range
 
         if ctx_trig["prop_id"]=="apply-button.n_clicks":
             seed = [grp['id'] for grp in sel_data['points']] # Extract information about selected points from `sel_data`
-            fig = graph.plotGraph(1840,1860,THRESH=THRESH,seed = seed)
+            fig = graph.plotGraph(minyr,maxyr,THRESH=THRESH,seed = seed)
 
         elif ctx_trig["prop_id"]=="reset-button.n_clicks":
             seed = False
             fig = OriginalFig
 
         elif ctx_trig["prop_id"]=="Thresh-slider.value":
-            fig = graph.plotGraph(1840,1860,THRESH=THRESH,seed = seed)
+            fig = graph.plotGraph(minyr,maxyr,THRESH=THRESH,seed = seed)
+
+        elif ctx_trig["prop_id"]=="opt-button.n_clicks":
+            yr_seed = int(seed[0].split("_")[0])
+            graph.Optimize(yr_seed-4,yr_seed+4,seed=seed,THRESH=THRESH,EPOCHS=5000,lr=1e-1,v=0)
+            fig = graph.plotGraph(minyr,maxyr,THRESH=THRESH,seed=seed)
+
+        elif ctx_trig["prop_id"]=="year-slider.value":
+            fig = graph.plotGraph(minyr,maxyr,THRESH=THRESH,seed = seed)
 
     return fig
 
