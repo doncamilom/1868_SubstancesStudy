@@ -21,11 +21,13 @@ fh = open(f'./Genetic1D/bestIndivs_yearly.gen', 'rb')
 Indivs_yr = pickle.load(fh)
 
 def main():
+    year_range=[1864,1866]
+
     size=3
     with mp.Pool(processes=size) as pool:
         results = [pool.apply_async(smoothForYear,
                                     args=(yr,10) )
-                   for yr in range(1800,2018,2)]
+                   for yr in range(year_range[0],year_range[1],2)]
         results_get = [r.get() for r in results]
     
 
