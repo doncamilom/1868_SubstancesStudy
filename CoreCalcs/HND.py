@@ -184,7 +184,7 @@ def plot_count_elems_w_matches(min_yr,max_yr,elem_count):
 
     labls = np.linspace(1770,2020,26).astype(int)
     ax.set_xticks(labls)
-    ax.set_xticklabels(labls,rotation=45)
+    ax.set_xticklabels(labls,rotation=90)
     ax.grid()
 
     ## Add lines and text at interesting points
@@ -200,7 +200,7 @@ def plot_count_elems_w_matches(min_yr,max_yr,elem_count):
     ax.annotate('1970:\nEnd linear\nregion.\nStart flat \nregion.', xy=(1970, 102), xytext=(1990, 50),
                 arrowprops=dict(arrowstyle="->",color='b'),fontsize=10)
 
-    ax.annotate('1868:\nFirst publication\nof PT\n (Mendeleev)', xy=(1868, 64), xytext=(1875, 30),
+    ax.annotate('1869:\nFirst publication\nof PT\n (Mendeleev)', xy=(1868, 64), xytext=(1875, 30),
                 arrowprops=dict(arrowstyle="->",color='b'),fontsize=10)
 
     plt.tight_layout()

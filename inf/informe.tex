@@ -204,6 +204,8 @@ Many things can be said just from these results. The lanthanides are observed to
 
 Many questions arise on the light of these results. Importantly, the focus of this work is on PSs and their evolution, and as such the interest relies on automatic extraction of such systems, and the analysis of their time evolution. This will be the topic for the following sections.
 
+\in 
+
 \subsection{Automatic generation of periodic system representations}
 \label{sec:geneticAlgo}
 
@@ -232,58 +234,7 @@ A metric was devised that allows for the comparison of different orderings in te
 
 \subsection{Comparison of 1D PTRs}
 
-An important point about the optimization of an ordering on the reference work \cite{Glawe_2016} is that the endpoints of the possible orderings are fixed to be H and Kr. This was done as it allowed for an easier visual inspection and comparison against the baseline, POS. The authors clearly state that, in their experiments, such decision does not influence the cost of the resulting orderings. We argue, however, that their results are affected in a way that is not directly manifested by the cost function, but instead as a limitation on the possible shapes the resulting PTRs could take, in the sense that other possible, equally \textit{fit} PTRs, will be ignored only for not meeting such an arbitrary criterium.
-
-Variety of representations is important for the present work, for statistical reasons. In no way can we claim to have found \textit{the} ultimate 1D PTR as, as has been shown here, many different PTRs perform similarly. The important thing to notice is that such different PTRs share several common \textit{local} features, which is in the end what needs to be captured by some statistical treatment on the optimized PTRs.
-
-Before such a statistical treatment, a quantity was devised that measures the similarity between two different PTRs, whose focus is only on local features of the orderings.\\
-
-
-%################ Maybe all of the above shouldn't be on this section, but the previous?
-
-The idea is in principle to compare the content of N-grams. For instance, with N=2, if an ordering $O_1$ has the ordered pair (Na,K) at position $N_1$, and ordering $O_2$ has the ordered pair (K,Na) at position $N_2$, $N_1 \neq N_2$, then both orderings have a strong sense of similarity between Na and K, regardless of localization within the particular ordering ($N_i$), or of the particular ordering of the given ordered pair. This should be reflected by our similarity measure between $O_1$ and $O_2$.
-
-The panorama is, however, more complicated in general. Consider for instance the following orderings:
-
-\begin{itemize}
-	\item $O_1$: K, Li, Na, He, Kr, Ar, Ne, La, Lu, Ce, Pr
-	\item $O_2$: Pr, Lu, Ce, La, Li, K, Na, Ar, He, Ne, Kr
-\end{itemize}
-
-As can be seen, three important PT groups have been displayed in both orderings, namely the alkalines (Li, Na, K), the noble gases (He, Ne, Ar, Kr), and the lanthanides (La, Lu, Ce, Pr). They differ, however, in that: 1. such groups are not listed in the same order, and 2. the inner ordering of each group varies as well. The quantity to be developed should return a relatively high value when comparing both of this orderings as both of them group the same elements in the same groups, and with that aim the latter points need to be addressed.\\
-
-Point 1. can be solved by comparing, using some function $E(NG_1, NG_2)$, every N-Gram $NG_1$ found in $O_1$, with every other N-Gram $NG_2$ found in $O_2$, while accumulating the values of E for every combination. Such mixing automatically disolves any problem related to groups of elements being placed at different parts of the sequences, as it is equivalent to considering each ordering simply as an unsorted bag of N-Grams, the expectation being that such N-Grams behave as slices of said groups of elements. For addressing point 2, function $E$ needs to be properly engineered. \\
-
-Point 2 requires us to compare N-Grams $NG_1$ and $NG_2$ as sets in some way. As the quality we wish to assess is that of \say{closeness} between pairs of elements, we choose in this work to let E = 1 iff $| {NG_1} \cap {NG_2} | \geq 2$, E = 0 otherwise, which may be rephrased as follows: If N-Grams $NG_1$ and $NG_2$ both contain a subset $Y = {NG_1} \cap {NG_2}$ of elements, such that $|Y| \geq 2$, then that means all the elements in set $Y$ are all displayed with distances less than N in both orderings, increasing the similarity between such orderings. 
-
-This formulation would be equivalent as considering every possible couple of elements $X_i$ and $X_j$, and asking whether the distance between them is less than N in both orderings. If so, E = 1, else E = 0. 
-
-The obtained quantity is then properly normalized, so that comparison between an ordering with itself equals 1.\\
-
-To test the capabilities of this quantity for assessment of similarities between orderings, a few experiments were performed. First, a large sample of reference orderings were produced. Particularly, a series of orderings were optimized with ---intentionally--- varied degrees of success, meaning that the optimization procedures were stopped before reaching optimal configurations. Such stopping was necessary for obtaining orderings with costs well distributed across the range -4 and -13, that is, between the extremes of random orderings and quasi-optimal configurations. In total 14 populations of 500 individuals, plus 4 of 5.000 individuals were obtained, which amounts to 27.000 varied individuals to which comparisons can be made. \\
-
-With these objects in hand, two individuals were selected: 1. the absolute best out of all 27k individuals, and 2. a random average individual. Next, for each, the similarity measure and the cost difference were calculated against each of the other individuals on the sample. Notice that these two individuals come each from a particular population, whose other individuals may be regarded as \say{siblings}, meaning they share a considerable ammount of common features or \textit{genetic material}. The results would then be biased if an individual was directly compared against its siblings. For this reason, the two individuals are only compared agains every other in the sample, that do not belong to the same population.
-
-Figures \ref{fig:metric_bestInd} and \ref{fig:metric_avgInd} show the results of comparing the two mentioned individuals, using the formerly discussed method, with N ranging from 2 to 5.
-
-\begin{figure}[h!]
-  \centering
-	\includegraphics[width=18.0cm]{metric_Against_best_individual.png}
-	\caption{Calculated similarity using N=2-5, against cost difference. Each point corresponds to the results of comparing the \textit{absolute best individual} on the sample, against some other individual.}
-	\label{fig:metric_bestInd}
-\end{figure}
-
-\begin{figure}[h!]
-  \centering
-	\includegraphics[width=18.0cm]{metric_Against_average_individual.png}
-	\caption{Calculated similarity using N=2-5, against cost difference. Each point corresponds to the results of comparing one \textit{random average individual} on the sample, against some other individual.}
-	\label{fig:metric_avgInd}
-\end{figure}
-
-As can be seen, the results of our quantity correlate well with cost in most cases, particularly with $N \geq 3$, implying it can be used for assessing similarity between orderings, and that the design points made at the beginning of the chapter are seemingly fulfilled. The advantage of the method, against comparing only the cost, is that this quantity is independent on any similarity matrix or any database at all, while it depends only on the given sequences of elements. 
-
-This is a very important point for this work, as deataching from particular databases allows to \textit{directly} compare the PTRs obtained for different years, resulting in a large scale historical analysis about the evolution of the PS, which is a topic for next section.
-
+\equiv
 \subsection{Historical evolution of the PS}
 
 Equiped with time-evolving CSs, and methods for obtaining PTRs out of such CSs and comparing them, a historical analysis is now straightforward, in the sense that all there is to do now is generating PTRs for each year to consider in the analysis, and comparing the results as a function of time.\\

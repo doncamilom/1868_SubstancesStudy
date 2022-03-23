@@ -193,7 +193,7 @@ def plot_SimPTBar(simMat_yr,year,element,min_yr,save=False):
     
     if save: plt.savefig(save,dpi=400,bbox_inches='tight')
     
-def plot_simMat_yr(simMat_yr,year,min_yr,save=False,raw=True,palette='magma_r',ordering=False,scale=15,show=True):
+def plot_simMat_yr(simMat_yr,year,min_yr,save=False,raw=True,palette='magma_r',ordering=False,scale=15,show=True,cbar=False):
     """Plot similarity matrix for a given year
     year: which year to plot
     raw:  plot the raw normalized matrix (non-symmetric)
@@ -235,7 +235,7 @@ def plot_simMat_yr(simMat_yr,year,min_yr,save=False,raw=True,palette='magma_r',o
         fig,ax = plt.subplots(figsize=(scale,scale))
         ax.set_title(f"Similarity matrix between elements ordered by atomic number, Year = {year}",
                      fontsize=20)
-        sns.heatmap(P,ax=ax,cbar=False,
+        sns.heatmap(P,ax=ax,cbar=cbar,
                     cmap=sns.color_palette(palette, as_cmap=True))
         
         labl = np.array(labels)[isn]      
