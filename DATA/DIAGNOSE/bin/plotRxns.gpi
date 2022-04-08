@@ -1,0 +1,110 @@
+
+set datafile separator "\t"
+set xrange [1800:2022]
+set logscale y
+set grid y
+set grid x lw 2 
+set xtics 4 rotate by 90 right
+set key left top
+
+# Plot counts of reaction schemes
+set terminal pngcairo enhanced size 2500,1500 font "Helvetica,30"
+
+plot "DATA/DIAGNOSE/Results/countRxnsSS_". date .".txt" u 1:2 w lp title "New SS reactions published in patents" pt 7
+replot "DATA/DIAGNOSE/Results/countRxnsSS_". date .".txt" u 1:3 w lp title "New SS reactions published in academic journals" pt 7
+replot "DATA/DIAGNOSE/Results/countRxnsSS_". date .".txt" u 1:4 w lp title "Sum" pt 7
+
+set output "DATA/DIAGNOSE/Results/rxnsYear_". date .".png"
+replot
+
+## Plot count of rxnid+rxds
+set terminal pngcairo enhanced size 2500,1500 font "Helvetica,30"
+plot "DATA/DIAGNOSE/Results/countRxnsSS_". date. ".txt" u 1:5 w lp title "New SS RXDs published in patents" pt 7
+replot "DATA/DIAGNOSE/Results/countRxnsSS_". date. ".txt" u 1:6 w lp title "New SS RXDs published in academic journals" pt 7
+replot "DATA/DIAGNOSE/Results/countRxnsSS_". date. ".txt" u 1:7 w lp title "Sum" pt 7
+
+set terminal pngcairo enhanced size 2500,1500 font "Helvetica,30"
+set output "DATA/DIAGNOSE/Results/RXDsYear_". date. ".png"
+replot
+
+# Plot counts of reaction schemes and number of substances in SS reactions
+plot "DATA/DIAGNOSE/Results/countRxnsSS_". date. ".txt" u 1:3 w lp title "New SS reactions published in academic journals" pt 7
+replot "DATA/DIAGNOSE/Results/countSubsSS_". date. ".txt" u 1:8 w lp title "New substances in reactions published in academic journals" pt 7
+
+set terminal pngcairo enhanced size 2500,1500 font "Helvetica,30"
+set output "DATA/DIAGNOSE/Results/rxnsSubsYear_". date. ".png"
+replot
+
+
+# Plot count of new substances in single step reactions, separated by role in reaction
+set terminal pngcairo enhanced size 2500,1500 font "Helvetica,30"
+set xlabel "Number of new substances in SS reactions, as reported in different roles."
+plot "DATA/DIAGNOSE/Results/countSubsSS_". date. ".txt" u 1:2 w lp title "Reactives" pt 7 ps 2
+replot "DATA/DIAGNOSE/Results/countSubsSS_". date. ".txt" u 1:3 w lp title "SXRN"  ps 2
+replot "DATA/DIAGNOSE/Results/countSubsSS_". date. ".txt" u 1:4 w lp title "Reagents"  ps 2
+replot "DATA/DIAGNOSE/Results/countSubsSS_". date. ".txt" u 1:5 w lp title "Catalysts"  ps 2
+replot "DATA/DIAGNOSE/Results/countSubsSS_". date. ".txt" u 1:6 w lp title "Solvents"  ps 2
+replot "DATA/DIAGNOSE/Results/countSubsSS_". date. ".txt" u 1:7 w lp title "Products"  ps 2
+replot "DATA/DIAGNOSE/Results/countSubsSS_". date. ".txt" u 1:8 w lp title "Total Sum"  ps 2
+
+set terminal pngcairo enhanced size 2500,1500 font "Helvetica,30"
+set output "DATA/DIAGNOSE/Results/numSubsRoleSS_". date. ".png"
+replot
+
+## Plot density
+unset logscale
+set xrange [1801:2022]
+set key left top
+set grid y
+set grid x lw 2 
+set xtics 4 rotate by 90 right
+plot "DATA/DIAGNOSE/Results/density_". date. ".txt" u 1:2 w lp title "Density = #substances / #reactions"
+set terminal pngcairo enhanced size 2500,1500 font "Helvetica,30"
+set output "DATA/DIAGNOSE/Results/density_". date. ".png"
+replot
+
+
+# Frequency plot of frequency of number of references
+unset logscale
+unset logscale
+set xlabel "Number of references for reaction detail in SS reactions."
+set ylabel "Frequency"
+set logscale
+unset xrange
+plot "DATA/DIAGNOSE/Results/countRefsFreqSS_". date. ".txt" u 1:2 w p pt 7 ps 2
+set terminal pngcairo enhanced size 2500,1500 font "Helvetica,30"
+set output "DATA/DIAGNOSE/Results/freqRefs_". date. ".png"
+replot
+
+
+# Frequency plot of number of variants vs number of references
+set xlabel "Number of references"
+set ylabel "Number of variants"
+set view map
+set nokey
+set logscale
+set ztics 1,8,1
+
+splot "DATA/DIAGNOSE/Results/countVarsRefsSS_". date. ".txt" using 1:2:3 with points pointtype 7 pointsize 1.5 palette
+set terminal pngcairo enhanced size 2500,1500 font "Helvetica,30"
+set output "DATA/DIAGNOSE/Results/freqVarsRefs_". date. ".png"
+replot
+
+# Integrating over each of the variables of the plot above, get frequency of variants, and of references, individually
+# References
+set logscale
+set xlabel "Number of references to a SS reaction scheme"
+plot "DATA/DIAGNOSE/Results/numRefsRXID_". date. ".txt" u 1:2 w p pt 7 
+set terminal pngcairo enhanced size 2500,1500 font "Helvetica,30"
+set output "DATA/DIAGNOSE/Results/freqRefsRXID_". date. ".png"
+replot
+
+# Variations
+set logscale
+set xlabel "Number of variations to a SS reaction scheme"
+plot "DATA/DIAGNOSE/Results/numVariationsRXID_". date. ".txt" u 1:2 w p pt 7 
+set terminal pngcairo enhanced size 2500,1500 font "Helvetica,30"
+set output "DATA/DIAGNOSE/Results/freqVarsRXID_". date. ".png"
+replot
+
+
