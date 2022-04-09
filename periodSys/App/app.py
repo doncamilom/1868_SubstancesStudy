@@ -18,8 +18,8 @@ app = dash.Dash(__name__,title="Evolution of element families")
 
 matbox = html.Div([])
 
-matrix_height = '650px'
-matrix_width = '720px'
+matrix_height = '640px'
+matrix_width = '690px'
 app.layout = html.Div([ html.H1("Visualization of an empirical Periodic System, over history.",
                                style={"textAlign": "center",
                                       "background": "#a6bddb"}),

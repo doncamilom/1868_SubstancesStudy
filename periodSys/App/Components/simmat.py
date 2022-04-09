@@ -5,6 +5,7 @@ This is code to plot a similarity matrix using plotly
 """
 
 import plotly.graph_objects as go
+import matplotlib.pyplot as plt
 import numpy as np
 from Components import loadData
 
@@ -64,39 +65,39 @@ def plot_simMat_yr(simMat_yr,year,min_yr,save=False,raw=True,cmap=False,ordering
     return P
 
 
-def colorbar(zmin, zmax, n = 6):
+def colorbar(zmin):
     lowlabel = np.ceil(np.log10(zmin))
     tickvals = np.arange(lowlabel,0,1)
     return dict(
         tickmode = "array",
-        tickvals = tickvals,
-        ticktext = ['10^-{}'.format(i) for i in -tickvals.astype(int)],
+        tickvals = list(tickvals)+[0],
+        ticktext = ['10^-{}'.format(i) for i in -tickvals.astype(int)] + ['10^0'],
         thickness = 8,
-        ypad = 0,
-        xpad = 0
+        len = 0.7,
+        x = 0.99
     )
 
+P /= P.max()
 zmin = P[P>0.].min()
-zmax = 1
-#go.Figure(go.Heatmap(z = np.log10(a), text = a,
-#    hovertemplate = 
-#    "<i>Logplot Demo</i><br>" +
-#    "<b>X</b>: %{x}<br>" +
-#    "<b>Y</b>: %{y}<br>" +
-#    "<b>Z</b>: %{text:.1f}",
-#    name = "",
-#    colorscale = "Portland",
-#    zmin = np.log10(zmin), zmax = np.log10(zmax),
-#))
-
 
 fig = go.Figure()
-fig.add_trace(go.Heatmap(x=elemList,y=elemList,z=np.log10(P), colorscale='Jet',
-                         colorbar = colorbar(zmin, zmax, 5)
+fig.add_trace(go.Heatmap(x=elemList,y=elemList,z=np.log10(P), text = P,
+                         colorscale='Jet',
+                         colorbar = colorbar(zmin),
+                         hovertemplate =
+                            "<b>%{x}~%{y}</b><br>" +
+                            "<i>%{text:.4f}</i>" +
+                            "<extra></extra>",
+                        hoverlabel = dict(
+                            bgcolor="white",
+                            font_size=20,
+                            font_family="Rockwell"
+                        ),
+
     ))
 
 fig.update_layout(yaxis = dict(scaleanchor = 'x'),
-                    margin=go.layout.Margin(
+                  margin=go.layout.Margin(
                         l=0, #left margin
                         r=0, #right margin
                         b=0, #bottom margin
