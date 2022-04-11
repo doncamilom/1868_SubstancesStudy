@@ -6,7 +6,10 @@ from Components import simmat
 elemList = simmat.elemList
 
 # Periodic Table Data
-from Components.TPs import TP as TP
+import Components.TPs as TPs
+
+# Change this to change the TP to be used
+TP = TPs.TPshort
 
 symbol = np.zeros(TP['shape'], 'U4')
 for elem in TP['xy'].keys():
