@@ -79,10 +79,10 @@ fig.add_trace(go.Heatmap(
                 
     ))
 
-annotations = go.Annotations()
+annotations = []
 for n, row in enumerate(symbol):
     for m, val in enumerate(row):
-        annotations.append(go.Annotation(text=str(symbol[::-1][n][m]), x=m, y=n,
+        annotations.append(go.layout.Annotation(text=str(symbol[::-1][n][m]), x=m, y=n,
                                          xref='x1', yref='y1', showarrow=False))
 
 fig.update_layout(

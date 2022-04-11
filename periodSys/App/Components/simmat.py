@@ -58,6 +58,7 @@ P /= P.max()
 zmin = P[P>0.].min()
 
 fig = go.Figure()
+np.seterr(divide='ignore')
 fig.add_trace(go.Heatmap(x=elemList,y=elemList,z=np.log10(P), text = P,
                          colorscale='Jet',
                          colorbar = colorbar(zmin),
