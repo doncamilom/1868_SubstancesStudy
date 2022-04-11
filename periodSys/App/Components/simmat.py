@@ -68,6 +68,7 @@ def plotSimMat(year, update=True):
     else:           fig.add_traces(trace)
 
     fig.update_layout(yaxis = dict(scaleanchor = 'x',autorange='reversed'),
+                      xaxis = dict(side='top',tickangle=0),
                       margin=dict(l=0,r=0,b=0,t=0),
                       plot_bgcolor='rgba(0,0,0,0)'
                       )

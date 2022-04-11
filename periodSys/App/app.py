@@ -47,8 +47,8 @@ col2 = dbc.Col([
             dbc.Row([
                     html.Div("Some information box :)",id = 'test-box',
                             style=dict(height='200px')),
-                    html.Div("Some information box 2 :)",id = 'test-box2',
-                            style={'height':'200px','text-align':'center'}),
+            #        html.Div("Some information box 2 :)",id = 'test-box2',
+            #                style={'height':'200px','text-align':'center'}),
                     ]),
             otherplot
             ])
@@ -65,29 +65,38 @@ app.layout = html.Div([tabs])
 ###################################################### Callbacks ###################################################
 
 @app.callback(
-        Output('test-box','children'),
-        [Input('PT-plot','clickData')]
+        Output('PT-plot','figure'),
+        [Input('PT-plot','clickData'), Input('year-slider','value')],
+        [State('PT-plot','figure')]
         )
-def test_pt(inp):
+def test_pt(inp, yr, fig):
     ctx_trig = dash.callback_context.triggered
-    print(ctx_trig )
+    if ctx_trig:
+        try:
+            s_elem = inp['points'][0]
+            x,y = s_elem['x'], s_elem['y']
+            elem = periodTable.symbol[::-1][y,x]
+        except:      elem = None
 
-    return "Update"
+        fig = go.Figure(fig)
+        fig['data'][0]['z'] = periodTable.plotSimPT(yr, elem)[::-1]
+    return fig
 
 
 @app.callback(
         Output('simmat-plot','figure'),
-        [Input('simmat-plot','clickData'), Input('year-slider','value')],
-        [State('simmat-plot','figure')]
+        [Input('year-slider','value')],
         )
-def test_simmat(inp,year,fig):
-    ctx_trig = dash.callback_context.triggered
-    print(ctx_trig)
-
-    #if ctx_trig[0]['prop_id'] == 'year-slider.value':
+def update_year_simmat(year):
     fig = simmat.plotSimMat(year)
-
     return fig
+
+
+#ctx_trig = dash.callback_context.triggered
+#print(ctx_trig)
+#if ctx_trig[0]['prop_id'] == 'year-slider.value':
+#Input('simmat-plot','clickData'), 
+#[State('simmat-plot','figure')]
 
 ###################################################### Run app server ###################################################    
     
