@@ -16,32 +16,34 @@ from Components import loadData,simmat, periodTable
 app = dash.Dash(__name__,title="Evolution of element families", external_stylesheets = [dbc.themes.BOOTSTRAP])
 
 
-matbox = html.Div([])
-
-matrix_height = '640px'
-matrix_width = '690px'
-
 title = html.Div([html.H1("Visualization of an empirical Periodic System, over history.",
                                style={"textAlign": "center",
                                       "background": "#a6bddb",
                                       "margin-top":"10px"})
                 ])
 
-matplot = dbc.Card(
-            dbc.CardBody(
-                    [dcc.Graph(figure=simmat.fig, id='simmat-plot', 
-                                style={'height':matrix_height,'margin-top':'0px'})]
-                )
-        )
 
-otherplot = dbc.Card(
-            dbc.CardBody(
-                    [dcc.Graph(figure=periodTable.fig, id="PT-plot",
-                        style=dict(height='700px'))]
-                )
-        )
+matrix_height = '600px'
+matrix_width = '670px'
 
-row = dbc.Row([matplot, otherplot])
+matplot = dcc.Graph(figure=simmat.fig, id='simmat-plot', 
+        style={'height':matrix_height,'width':matrix_width,'margin-top':'0px'})
+
+
+otherplot = dcc.Graph(figure=periodTable.fig, id="PT-plot",
+                style=dict(height='400px'))
+
+col2 = dbc.Col([
+            dbc.Row([
+                    html.Div("Some information box :)",id = 'test-box',
+                            style=dict(height='200px')),
+                    html.Div("Some information box 2 :)",id = 'test-box2',
+                            style=dict(height='200px')),
+                    ]),
+            otherplot
+            ])
+
+row = dbc.Row([matplot, col2])
 tabs = dbc.Col([title,  row])
 
 
@@ -51,7 +53,26 @@ app.layout = html.Div([tabs])
 
 ###################################################### Callbacks ###################################################
 
+@app.callback(
+        Output('test-box','children'),
+        [Input('PT-plot','clickData')]
+        )
+def test_pt(inp):
+    ctx_trig = dash.callback_context.triggered
+    print(ctx_trig)
 
+    return "Update"
+
+
+@app.callback(
+        Output('test-box2','children'),
+        [Input('simmat-plot','clickData')]
+        )
+def test_simmat(inp):
+    ctx_trig = dash.callback_context.triggered
+    print(ctx_trig)
+
+    return "Update"
 
 ###################################################### Run app server ###################################################    
     

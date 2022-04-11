@@ -42,29 +42,6 @@ inds = np.arange(0,n)
 #P[inds,inds] = 0
 
 
-
-
-def plot_simMat_yr(simMat_yr,year,min_yr,save=False,raw=True,cmap=False,ordering=False,scale=15,show=True,elemList=False):
-    
-    if show: 
-        fig,ax = plt.subplots(1,2,figsize=(scale,scale),
-                              gridspec_kw={"width_ratios":[100,1],"wspace":0.05})
-        ax[0].set_title("Similarity matrix between elements ordered by atomic number, Year = {}".format(year),
-                     fontsize=20)
-        sns.heatmap(P,norm=LogNorm(),ax=ax[0],cbar_ax=ax[1],cmap=cmap)
-        
-        labl = np.array(labels)[isn]      
-        tick = [i+0.5 for i in range(len(labl))]
-        ax.set_xticks(tick)
-        ax.set_yticks(tick)
-        ax.set_xticklabels(labl,fontsize=8)
-        ax.set_yticklabels(labl,fontsize=8)
-        
-        if save: plt.savefig(save,dpi=400,bbox_inches='tight')
-
-    return P
-
-
 def colorbar(zmin):
     lowlabel = np.ceil(np.log10(zmin))
     tickvals = np.arange(lowlabel,0,1)
@@ -97,12 +74,8 @@ fig.add_trace(go.Heatmap(x=elemList,y=elemList,z=np.log10(P), text = P,
     ))
 
 fig.update_layout(yaxis = dict(scaleanchor = 'x'),
-                  margin=go.layout.Margin(
-                        l=0, #left margin
-                        r=0, #right margin
-                        b=0, #bottom margin
-                        t=0  #top margin
-                ))
+                  margin=dict(l=0,r=0,b=0,t=0),
+                  plot_bgcolor='rgba(0,0,0,0)'
+                  )
 
-fig.update_layout(plot_bgcolor='rgba(0,0,0,0)')
 fig['layout']['yaxis']['autorange'] = "reversed"
