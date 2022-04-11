@@ -59,7 +59,7 @@ app.layout = html.Div([tabs])
         )
 def test_pt(inp):
     ctx_trig = dash.callback_context.triggered
-    print(ctx_trig)
+    print(ctx_trig )
 
     return "Update"
 
