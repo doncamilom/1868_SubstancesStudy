@@ -9,38 +9,28 @@ import matplotlib.pyplot as plt
 import numpy as np
 from Components import loadData
 
-year = 2020
-ordering=False
-elemList=loadData.elemList
+# Compute all (symmetric) similarity matrices at once
+P = loadData.simMats.copy()
+Sum0 = P.sum(axis=1).reshape(P.shape[0], P.shape[1], 1).repeat(103,axis=2)
+Sum1 = P.sum(axis=2).reshape(P.shape[0], 1, P.shape[1]).repeat(103,axis=1)
 
-S = loadData.simMats[year-loadData.min_yr].copy()
+np.seterr(divide='ignore')
+P = np.sqrt(P**2/(Sum0*Sum1))
+P /= np.nanmax(P)
 
-# First change order, then clean empty rows + cols
-if type(ordering)!=bool: # Use new order
-    indices = ['_' for i in range(103)]
-    labels = indices.copy()
-    for i,idx in enumerate(ordering):
-        indices[idx] = i
-        labels[idx] = elemList[i]
-    S = S[indices][:,indices]
-    
-else: labels = elemList
+zmin = P[P>0.].min()
+min_yr = 1800
 
-# Remove non-existent elements (diag==0)
-diag = np.diag(S)
-isn = diag!=0
-S = S[isn][:,isn]
-n = isn.sum()
-diag = diag[isn]
 
-Sum0 = S.sum(axis=0).reshape(-1,1).repeat(n,axis=1)
-Sum1 = S.sum(axis=1).reshape(1,-1).repeat(n,axis=0)
-P = np.sqrt(S**2/(Sum0*Sum1))
-    
-## Replace diagonal with 0, so that important features are evident
-inds = np.arange(0,n)
-#P[inds,inds] = 0
+def getElemList(dataPath):
+    elemList = []
+    with open("{}/ElementList.txt".format(dataPath),'r') as f:
+        for line in f:
+            elemList.append(line.strip())
+    return elemList
 
+def getSimMat(year):
+    return P[year-min_yr]
 
 def colorbar(zmin):
     lowlabel = np.ceil(np.log10(zmin))
@@ -54,12 +44,13 @@ def colorbar(zmin):
         x = 0.99
     )
 
-P /= P.max()
-zmin = P[P>0.].min()
+elemList = getElemList('../Data')
+year = 1900
 
 fig = go.Figure()
 np.seterr(divide='ignore')
-fig.add_trace(go.Heatmap(x=elemList,y=elemList,z=np.log10(P), text = P,
+fig.add_trace(go.Heatmap(x=elemList,y=elemList,
+                         z=np.log10(getSimMat(1900)), text = getSimMat(1900),
                          colorscale='Jet',
                          colorbar = colorbar(zmin),
                          hovertemplate =
