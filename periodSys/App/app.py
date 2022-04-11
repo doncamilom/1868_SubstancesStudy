@@ -26,6 +26,16 @@ title = html.Div([html.H1("Visualization of an empirical Periodic System, over h
 matrix_height = '600px'
 matrix_width = '670px'
 
+year_slider = html.Div([
+                    #html.H1("Year",
+                    #        style={'text-align':'center',
+                    #                'font-size':'1'}),
+                    dcc.Slider(id="year-slider",min=1800,max=2022,step=1,value=2022,
+                            marks={yr:str(yr) for yr in range(1800,2022,10)},
+                            tooltip={"placement": "top", "always_visible": True}),
+                    ],
+                    style={'margin-bottom':'40px'})
+
 matplot = dcc.Graph(figure=simmat.fig, id='simmat-plot', 
         style={'height':matrix_height,'width':matrix_width,'margin-top':'0px'})
 
@@ -38,13 +48,14 @@ col2 = dbc.Col([
                     html.Div("Some information box :)",id = 'test-box',
                             style=dict(height='200px')),
                     html.Div("Some information box 2 :)",id = 'test-box2',
-                            style=dict(height='200px')),
+                            style={'height':'200px','text-align':'center'}),
                     ]),
             otherplot
             ])
 
 row = dbc.Row([matplot, col2])
-tabs = dbc.Col([title,  row])
+tabs = dbc.Col([title, year_slider,  row],
+        style={'margin-bottom':'100px'})
 
 
 
@@ -66,13 +77,13 @@ def test_pt(inp):
 
 @app.callback(
         Output('test-box2','children'),
-        [Input('simmat-plot','clickData')]
+        [Input('simmat-plot','clickData'), Input('year-slider','value')]
         )
-def test_simmat(inp):
+def test_simmat(inp,year):
     ctx_trig = dash.callback_context.triggered
     print(ctx_trig)
 
-    return "Update"
+    return "Year was updated to {}".format(year)
 
 ###################################################### Run app server ###################################################    
     
