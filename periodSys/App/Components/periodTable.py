@@ -38,8 +38,8 @@ def plotSimPT(year,elem):
     elems_yr = np.array(simmat.elemList)[~isna]
 
     # Get list of similarities between our element and all the rest
-    sims = Pyr[elemList.index(elem)]
-    print(sims)
+    sims = np.nan_to_num(Pyr[elemList.index(elem)],0.)
+    if sims.sum()==0.:        sims += 1.    # If all 0., click stops responding 
 
     img = np.zeros(TP['shape'])
     for e in simmat.elemList:
