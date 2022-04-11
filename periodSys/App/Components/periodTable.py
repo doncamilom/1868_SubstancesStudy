@@ -33,10 +33,6 @@ def plotSimPT(year,elem):
     Pyr = P[year-1800].copy()
     X,Y = TP['xy'][elem]
     
-    # White out non-existent elements (in this year)
-    isna = np.isnan(np.diag(Pyr))
-    elems_yr = np.array(simmat.elemList)[~isna]
-
     # Get list of similarities between our element and all the rest
     sims = np.nan_to_num(Pyr[elemList.index(elem)],0.)
     if sims.sum()==0.:        sims += 1.    # If all 0., click stops responding 
@@ -51,7 +47,12 @@ def plotSimPT(year,elem):
     img[X,Y] = np.nanmax(img)
     img /= np.nanmax(img)
 
-    return img
+
+    # White out non-existent elements (in this year)
+    isna = np.isnan(np.diag(Pyr))
+    elems_yr = np.array(simmat.elemList)[~isna]
+
+    return img,elems_yr
 
 
 
@@ -83,7 +84,7 @@ fig.add_trace(go.Heatmap(
 annotations = []
 for n, row in enumerate(symbol):
     for m, val in enumerate(row):
-        annotations.append(go.layout.Annotation(text=str(symbol[::-1][n][m]), x=m, y=n,
+        annotations.append(go.layout.Annotation(text="<b>{}</b>".format(symbol[::-1][n][m]), x=m, y=n,
                                          xref='x1', yref='y1', showarrow=False))
 
 fig.update_layout(

@@ -41,7 +41,7 @@ matplot = dcc.Graph(figure=simmat.fig, id='simmat-plot',
 
 
 otherplot = dcc.Graph(figure=periodTable.fig, id="PT-plot",
-                style=dict(height='400px'))
+                style=dict(height='300px'))
 
 col2 = dbc.Col([
             dbc.Row([
@@ -79,7 +79,15 @@ def test_pt(inp, yr, fig):
         except:      elem = None
 
         fig = go.Figure(fig)
-        fig['data'][0]['z'] = periodTable.plotSimPT(yr, elem)[::-1]
+        s_data = periodTable.plotSimPT(yr, elem)    # Get necessary data for update
+
+        # Update color pattern
+        fig['data'][0]['z'] = s_data[0][::-1]
+
+        # Update labels, to account for elements that don't exist at some given year
+        new_annots = [e for e in periodTable.annotations if e.text.split('<')[1][2:] in s_data[1]]
+        fig['layout']['annotations'] = new_annots
+
     return fig
 
 
