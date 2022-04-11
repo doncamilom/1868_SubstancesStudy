@@ -14,9 +14,9 @@ P = loadData.simMats.copy()
 Sum0 = P.sum(axis=1).reshape(P.shape[0], P.shape[1], 1).repeat(103,axis=2)
 Sum1 = P.sum(axis=2).reshape(P.shape[0], 1, P.shape[1]).repeat(103,axis=1)
 
-np.seterr(divide='ignore')
-P = np.sqrt(P**2/(Sum0*Sum1))
-P /= np.nanmax(P)
+with np.errstate(divide='ignore', invalid='ignore'):
+    P = np.sqrt(P**2/(Sum0*Sum1))
+    P /= np.nanmax(P)
 
 zmin = P[P>0.].min()
 min_yr = 1800
@@ -41,16 +41,16 @@ def colorbar(zmin):
         ticktext = ['10^-{}'.format(i) for i in -tickvals.astype(int)] + ['10^0'],
         thickness = 8,
         len = 0.7,
-        x = 0.99
+        x = 0.99,
     )
 
 elemList = getElemList('../Data')
-year = 1900
 
 fig = go.Figure()
-np.seterr(divide='ignore')
-fig.add_trace(go.Heatmap(x=elemList,y=elemList,
-                         z=np.log10(getSimMat(1900)), text = getSimMat(1900),
+def plotSimMat(year, update=True):
+    np.seterr(divide='ignore')
+    trace = go.Heatmap(x=elemList,y=elemList,
+                         z=np.log10(getSimMat(year)), text = getSimMat(year),
                          colorscale='Jet',
                          colorbar = colorbar(zmin),
                          hovertemplate =
@@ -62,12 +62,15 @@ fig.add_trace(go.Heatmap(x=elemList,y=elemList,
                             font_size=20,
                             font_family="Rockwell"
                         ),
+        )
 
-    ))
+    if update:      fig.update_traces(trace)
+    else:           fig.add_traces(trace)
 
-fig.update_layout(yaxis = dict(scaleanchor = 'x'),
-                  margin=dict(l=0,r=0,b=0,t=0),
-                  plot_bgcolor='rgba(0,0,0,0)'
-                  )
+    fig.update_layout(yaxis = dict(scaleanchor = 'x',autorange='reversed'),
+                      margin=dict(l=0,r=0,b=0,t=0),
+                      plot_bgcolor='rgba(0,0,0,0)'
+                      )
+    return fig
 
-fig['layout']['yaxis']['autorange'] = "reversed"
+fig = plotSimMat(2022,update=False)

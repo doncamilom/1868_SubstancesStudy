@@ -76,14 +76,18 @@ def test_pt(inp):
 
 
 @app.callback(
-        Output('test-box2','children'),
-        [Input('simmat-plot','clickData'), Input('year-slider','value')]
+        Output('simmat-plot','figure'),
+        [Input('simmat-plot','clickData'), Input('year-slider','value')],
+        [State('simmat-plot','figure')]
         )
-def test_simmat(inp,year):
+def test_simmat(inp,year,fig):
     ctx_trig = dash.callback_context.triggered
     print(ctx_trig)
 
-    return "Year was updated to {}".format(year)
+    #if ctx_trig[0]['prop_id'] == 'year-slider.value':
+    fig = simmat.plotSimMat(year)
+
+    return fig
 
 ###################################################### Run app server ###################################################    
     
