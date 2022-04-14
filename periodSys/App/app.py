@@ -45,10 +45,10 @@ PTplot = dcc.Graph(figure=periodTable.fig, id="PT-plot",
 
 col2 = dbc.Col([
             dbc.Row([
-                    html.Button("Optimize", id='opt-button',),
-                    html.Div("Cost: -3.6",id = 'test-box2',
+                    html.Button("Optimize\npermutation", id='opt-button',),
+                    html.Div("",id = 'show-cost',
                             style={'height':'200px','text-align':'center',
-                                    'font-size':25,'width':'200px'}),
+                                    'font-size':25,'width':'500px'}),
                     ]),
             PTplot
             ])
@@ -59,7 +59,7 @@ tabs = dbc.Col([title, year_slider,  row],
 
 
 
-app.layout = html.Div([tabs])
+app.layout = html.Div([tabs, dcc.Store(id='current-perm')])
     
 
 ###################################################### Callbacks ###################################################
@@ -69,7 +69,7 @@ app.layout = html.Div([tabs])
         [Input('PT-plot','clickData'), Input('year-slider','value')],
         [State('PT-plot','figure')]
         )
-def test_pt(inp, yr, fig):
+def update_PT(inp, yr, fig):
     ctx_trig = dash.callback_context.triggered
     if ctx_trig:
         try:
@@ -92,34 +92,93 @@ def test_pt(inp, yr, fig):
 
 
 @app.callback(
-        Output('simmat-plot','figure'),
-        [Input('year-slider','value'),Input('opt-button','n_clicks')],
-        [State('simmat-plot','figure')]
+        Output('current-perm','data'),
+        [Input('year-slider','value'), Input('opt-button','n_clicks')],
+        [State('current-perm','data')]
         )
-def update_simmat(year, _, fig):
-    global perm
+def select_perm(year, _, current):
+    """
+    Upon pressing button, select a random index of permutation, and store in dcc.Store
+    """
     ctx_trig = dash.callback_context.triggered
 
-    if ctx_trig[0]['prop_id'] == 'year-slider.value':
+    if ctx_trig[0]['prop_id'] == 'opt-button.n_clicks':
+        indivs_yr = loadData.opt_permut[2020]
+        n = np.random.choice(len(indivs_yr))
+        return year, n
+    else: return current
+
+
+@app.callback(
+        Output('simmat-plot','figure'),
+        [Input('year-slider','value'),Input('opt-button','n_clicks'), Input('current-perm','data')],
+        [State('simmat-plot','figure')]
+        )
+def update_simmat(year, _, store, fig):
+    """
+    Update what similarity matrix is being shown.
+    User has the option to select a year, and to optimize permutation.
+    Depending on the order, various outcomes are possible, e.g.
+        Select year, optimize:
+            Show simMat for year, with ordering opt for that year.
+        Select year1, optimize, select year2:
+            Show simMat of year2, with ordering optimized for year1.
+    """
+
+    ctx_trig = dash.callback_context.triggered
+
+    if ctx_trig[0]['prop_id'] == 'year-slider.value':   # If only year is updated: don't change permutation
+        if store:
+            prev_yr, perm_n = store
+            indivs_yr = loadData.opt_permut[prev_yr]
+            perm = indivs_yr[ perm_n ]
+        else:
+            perm = np.arange(103)
+
         fig = simmat.plotSimMat(year, perm)
 
-    if ctx_trig[0]['prop_id'] == 'opt-button.n_clicks':
+    if ctx_trig[0]['prop_id'] == 'opt-button.n_clicks': # If opt button was activated: change permutation, to this year's
         # Select a random pre-optimized permutation for this year. 
+        _, perm_n = store
+
         indivs_yr = loadData.opt_permut[year]
-        perm = indivs_yr[ np.random.choice(len(indivs_yr)) ]
-
-        print(perm)
-
+        if type(perm_n)==int:   perm = indivs_yr[ perm_n ]
+        else:                   perm = range(103)
 
         fig = simmat.plotSimMat(year, perm)
 
     return fig
 
-#ctx_trig = dash.callback_context.triggered
-#print(ctx_trig)
-#if ctx_trig[0]['prop_id'] == 'year-slider.value':
-#Input('simmat-plot','clickData'), 
-#[State('simmat-plot','figure')]
+
+
+@app.callback(
+        Output('show-cost','children'),
+        [Input('year-slider','value'), Input('opt-button','n_clicks'), Input('current-perm','data')]
+        )
+def update_cost(year, _, store):
+    """
+    Update box showing the cost of permutation, on the current simmat.
+    """
+
+    if store:
+        perm_year, perm_n = store
+        indivs_yr = loadData.opt_permut[perm_year]
+
+        if type(perm_n)==int:   perm = indivs_yr[ perm_n ]
+        else:                   perm = np.arange(103)
+
+        P = simmat.getSimMat(year,perm=range(103))
+        P = np.nan_to_num(P,0)
+        cost = loadData.costPerm(P,perm)
+
+        ctx_trig = dash.callback_context.triggered
+        if ctx_trig[0]['prop_id'] in ['year-slider.value', 'opt-button.n_clicks']:
+            return "Using 1D-PS from {},\n\nthe cost in {} is {:.3f}".format(perm_year, year, cost)
+
+    return "Do something!"
+
+
+
 
 ###################################################### Run app server ###################################################    
     

@@ -17,6 +17,12 @@ dataPath = root+'Data/'
 resultsPath = root+ 'Results/'
 
 
+def costPerm(P, perm):
+    i = perm.reshape(1,-1)
+    diffs = np.abs(i - i.T) + np.eye(i.shape[1])
+    F = -np.sum(P/diffs)
+    return F
+
 def getElemList(dataPath):
     elemList = []
     with open("{}ElementList.txt".format(dataPath),'r') as f:
