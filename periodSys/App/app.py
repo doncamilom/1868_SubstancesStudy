@@ -69,14 +69,16 @@ app.layout = html.Div([tabs, dcc.Store(id='current-perm')])
         [Input('PT-plot','clickData'), Input('year-slider','value')],
         [State('PT-plot','figure')]
         )
-def update_PT(inp, yr, fig):
+def update_PT(click, yr, fig):
     ctx_trig = dash.callback_context.triggered
-    if ctx_trig:
-        try:
-            s_elem = inp['points'][0]
+
+    if ctx_trig[0]['prop_id'] in [ 'PT-plot.clickData','year-slider.value' ]:
+        try:    # If element exists in clicked position
+            s_elem = click['points'][0]
             x,y = s_elem['x'], s_elem['y']
             elem = periodTable.symbol[::-1][y,x]
         except:      elem = None
+        
 
         fig = go.Figure(fig)
         s_data = periodTable.plotSimPT(yr, elem)    # Get necessary data for update

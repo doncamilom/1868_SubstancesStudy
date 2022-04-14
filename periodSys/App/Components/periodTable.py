@@ -31,10 +31,19 @@ def plotSimPT(year,elem):
     Get values of similarity between selected element, and all other elements.
     Format this in a periodic table as specified in TP module.
     """
-    if elem==None:        return color
 
     Pyr = P[year-1800].copy()
-    X,Y = TP['xy'][elem]
+
+    # Get list of elements that exist this year
+    isna = np.isnan(np.diag(Pyr))
+    elems_yr = np.array(simmat.elemList)[~isna]
+
+    if elem==None:        return color, elems_yr
+
+
+    if elem!='':
+        X,Y = TP['xy'][elem]
+    else: X,Y = 0,0
     
     # Get list of similarities between our element and all the rest
     sims = np.nan_to_num(Pyr[elemList.index(elem)],0.)
@@ -50,12 +59,10 @@ def plotSimPT(year,elem):
     img[X,Y] = np.nanmax(img)
     img /= np.nanmax(img)
 
-
-    # White out non-existent elements (in this year)
-    isna = np.isnan(np.diag(Pyr))
-    elems_yr = np.array(simmat.elemList)[~isna]
-
     return img,elems_yr
+
+
+
 
 
 
