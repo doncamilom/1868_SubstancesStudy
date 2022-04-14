@@ -30,7 +30,7 @@ year_slider = html.Div([
                     #html.H1("Year",
                     #        style={'text-align':'center',
                     #                'font-size':'1'}),
-                    dcc.Slider(id="year-slider",min=1800,max=2022,step=1,value=2022,
+                    dcc.Slider(id="year-slider",min=1800,max=2021,step=1,value=2021,
                             marks={yr:str(yr) for yr in range(1800,2022,10)},
                             tooltip={"placement": "top", "always_visible": True}),
                     ],
@@ -40,17 +40,17 @@ matplot = dcc.Graph(figure=simmat.fig, id='simmat-plot',
         style={'height':matrix_height,'width':matrix_width,'margin-top':'0px'})
 
 
-otherplot = dcc.Graph(figure=periodTable.fig, id="PT-plot",
+PTplot = dcc.Graph(figure=periodTable.fig, id="PT-plot",
                 style=dict(height='300px'))
 
 col2 = dbc.Col([
             dbc.Row([
-                    html.Div("Some information box :)",id = 'test-box',
-                            style=dict(height='200px')),
-            #        html.Div("Some information box 2 :)",id = 'test-box2',
-            #                style={'height':'200px','text-align':'center'}),
+                    html.Button("Optimize", id='opt-button',),
+                    html.Div("Cost: -3.6",id = 'test-box2',
+                            style={'height':'200px','text-align':'center',
+                                    'font-size':25,'width':'200px'}),
                     ]),
-            otherplot
+            PTplot
             ])
 
 row = dbc.Row([matplot, col2])
@@ -93,12 +93,27 @@ def test_pt(inp, yr, fig):
 
 @app.callback(
         Output('simmat-plot','figure'),
-        [Input('year-slider','value')],
+        [Input('year-slider','value'),Input('opt-button','n_clicks')],
+        [State('simmat-plot','figure')]
         )
-def update_year_simmat(year):
-    fig = simmat.plotSimMat(year)
-    return fig
+def update_simmat(year, _, fig):
+    global perm
+    ctx_trig = dash.callback_context.triggered
 
+    if ctx_trig[0]['prop_id'] == 'year-slider.value':
+        fig = simmat.plotSimMat(year, perm)
+
+    if ctx_trig[0]['prop_id'] == 'opt-button.n_clicks':
+        # Select a random pre-optimized permutation for this year. 
+        indivs_yr = loadData.opt_permut[year]
+        perm = indivs_yr[ np.random.choice(len(indivs_yr)) ]
+
+        print(perm)
+
+
+        fig = simmat.plotSimMat(year, perm)
+
+    return fig
 
 #ctx_trig = dash.callback_context.triggered
 #print(ctx_trig)

@@ -29,8 +29,26 @@ def getElemList(dataPath):
             elemList.append(line.strip())
     return elemList
 
-def getSimMat(year):
-    return P[year-min_yr]
+def genToElem(gen,ref=False):
+    """ref: list of elements of reference. When all elements present, ref = elements by AN"""
+    if type(ref)==bool:
+        ref = elemList
+    order = ['_' for i in range(len(ref))]
+    for i,idx in enumerate(gen):
+        order[idx] = ref[i]
+    return order
+
+def getSimMat(year,perm):
+
+    indices = ['_' for i in range(103)]
+    labels = indices.copy()
+    for i,idx in enumerate(perm):
+        indices[idx] = i
+        labels[idx] = elemList[i]
+    S = P[year-min_yr][indices][:,indices]
+    return S
+
+    return P[year-min_yr][perm][:,perm]
 
 def colorbar(zmin):
     lowlabel = np.ceil(np.log10(zmin))
@@ -47,10 +65,13 @@ def colorbar(zmin):
 elemList = getElemList('../Data')
 
 fig = go.Figure()
-def plotSimMat(year, update=True):
+def plotSimMat(year, perm=range(103), update=True):
     np.seterr(divide='ignore')
-    trace = go.Heatmap(x=elemList,y=elemList,
-                         z=np.log10(getSimMat(year)), text = getSimMat(year),
+    p = getSimMat(year,perm)
+    label = genToElem(perm)
+
+    trace = go.Heatmap(x=label,y=label,
+                         z=np.log10(p), text = p,
                          colorscale='Jet',
                          colorbar = colorbar(zmin),
                          hovertemplate =
@@ -74,4 +95,4 @@ def plotSimMat(year, update=True):
                       )
     return fig
 
-fig = plotSimMat(2022,update=False)
+fig = plotSimMat(2021,update=False)
