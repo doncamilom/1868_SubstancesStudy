@@ -6,20 +6,30 @@
 
 downl_rxn=''
 donwl_sub=''
+date=$(date +%d_%b_%y)	# Store date as a variable
 preproc_rxn=''
 describe=''
 preproc_PS=''
 run_PS=''
-#verbose='false'
 
 print_usage() {
-  echo "Usage: ..."
+  printf "\n\nUsage %s:\n\n" $0 
+  echo "	[-R] Download database for Reactions"
+  echo "	[-S] Download database for Substances"
+  echo "	[-D] Input custom date in format dd_Mon_yy. (e.g. 21_Feb_22)"
+  echo "	     Use this when download was made in different date than other steps"
+  echo "	[-r] Preprocess downloaded Reaction data"
+  echo "	[-d] Produce diagnostic plots on downloaded data"
+  echo "	[-p] Produce dataset for Periodic System project"
+  printf "	[-P] Run the whole pipeline for PS project\n\n\n"
 }
 
-while getopts 'RSrdpPv' flag; do
+# Parse arguments
+while getopts 'RSD:rdpPv' flag; do
   case "${flag}" in
     R) downl_rxn=1 ;;
     S) downl_sub=1 ;;
+    D) date="$OPTARG" ;;
     r) preproc_rxn=1 ;;
     d) describe=1 ;;
     p) preproc_PS=1 ;;
@@ -29,11 +39,6 @@ while getopts 'RSrdpPv' flag; do
   esac
 done
 
-
-
-
-date=$(date +%d_%b_%y)	# Store date as a variable
-#date="21_Feb_22"	TODO: Handle custom date
 
 ## Download reactions from database using 20 processes (check periodically that 60M is large enough to contain all IDs)
 if [ -n "$downl_rxn" ]; then
@@ -129,13 +134,13 @@ fi
 if [ -n "$run_PS" ]; then
 	# Execute extraction of similarities for periodSys project
 	cd periodSys
-	./run_pipe.sh
+	./run_pipe.sh -RSPH
+	./run_pipe.sh -pi SplitOrgInorg/org_subs.tsv -o SplitOrgInorg/RunOrg -RSPH
+
 	
 	# To run everything for a custom CS. e.g. CS of only organic substances, etc. Use pip_customCS.sh
 	# First argument is datafile (already formated with Perl script)
 	# Second argument is output dir. Here, a whole file system will be created to host results, scr, etc.
-	cd periodSys
-	./pipe_customCS.sh SplitOrgInorg/org_subs.tsv SplitOrgInorg/RunOrg &
 fi
 
 
