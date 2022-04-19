@@ -78,28 +78,28 @@ if [ -n "$git_sim" ]; then
 	cat $out_dir/scr/grouped_rs* > $out_dir/Data/allRs.tsv
 	
 	## Convert all this data into python usable format
-	./similarity/dataToPy.py -i $out_dir/
+	python3 similarity/dataToPy.py -i $out_dir/
 	
 	# Produce similarity matrices for years between 1800 and 2022, (takes ~ 4h using 50 processors)
-	./similarity/simMat.py -n 50 -i $out_dir/ > $out_dir/log/sim.log
+	python3 similarity/simMat.py -n 50 -i $out_dir/ > $out_dir/log/sim.log
 fi
 
 if [ -n "$opt_perm" ]; then
 	# Run optimization of ordering of elements with genetic algorithms
 	rm $out_dir/log/genetic1D.log -f
-	./Genetic1D/genetic1D.py -N 50 -i $out_dir/	# Run 50 optimizations each year, so we can pick the best 20.
+	python3 Genetic1D/genetic1D.py -N 50 -i $out_dir/	# Run 50 optimizations each year, so we can pick the best 20.
 fi
 
 if [ -n "$comparePS" ]; then
 	# Explore historical evolution of PS. run comparison of the optimized permutations over time
 	# Produces the file ./Results/mathistory.npy
-	./Genetic1D/comparePSs.py -N 50 -i $out_dir/
+	python3 Genetic1D/comparePSs.py -i $out_dir/
 fi
 
 if [ -n "$findGrps" ]; then
 	# For this step, we have to switch to k70 as the module we need for that is only here.
 	# Run code for finding families of elements using computer vision algorithms
-	./familiesElem/findGroups.py -N 20	#TODO modify script to accept $out_dir as an arg
+	python3 familiesElem/findGroups.py -N 20	#TODO modify script to accept $out_dir as an arg
 fi
 
 
