@@ -55,14 +55,12 @@ mkdir $out_dir/log
 cp $home/Data/ElementList.txt $out_dir/Data/
 
 
-echo $inp_file
 if [ -z "$inp_preproc" ]; then	# If data is reported to NOT be preprocessed with format.pl
 	## Format data into tractable format for awk
 	echo "Formating $inp_file and saving in $out_dir/Data/format_MFs.tsv"
 	#./similarity/format.pl $inp_file > $out_dir/Data/format_MFs.tsv
 	inp_file="$out_dir/Data/format_MFs.tsv"
 fi
-echo $inp_file
 
 if [ -n "$get_rs" ]; then
 	## Decompose MFs into Rs

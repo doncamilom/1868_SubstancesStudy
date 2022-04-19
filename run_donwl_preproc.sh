@@ -135,12 +135,14 @@ if [ -n "$run_PS" ]; then
 	# Execute extraction of similarities for periodSys project
 	cd periodSys
 	./run_pipe.sh -RSPH
-	./run_pipe.sh -pi SplitOrgInorg/org_subs.tsv -o SplitOrgInorg/RunOrg -RSPH
-
 	
-	# To run everything for a custom CS. e.g. CS of only organic substances, etc. Use pip_customCS.sh
-	# First argument is datafile (already formated with Perl script)
-	# Second argument is output dir. Here, a whole file system will be created to host results, scr, etc.
+	######################
+	## To run everything for a custom CS. e.g. CS of only organic substances, etc. Use pip_customCS.sh
+	## First argument is datafile (already formated with Perl script)
+	## Second argument is output dir. Here, a whole file system will be created to host results, scr, etc.
+	######################
+
+	#./run_pipe.sh -pi SplitOrgInorg/org_subs.tsv -o SplitOrgInorg/RunOrg -RSPH
 fi
 
 

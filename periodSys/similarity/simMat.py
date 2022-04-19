@@ -5,14 +5,18 @@ import multiprocessing as mp
 import pandas as pd
 from itertools import chain
 from TPs import TP
-from matplotlib.colors import LogNorm
-from matplotlib import cm
 import re
 import bz2
 import pickle
 from scipy import sparse as sp
 from time import time
 
+try:
+    import matplotlib.pyplot as plt
+    import seaborn as sns
+    from matplotlib.colors import LogNorm
+    from matplotlib import cm
+except: pass
 
 def getElemList(dataPath):
     with open(dataPath + 'ElementList.txt','r') as f:
@@ -222,7 +226,7 @@ def plot_simMat_yr(simMat_yr,year,min_yr,save=False,raw=True,cmap=False,ordering
         e.g. [40,21,10] means H is in position 40, He in 21 and Li is 10th.
     """
     S = simMat_yr[year - min_yr].copy()
-    
+
     # First change order, then clean empty rows + cols
     if type(ordering)!=bool: # Use new order
         indices = ['_' for i in range(103)]
@@ -247,23 +251,20 @@ def plot_simMat_yr(simMat_yr,year,min_yr,save=False,raw=True,cmap=False,ordering
         Sum1 = S.sum(axis=1).reshape(1,-1).repeat(n,axis=0)
         P = np.sqrt(S**2/(Sum0*Sum1))
         
-    ## Replace diagonal with 0, so that important features are evident
-    inds = np.arange(0,n)
-    #P[inds,inds] = 0
-    
     if show: 
         fig,ax = plt.subplots(1,2,figsize=(scale,scale),
                               gridspec_kw={"width_ratios":[100,1],"wspace":0.05})
+        ax = ax.ravel()
         ax[0].set_title("Similarity matrix between elements ordered by atomic number, Year = {}".format(year),
                      fontsize=20)
         sns.heatmap(P,norm=LogNorm(),ax=ax[0],cbar_ax=ax[1],cmap=cmap)
         
         labl = np.array(labels)[isn]      
         tick = [i+0.5 for i in range(len(labl))]
-        ax.set_xticks(tick)
-        ax.set_yticks(tick)
-        ax.set_xticklabels(labl,fontsize=8)
-        ax.set_yticklabels(labl,fontsize=8)
+        ax[0].set_xticks(tick)
+        ax[0].set_yticks(tick)
+        ax[0].set_xticklabels(labl,fontsize=8)
+        ax[0].set_yticklabels(labl,fontsize=8)
         
         if save: plt.savefig(save,dpi=400,bbox_inches='tight')
 
