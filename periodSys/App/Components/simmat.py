@@ -22,6 +22,26 @@ zmin = P[P>0.].min()
 min_yr = 1800
 
 
+def symmetrize(S):
+    """Get symmetrized version (P) of matrix S"""
+    # Set all nans to 0
+    S = np.nan_to_num(S,0)    
+
+    diag = np.diag(S)
+    n = S.shape[0]
+    Sum0 = S.sum(axis=0).reshape(-1,1).repeat(n,axis=1)
+    Sum1 = S.sum(axis=1).reshape(1,-1).repeat(n,axis=0)
+
+    P = np.sqrt(S**2/(Sum0*Sum1+1e-5))
+
+    P = np.nan_to_num(P,0)  # If entry is nan, then element doesn't exist. Make weight == 0.
+
+    # Set diagonal elements to 0
+    inds = np.arange(0,n)
+    P[inds,inds] = 0
+    return P
+
+
 def getElemList(dataPath):
     elemList = []
     with open("{}/ElementList.txt".format(dataPath),'r') as f:

@@ -169,8 +169,9 @@ def update_cost(year, _, store):
         if type(perm_n)==int:   perm = indivs_yr[ perm_n ]
         else:                   perm = np.arange(103)
 
-        P = simmat.getSimMat(year,perm=range(103))
-        P = np.nan_to_num(P,0)
+        S = loadData.simMats[year - 1800].copy()
+        P = simmat.symmetrize(S)
+        
         cost = loadData.costPerm(P,perm)
 
         ctx_trig = dash.callback_context.triggered

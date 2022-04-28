@@ -40,3 +40,7 @@ min_yr, max_yr = 1800,2022
 # Load optimized permutations of elements
 fh = open(resultsPath + 'optim_permut_yearly.gen', 'rb') 
 opt_permut = pickle.load(fh)
+
+# Load families of elements.
+fh = open(resultsPath + 'foundGroups.bin','rb')
+FEs = dict(pickle.load(fh))
