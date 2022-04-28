@@ -29,9 +29,10 @@ def main():
     fh = open(resultPath + 'optim_permut_yearly.gen', 'rb') 
     Indivs_yr = pickle.load(fh)
 
+
     with mp.Pool(processes=NP) as pool:
         results = [pool.apply_async(FEs_from_SM, args=(yr, 20))     # Use only 20 best permuts. for each year. 
-                   for yr in range(1800,1804)]
+                   for yr in range(1800,2022)]
         results_get = [r.get() for r in results]
     
 
@@ -97,7 +98,10 @@ def CVP(Y, ind, US_FACT, blur_sz, th, b, max_grp=20):
     canny = cv2.Canny(padd, th , th + b)
 
     # Find rectangles
-    cnts = cv2.findContours(canny, cv2.RETR_LIST, cv2.CHAIN_APPROX_NONE)[0]
+    cnts = cv2.findContours(canny, cv2.RETR_LIST, cv2.CHAIN_APPROX_NONE)
+
+    # ATTENTION: Depending on the version of OpenCV, contours are index 0 or 1.
+    cnts = cnts[1]
 
     cp=upsamp.copy()
     final_cnts = []
