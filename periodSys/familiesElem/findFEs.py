@@ -31,13 +31,13 @@ def main():
 
     with mp.Pool(processes=NP) as pool:
         results = [pool.apply_async(FEs_from_SM, args=(yr, 20))     # Use only 20 best permuts. for each year. 
-                   for yr in range(1800,1812)]
+                   for yr in range(1800,1804)]
         results_get = [r.get() for r in results]
     
 
-    print(results_get)
+    logger(results_get)
     filehandler = open(resultPath+'foundFEs.bin', 'wb')
-    #pickle.dump(results_get, filehandler)
+    pickle.dump(results_get, filehandler)
 
 ######
 
@@ -232,7 +232,7 @@ def SNR(Collection, NIters, ID_run):
             if sum_sim/len(FinalState) == meanSimIter: break
                 
         meanSimIter = sum_sim/len(FinalState)
-        print(f"ID {ID_run} Mean Similarity in {It+1}th Iteration = {meanSimIter:.3f}.")
+        logger(f"ID {ID_run} Mean Similarity in {It+1}th Iteration = {meanSimIter:.3f}.")
 
         
     # All this is just diagnostic.
@@ -252,9 +252,9 @@ def SNR(Collection, NIters, ID_run):
     Return = getUnique(FinalState)
     TotalUniqInitState = getUnique(Collection)
 
-    print(f"ID {ID_run} Loop finished after {It+1} iterations.")
-    print(f"ID {ID_run} \t ** InitState contained {len(TotalUniqInitState)} unique groups.")
-    print(f"ID {ID_run} \t ** FinalState contains {len(Return)}\n")
+    logger(f"ID {ID_run} Loop finished after {It+1} iterations.")
+    logger(f"ID {ID_run} \t ** InitState contained {len(TotalUniqInitState)} unique groups.")
+    logger(f"ID {ID_run} \t ** FinalState contains {len(Return)}\n")
 
     return Return
 
@@ -312,14 +312,14 @@ def FEs_from_SM(Y, Nind):
         collects.append(ci)
 
 
-    print("*** Now calculating final collection for year {}***\n".format(Y))
+    logger("*** Now calculating final collection for year {}***\n".format(Y))
 
-    res = ( Y, SNR(collects, NIters=15, ID_run=f"{Y:full}") )
+    res = ( Y, SNR(collects, NIters=15, ID_run=f"{Y}:FULL") )
 
     fh = open(resultPath+'foundFEs/FE_{}.bin'.format(Y), 'wb')
-    #pickle.dump(res, fh)
+    pickle.dump(res, fh)
     
-    print("Done with year {}".format(Y))
+    logger("Done with year {}".format(Y))
     return res
 
 
@@ -346,4 +346,4 @@ if __name__=="__main__":
     t0=time()
     main()
 
-    #logger("Total time: {:.3f} s".format(time()-t0))
+    logger("Total time: {:.3f} s".format(time()-t0))

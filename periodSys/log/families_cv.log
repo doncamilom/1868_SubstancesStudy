@@ -1,0 +1,527 @@
+ID 1800:0 Mean Similarity in 1th Iteration = 1.000.
+ID 1801:0 Mean Similarity in 1th Iteration = 1.000.
+ID 1800:0 Mean Similarity in 2th Iteration = 1.000.
+ID 1801:0 Mean Similarity in 2th Iteration = 1.000.
+ID 1800:0 Loop finished after 3 iterations.
+ID 1800:0 	 ** InitState contained 6 unique groups.
+ID 1800:0 	 ** FinalState contains 4
+
+ID 1801:0 Loop finished after 3 iterations.
+ID 1801:0 	 ** InitState contained 7 unique groups.
+ID 1801:0 	 ** FinalState contains 4
+
+ID 1800:1 Mean Similarity in 1th Iteration = 1.000.
+ID 1800:1 Mean Similarity in 2th Iteration = 1.000.
+ID 1801:1 Mean Similarity in 1th Iteration = 1.000.
+ID 1800:1 Loop finished after 3 iterations.
+ID 1800:1 	 ** InitState contained 6 unique groups.
+ID 1800:1 	 ** FinalState contains 4
+
+ID 1801:1 Mean Similarity in 2th Iteration = 1.000.
+ID 1801:1 Loop finished after 3 iterations.
+ID 1801:1 	 ** InitState contained 7 unique groups.
+ID 1801:1 	 ** FinalState contains 4
+
+ID 1800:2 Mean Similarity in 1th Iteration = 1.000.
+ID 1801:2 Mean Similarity in 1th Iteration = 0.946.
+ID 1800:2 Mean Similarity in 2th Iteration = 1.000.
+ID 1801:2 Mean Similarity in 2th Iteration = 1.000.
+ID 1800:2 Loop finished after 3 iterations.
+ID 1800:2 	 ** InitState contained 8 unique groups.
+ID 1800:2 	 ** FinalState contains 4
+
+ID 1801:2 Loop finished after 3 iterations.
+ID 1801:2 	 ** InitState contained 5 unique groups.
+ID 1801:2 	 ** FinalState contains 3
+
+ID 1800:3 Mean Similarity in 1th Iteration = 1.000.
+ID 1800:3 Mean Similarity in 2th Iteration = 1.000.
+ID 1801:3 Mean Similarity in 1th Iteration = 1.000.
+ID 1800:3 Loop finished after 3 iterations.
+ID 1800:3 	 ** InitState contained 6 unique groups.
+ID 1800:3 	 ** FinalState contains 4
+
+ID 1801:3 Mean Similarity in 2th Iteration = 1.000.
+ID 1800:4 Mean Similarity in 1th Iteration = 1.000.
+ID 1801:3 Loop finished after 3 iterations.
+ID 1801:3 	 ** InitState contained 9 unique groups.
+ID 1801:3 	 ** FinalState contains 5
+
+ID 1800:4 Mean Similarity in 2th Iteration = 1.000.
+ID 1800:4 Loop finished after 3 iterations.
+ID 1800:4 	 ** InitState contained 8 unique groups.
+ID 1800:4 	 ** FinalState contains 4
+
+ID 1801:4 Mean Similarity in 1th Iteration = 1.000.
+ID 1800:5 Mean Similarity in 1th Iteration = 1.000.
+ID 1801:4 Mean Similarity in 2th Iteration = 1.000.
+ID 1800:5 Mean Similarity in 2th Iteration = 1.000.
+ID 1801:4 Loop finished after 3 iterations.
+ID 1801:4 	 ** InitState contained 8 unique groups.
+ID 1801:4 	 ** FinalState contains 4
+
+ID 1800:5 Loop finished after 3 iterations.
+ID 1800:5 	 ** InitState contained 8 unique groups.
+ID 1800:5 	 ** FinalState contains 4
+
+ID 1800:6 Mean Similarity in 1th Iteration = 1.000.
+ID 1801:5 Mean Similarity in 1th Iteration = 1.000.
+ID 1800:6 Mean Similarity in 2th Iteration = 1.000.
+ID 1800:6 Loop finished after 3 iterations.
+ID 1800:6 	 ** InitState contained 6 unique groups.
+ID 1800:6 	 ** FinalState contains 4
+
+ID 1801:5 Mean Similarity in 2th Iteration = 1.000.
+ID 1801:5 Loop finished after 3 iterations.
+ID 1801:5 	 ** InitState contained 9 unique groups.
+ID 1801:5 	 ** FinalState contains 5
+
+ID 1800:7 Mean Similarity in 1th Iteration = 1.000.
+ID 1800:7 Mean Similarity in 2th Iteration = 1.000.
+ID 1800:7 Loop finished after 3 iterations.
+ID 1800:7 	 ** InitState contained 8 unique groups.
+ID 1800:7 	 ** FinalState contains 4
+
+ID 1801:6 Mean Similarity in 1th Iteration = 1.000.
+ID 1800:8 Mean Similarity in 1th Iteration = 1.000.
+ID 1800:8 Mean Similarity in 2th Iteration = 1.000.
+ID 1801:6 Mean Similarity in 2th Iteration = 1.000.
+ID 1800:8 Loop finished after 3 iterations.
+ID 1800:8 	 ** InitState contained 6 unique groups.
+ID 1800:8 	 ** FinalState contains 4
+
+ID 1801:6 Loop finished after 3 iterations.
+ID 1801:6 	 ** InitState contained 9 unique groups.
+ID 1801:6 	 ** FinalState contains 5
+
+ID 1800:9 Mean Similarity in 1th Iteration = 1.000.
+ID 1800:9 Mean Similarity in 2th Iteration = 1.000.
+ID 1800:9 Loop finished after 3 iterations.
+ID 1800:9 	 ** InitState contained 8 unique groups.
+ID 1800:9 	 ** FinalState contains 4
+
+ID 1801:7 Mean Similarity in 1th Iteration = 1.000.
+ID 1801:7 Mean Similarity in 2th Iteration = 1.000.
+ID 1800:10 Mean Similarity in 1th Iteration = 1.000.
+ID 1800:10 Mean Similarity in 2th Iteration = 1.000.
+ID 1801:7 Loop finished after 3 iterations.
+ID 1801:7 	 ** InitState contained 10 unique groups.
+ID 1801:7 	 ** FinalState contains 5
+
+ID 1800:10 Loop finished after 3 iterations.
+ID 1800:10 	 ** InitState contained 6 unique groups.
+ID 1800:10 	 ** FinalState contains 4
+
+ID 1801:8 Mean Similarity in 1th Iteration = 0.963.
+ID 1800:11 Mean Similarity in 1th Iteration = 1.000.
+ID 1801:8 Mean Similarity in 2th Iteration = 1.000.
+ID 1800:11 Mean Similarity in 2th Iteration = 1.000.
+ID 1801:8 Loop finished after 3 iterations.
+ID 1801:8 	 ** InitState contained 8 unique groups.
+ID 1801:8 	 ** FinalState contains 4
+
+ID 1800:11 Loop finished after 3 iterations.
+ID 1800:11 	 ** InitState contained 8 unique groups.
+ID 1800:11 	 ** FinalState contains 4
+
+ID 1800:12 Mean Similarity in 1th Iteration = 1.000.
+ID 1801:9 Mean Similarity in 1th Iteration = 1.000.
+ID 1800:12 Mean Similarity in 2th Iteration = 1.000.
+ID 1800:12 Loop finished after 3 iterations.
+ID 1800:12 	 ** InitState contained 8 unique groups.
+ID 1800:12 	 ** FinalState contains 4
+
+ID 1801:9 Mean Similarity in 2th Iteration = 1.000.
+ID 1801:9 Loop finished after 3 iterations.
+ID 1801:9 	 ** InitState contained 6 unique groups.
+ID 1801:9 	 ** FinalState contains 5
+
+ID 1800:13 Mean Similarity in 1th Iteration = 1.000.
+ID 1800:13 Mean Similarity in 2th Iteration = 1.000.
+ID 1800:13 Loop finished after 3 iterations.
+ID 1800:13 	 ** InitState contained 6 unique groups.
+ID 1800:13 	 ** FinalState contains 4
+
+ID 1801:10 Mean Similarity in 1th Iteration = 0.958.
+ID 1800:14 Mean Similarity in 1th Iteration = 1.000.
+ID 1801:10 Mean Similarity in 2th Iteration = 1.000.
+ID 1800:14 Mean Similarity in 2th Iteration = 1.000.
+ID 1800:14 Loop finished after 3 iterations.
+ID 1800:14 	 ** InitState contained 8 unique groups.
+ID 1800:14 	 ** FinalState contains 4
+
+ID 1801:10 Loop finished after 3 iterations.
+ID 1801:10 	 ** InitState contained 10 unique groups.
+ID 1801:10 	 ** FinalState contains 5
+
+ID 1800:15 Mean Similarity in 1th Iteration = 1.000.
+ID 1800:15 Mean Similarity in 2th Iteration = 1.000.
+ID 1801:11 Mean Similarity in 1th Iteration = 0.958.
+ID 1800:15 Loop finished after 3 iterations.
+ID 1800:15 	 ** InitState contained 6 unique groups.
+ID 1800:15 	 ** FinalState contains 4
+
+ID 1801:11 Mean Similarity in 2th Iteration = 1.000.
+ID 1800:16 Mean Similarity in 1th Iteration = 1.000.
+ID 1801:11 Loop finished after 3 iterations.
+ID 1801:11 	 ** InitState contained 10 unique groups.
+ID 1801:11 	 ** FinalState contains 5
+
+ID 1800:16 Mean Similarity in 2th Iteration = 1.000.
+ID 1800:16 Loop finished after 3 iterations.
+ID 1800:16 	 ** InitState contained 6 unique groups.
+ID 1800:16 	 ** FinalState contains 4
+
+ID 1801:12 Mean Similarity in 1th Iteration = 0.963.
+ID 1800:17 Mean Similarity in 1th Iteration = 1.000.
+ID 1801:12 Mean Similarity in 2th Iteration = 1.000.
+ID 1800:17 Mean Similarity in 2th Iteration = 1.000.
+ID 1800:17 Loop finished after 3 iterations.
+ID 1800:17 	 ** InitState contained 8 unique groups.
+ID 1800:17 	 ** FinalState contains 4
+
+ID 1801:12 Loop finished after 3 iterations.
+ID 1801:12 	 ** InitState contained 9 unique groups.
+ID 1801:12 	 ** FinalState contains 4
+
+ID 1800:18 Mean Similarity in 1th Iteration = 1.000.
+ID 1800:18 Mean Similarity in 2th Iteration = 1.000.
+ID 1801:13 Mean Similarity in 1th Iteration = 1.000.
+ID 1800:18 Loop finished after 3 iterations.
+ID 1800:18 	 ** InitState contained 8 unique groups.
+ID 1800:18 	 ** FinalState contains 4
+
+ID 1801:13 Mean Similarity in 2th Iteration = 1.000.
+ID 1801:13 Loop finished after 3 iterations.
+ID 1801:13 	 ** InitState contained 9 unique groups.
+ID 1801:13 	 ** FinalState contains 5
+
+ID 1800:19 Mean Similarity in 1th Iteration = 1.000.
+ID 1800:19 Mean Similarity in 2th Iteration = 1.000.
+ID 1800:19 Loop finished after 3 iterations.
+ID 1800:19 	 ** InitState contained 8 unique groups.
+ID 1800:19 	 ** FinalState contains 4
+
+*** Now calculating final collection for year 1800***
+
+ID 1800:FULL Mean Similarity in 1th Iteration = 0.856.
+ID 1800:FULL Mean Similarity in 2th Iteration = 0.918.
+ID 1800:FULL Loop finished after 3 iterations.
+ID 1800:FULL 	 ** InitState contained 6 unique groups.
+ID 1800:FULL 	 ** FinalState contains 4
+
+Done with year 1800
+ID 1801:14 Mean Similarity in 1th Iteration = 1.000.
+ID 1801:14 Mean Similarity in 2th Iteration = 1.000.
+ID 1801:14 Loop finished after 3 iterations.
+ID 1801:14 	 ** InitState contained 8 unique groups.
+ID 1801:14 	 ** FinalState contains 4
+
+ID 1801:15 Mean Similarity in 1th Iteration = 1.000.
+ID 1801:15 Mean Similarity in 2th Iteration = 1.000.
+ID 1802:0 Mean Similarity in 1th Iteration = 1.000.
+ID 1801:15 Loop finished after 3 iterations.
+ID 1801:15 	 ** InitState contained 10 unique groups.
+ID 1801:15 	 ** FinalState contains 5
+
+ID 1802:0 Mean Similarity in 2th Iteration = 1.000.
+ID 1801:16 Mean Similarity in 1th Iteration = 1.000.
+ID 1801:16 Mean Similarity in 2th Iteration = 1.000.
+ID 1802:0 Loop finished after 3 iterations.
+ID 1802:0 	 ** InitState contained 20 unique groups.
+ID 1802:0 	 ** FinalState contains 7
+
+ID 1801:16 Loop finished after 3 iterations.
+ID 1801:16 	 ** InitState contained 10 unique groups.
+ID 1801:16 	 ** FinalState contains 4
+
+ID 1801:17 Mean Similarity in 1th Iteration = 1.000.
+ID 1801:17 Mean Similarity in 2th Iteration = 1.000.
+ID 1801:17 Loop finished after 3 iterations.
+ID 1801:17 	 ** InitState contained 10 unique groups.
+ID 1801:17 	 ** FinalState contains 4
+
+ID 1802:1 Mean Similarity in 1th Iteration = 1.000.
+ID 1801:18 Mean Similarity in 1th Iteration = 0.973.
+ID 1802:1 Mean Similarity in 2th Iteration = 1.000.
+ID 1801:18 Mean Similarity in 2th Iteration = 1.000.
+ID 1801:18 Loop finished after 3 iterations.
+ID 1801:18 	 ** InitState contained 11 unique groups.
+ID 1801:18 	 ** FinalState contains 6
+
+ID 1802:1 Loop finished after 3 iterations.
+ID 1802:1 	 ** InitState contained 17 unique groups.
+ID 1802:1 	 ** FinalState contains 10
+
+ID 1801:19 Mean Similarity in 1th Iteration = 1.000.
+ID 1801:19 Mean Similarity in 2th Iteration = 1.000.
+ID 1801:19 Loop finished after 3 iterations.
+ID 1801:19 	 ** InitState contained 10 unique groups.
+ID 1801:19 	 ** FinalState contains 5
+
+*** Now calculating final collection for year 1801***
+
+ID 1801:FULL Mean Similarity in 1th Iteration = 0.690.
+ID 1801:FULL Mean Similarity in 2th Iteration = 0.908.
+ID 1801:FULL Mean Similarity in 3th Iteration = 0.992.
+ID 1801:FULL Loop finished after 4 iterations.
+ID 1801:FULL 	 ** InitState contained 27 unique groups.
+ID 1801:FULL 	 ** FinalState contains 3
+
+Done with year 1801
+ID 1802:2 Mean Similarity in 1th Iteration = 1.000.
+ID 1802:2 Mean Similarity in 2th Iteration = 1.000.
+ID 1803:0 Mean Similarity in 1th Iteration = 1.000.
+ID 1802:2 Loop finished after 3 iterations.
+ID 1802:2 	 ** InitState contained 22 unique groups.
+ID 1802:2 	 ** FinalState contains 10
+
+ID 1803:0 Mean Similarity in 2th Iteration = 1.000.
+ID 1803:0 Loop finished after 3 iterations.
+ID 1803:0 	 ** InitState contained 18 unique groups.
+ID 1803:0 	 ** FinalState contains 7
+
+ID 1802:3 Mean Similarity in 1th Iteration = 0.922.
+ID 1802:3 Mean Similarity in 2th Iteration = 1.000.
+ID 1802:3 Loop finished after 3 iterations.
+ID 1802:3 	 ** InitState contained 18 unique groups.
+ID 1802:3 	 ** FinalState contains 9
+
+ID 1803:1 Mean Similarity in 1th Iteration = 1.000.
+ID 1803:1 Mean Similarity in 2th Iteration = 1.000.
+ID 1802:4 Mean Similarity in 1th Iteration = 1.000.
+ID 1803:1 Loop finished after 3 iterations.
+ID 1803:1 	 ** InitState contained 23 unique groups.
+ID 1803:1 	 ** FinalState contains 10
+
+ID 1802:4 Mean Similarity in 2th Iteration = 1.000.
+ID 1802:4 Loop finished after 3 iterations.
+ID 1802:4 	 ** InitState contained 15 unique groups.
+ID 1802:4 	 ** FinalState contains 9
+
+ID 1803:2 Mean Similarity in 1th Iteration = 1.000.
+ID 1802:5 Mean Similarity in 1th Iteration = 1.000.
+ID 1802:5 Mean Similarity in 2th Iteration = 1.000.
+ID 1803:2 Mean Similarity in 2th Iteration = 1.000.
+ID 1802:5 Loop finished after 3 iterations.
+ID 1802:5 	 ** InitState contained 16 unique groups.
+ID 1802:5 	 ** FinalState contains 7
+
+ID 1803:2 Loop finished after 3 iterations.
+ID 1803:2 	 ** InitState contained 21 unique groups.
+ID 1803:2 	 ** FinalState contains 9
+
+ID 1802:6 Mean Similarity in 1th Iteration = 1.000.
+ID 1802:6 Mean Similarity in 2th Iteration = 1.000.
+ID 1802:6 Loop finished after 3 iterations.
+ID 1802:6 	 ** InitState contained 17 unique groups.
+ID 1802:6 	 ** FinalState contains 8
+
+ID 1803:3 Mean Similarity in 1th Iteration = 1.000.
+ID 1802:7 Mean Similarity in 1th Iteration = 0.925.
+ID 1803:3 Mean Similarity in 2th Iteration = 1.000.
+ID 1802:7 Mean Similarity in 2th Iteration = 1.000.
+ID 1802:7 Loop finished after 3 iterations.
+ID 1802:7 	 ** InitState contained 14 unique groups.
+ID 1802:7 	 ** FinalState contains 7
+
+ID 1803:3 Loop finished after 3 iterations.
+ID 1803:3 	 ** InitState contained 27 unique groups.
+ID 1803:3 	 ** FinalState contains 14
+
+ID 1802:8 Mean Similarity in 1th Iteration = 0.917.
+ID 1802:8 Mean Similarity in 2th Iteration = 1.000.
+ID 1802:8 Loop finished after 3 iterations.
+ID 1802:8 	 ** InitState contained 15 unique groups.
+ID 1802:8 	 ** FinalState contains 10
+
+ID 1803:4 Mean Similarity in 1th Iteration = 1.000.
+ID 1802:9 Mean Similarity in 1th Iteration = 1.000.
+ID 1802:9 Mean Similarity in 2th Iteration = 1.000.
+ID 1803:4 Mean Similarity in 2th Iteration = 1.000.
+ID 1802:9 Loop finished after 3 iterations.
+ID 1802:9 	 ** InitState contained 18 unique groups.
+ID 1802:9 	 ** FinalState contains 9
+
+ID 1802:10 Mean Similarity in 1th Iteration = 0.918.
+ID 1803:4 Loop finished after 3 iterations.
+ID 1803:4 	 ** InitState contained 22 unique groups.
+ID 1803:4 	 ** FinalState contains 15
+
+ID 1802:10 Mean Similarity in 2th Iteration = 0.998.
+ID 1802:10 Mean Similarity in 3th Iteration = 0.916.
+ID 1802:10 Loop finished after 4 iterations.
+ID 1802:10 	 ** InitState contained 18 unique groups.
+ID 1802:10 	 ** FinalState contains 10
+
+ID 1803:5 Mean Similarity in 1th Iteration = 1.000.
+ID 1802:11 Mean Similarity in 1th Iteration = 1.000.
+ID 1803:5 Mean Similarity in 2th Iteration = 1.000.
+ID 1802:11 Mean Similarity in 2th Iteration = 1.000.
+ID 1802:11 Loop finished after 3 iterations.
+ID 1802:11 	 ** InitState contained 17 unique groups.
+ID 1802:11 	 ** FinalState contains 10
+
+ID 1803:5 Loop finished after 3 iterations.
+ID 1803:5 	 ** InitState contained 18 unique groups.
+ID 1803:5 	 ** FinalState contains 12
+
+ID 1802:12 Mean Similarity in 1th Iteration = 0.975.
+ID 1802:12 Mean Similarity in 2th Iteration = 0.983.
+ID 1802:12 Loop finished after 3 iterations.
+ID 1802:12 	 ** InitState contained 14 unique groups.
+ID 1802:12 	 ** FinalState contains 7
+
+ID 1803:6 Mean Similarity in 1th Iteration = 1.000.
+ID 1803:6 Mean Similarity in 2th Iteration = 1.000.
+ID 1803:6 Loop finished after 3 iterations.
+ID 1803:6 	 ** InitState contained 22 unique groups.
+ID 1803:6 	 ** FinalState contains 8
+
+ID 1802:13 Mean Similarity in 1th Iteration = 0.831.
+ID 1802:13 Mean Similarity in 2th Iteration = 1.000.
+ID 1803:7 Mean Similarity in 1th Iteration = 0.846.
+ID 1802:13 Loop finished after 3 iterations.
+ID 1802:13 	 ** InitState contained 20 unique groups.
+ID 1802:13 	 ** FinalState contains 10
+
+ID 1803:7 Mean Similarity in 2th Iteration = 0.984.
+ID 1803:7 Loop finished after 3 iterations.
+ID 1803:7 	 ** InitState contained 21 unique groups.
+ID 1803:7 	 ** FinalState contains 11
+
+ID 1802:14 Mean Similarity in 1th Iteration = 1.000.
+ID 1802:14 Mean Similarity in 2th Iteration = 1.000.
+ID 1802:14 Loop finished after 3 iterations.
+ID 1802:14 	 ** InitState contained 18 unique groups.
+ID 1802:14 	 ** FinalState contains 11
+
+ID 1803:8 Mean Similarity in 1th Iteration = 0.938.
+ID 1802:15 Mean Similarity in 1th Iteration = 1.000.
+ID 1803:8 Mean Similarity in 2th Iteration = 0.986.
+ID 1802:15 Mean Similarity in 2th Iteration = 1.000.
+ID 1803:8 Loop finished after 3 iterations.
+ID 1803:8 	 ** InitState contained 21 unique groups.
+ID 1803:8 	 ** FinalState contains 11
+
+ID 1802:15 Loop finished after 3 iterations.
+ID 1802:15 	 ** InitState contained 14 unique groups.
+ID 1802:15 	 ** FinalState contains 10
+
+ID 1803:9 Mean Similarity in 1th Iteration = 1.000.
+ID 1802:16 Mean Similarity in 1th Iteration = 1.000.
+ID 1803:9 Mean Similarity in 2th Iteration = 1.000.
+ID 1803:9 Loop finished after 3 iterations.
+ID 1803:9 	 ** InitState contained 15 unique groups.
+ID 1803:9 	 ** FinalState contains 5
+
+ID 1802:16 Mean Similarity in 2th Iteration = 1.000.
+ID 1802:16 Loop finished after 3 iterations.
+ID 1802:16 	 ** InitState contained 18 unique groups.
+ID 1802:16 	 ** FinalState contains 9
+
+ID 1803:10 Mean Similarity in 1th Iteration = 1.000.
+ID 1803:10 Mean Similarity in 2th Iteration = 1.000.
+ID 1802:17 Mean Similarity in 1th Iteration = 1.000.
+ID 1803:10 Loop finished after 3 iterations.
+ID 1803:10 	 ** InitState contained 19 unique groups.
+ID 1803:10 	 ** FinalState contains 8
+
+ID 1802:17 Mean Similarity in 2th Iteration = 1.000.
+ID 1802:17 Loop finished after 3 iterations.
+ID 1802:17 	 ** InitState contained 16 unique groups.
+ID 1802:17 	 ** FinalState contains 6
+
+ID 1802:18 Mean Similarity in 1th Iteration = 1.000.
+ID 1803:11 Mean Similarity in 1th Iteration = 0.769.
+ID 1802:18 Mean Similarity in 2th Iteration = 1.000.
+ID 1802:18 Loop finished after 3 iterations.
+ID 1802:18 	 ** InitState contained 19 unique groups.
+ID 1802:18 	 ** FinalState contains 7
+
+ID 1803:11 Mean Similarity in 2th Iteration = 0.950.
+ID 1803:11 Mean Similarity in 3th Iteration = 1.000.
+ID 1802:19 Mean Similarity in 1th Iteration = 0.937.
+ID 1803:11 Loop finished after 4 iterations.
+ID 1803:11 	 ** InitState contained 21 unique groups.
+ID 1803:11 	 ** FinalState contains 13
+
+ID 1802:19 Mean Similarity in 2th Iteration = 0.937.
+ID 1802:19 Loop finished after 3 iterations.
+ID 1802:19 	 ** InitState contained 21 unique groups.
+ID 1802:19 	 ** FinalState contains 11
+
+*** Now calculating final collection for year 1802***
+
+ID 1802:FULL Mean Similarity in 1th Iteration = 0.627.
+ID 1802:FULL Mean Similarity in 2th Iteration = 0.811.
+ID 1802:FULL Mean Similarity in 3th Iteration = 0.924.
+ID 1802:FULL Mean Similarity in 4th Iteration = 0.935.
+ID 1802:FULL Loop finished after 5 iterations.
+ID 1802:FULL 	 ** InitState contained 75 unique groups.
+ID 1802:FULL 	 ** FinalState contains 10
+
+Done with year 1802
+ID 1803:12 Mean Similarity in 1th Iteration = 1.000.
+ID 1803:12 Mean Similarity in 2th Iteration = 1.000.
+ID 1803:12 Loop finished after 3 iterations.
+ID 1803:12 	 ** InitState contained 18 unique groups.
+ID 1803:12 	 ** FinalState contains 9
+
+ID 1803:13 Mean Similarity in 1th Iteration = 0.875.
+ID 1803:13 Mean Similarity in 2th Iteration = 1.000.
+ID 1803:13 Loop finished after 3 iterations.
+ID 1803:13 	 ** InitState contained 27 unique groups.
+ID 1803:13 	 ** FinalState contains 11
+
+ID 1803:14 Mean Similarity in 1th Iteration = 1.000.
+ID 1803:14 Mean Similarity in 2th Iteration = 1.000.
+ID 1803:14 Loop finished after 3 iterations.
+ID 1803:14 	 ** InitState contained 20 unique groups.
+ID 1803:14 	 ** FinalState contains 11
+
+ID 1803:15 Mean Similarity in 1th Iteration = 0.833.
+ID 1803:15 Mean Similarity in 2th Iteration = 1.000.
+ID 1803:15 Loop finished after 3 iterations.
+ID 1803:15 	 ** InitState contained 16 unique groups.
+ID 1803:15 	 ** FinalState contains 10
+
+ID 1803:16 Mean Similarity in 1th Iteration = 0.953.
+ID 1803:16 Mean Similarity in 2th Iteration = 1.000.
+ID 1803:16 Loop finished after 3 iterations.
+ID 1803:16 	 ** InitState contained 23 unique groups.
+ID 1803:16 	 ** FinalState contains 12
+
+ID 1803:17 Mean Similarity in 1th Iteration = 0.946.
+ID 1803:17 Mean Similarity in 2th Iteration = 1.000.
+ID 1803:17 Loop finished after 3 iterations.
+ID 1803:17 	 ** InitState contained 17 unique groups.
+ID 1803:17 	 ** FinalState contains 9
+
+ID 1803:18 Mean Similarity in 1th Iteration = 1.000.
+ID 1803:18 Mean Similarity in 2th Iteration = 1.000.
+ID 1803:18 Loop finished after 3 iterations.
+ID 1803:18 	 ** InitState contained 17 unique groups.
+ID 1803:18 	 ** FinalState contains 10
+
+ID 1803:19 Mean Similarity in 1th Iteration = 0.812.
+ID 1803:19 Mean Similarity in 2th Iteration = 0.938.
+ID 1803:19 Mean Similarity in 3th Iteration = 1.000.
+ID 1803:19 Loop finished after 4 iterations.
+ID 1803:19 	 ** InitState contained 20 unique groups.
+ID 1803:19 	 ** FinalState contains 11
+
+*** Now calculating final collection for year 1803***
+
+ID 1803:FULL Mean Similarity in 1th Iteration = 0.549.
+ID 1803:FULL Mean Similarity in 2th Iteration = 0.756.
+ID 1803:FULL Mean Similarity in 3th Iteration = 0.851.
+ID 1803:FULL Mean Similarity in 4th Iteration = 0.944.
+ID 1803:FULL Mean Similarity in 5th Iteration = 0.959.
+ID 1803:FULL Loop finished after 6 iterations.
+ID 1803:FULL 	 ** InitState contained 119 unique groups.
+ID 1803:FULL 	 ** FinalState contains 7
+
+Done with year 1803
+[(1800, [{'Sn', 'Cu', 'Mg'}, {'K', 'H', 'N', 'Cu', 'Cl'}, {'S', 'C', 'Cl', 'O'}, {'Sn', 'Mg'}]), (1801, [{'S', 'C', 'Fe'}, {'C', 'Mg', 'Ba', 'O', 'Cu', 'Sn', 'S', 'Be'}, {'K', 'As', 'H', 'O', 'N', 'Cl'}]), (1802, [{'Hg', 'Mg', 'Ba', 'O', 'N', 'Sn', 'Cl'}, {'Cl', 'N'}, {'Mg', 'Hg', 'Sn'}, {'Hg', 'Mg', 'Ba', 'Ca', 'Sn'}, {'Cu', 'Be'}, {'C', 'Fe', 'As', 'P', 'S', 'Al'}, {'Fe', 'Al', 'As'}, {'H', 'Ag', 'O', 'K'}, {'S', 'C'}, {'Mg', 'Hg', 'Ba', 'Sn'}]), (1803, [{'H', 'Ag', 'Na', 'K'}, {'Hg', 'Sn', 'Co', 'Ba', 'Pd', 'Zn', 'Pb', 'Mg'}, {'Zn', 'Cu', 'Be'}, {'Pd', 'Hg', 'Co', 'Pb'}, {'Fe', 'As', 'P', 'S', 'Al'}, {'Br', 'Cl', 'O', 'N'}, {'P', 'Fe', 'Al', 'As'}])]
+Total time: 20.309 s
