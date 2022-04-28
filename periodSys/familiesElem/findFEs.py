@@ -191,6 +191,7 @@ def SNR(Collection, NIters, ID_run):
     for It in range(NIters):
         # Keep track of mean similarity between most similar FEs.
         sum_sim = 0 
+        counter = 0  # Divisor for takin avg (sum_sim/counter)
         FinalState = []
         
         # Iter over collections.
@@ -221,17 +222,19 @@ def SNR(Collection, NIters, ID_run):
                 if len(condense)>1:
                     Ci_smooth[str(sorted(condense))] = condense
 
+                sum_sim += np.mean(sim_FEs_Tanim)
+                counter += 1
+
             FinalState.append(list(Ci_smooth.values()))
-            sum_sim += np.mean(sim_FEs_Tanim)
 
             
         CurrState = FinalState.copy()  # Set current state to the newly formed state
         
         # Interrupt loop if meanSimIter converges to some value.
         if It > 1:
-            if sum_sim/len(FinalState) == meanSimIter: break
+            if sum_sim/counter == meanSimIter: break
                 
-        meanSimIter = sum_sim/len(FinalState)
+        meanSimIter = sum_sim/counter
         logger(f"ID {ID_run} Mean Similarity in {It+1}th Iteration = {meanSimIter:.3f}.")
 
         
