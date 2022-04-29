@@ -42,5 +42,5 @@ fh = open(resultsPath + 'optim_permut_yearly.gen', 'rb')
 opt_permut = pickle.load(fh)
 
 # Load families of elements.
-fh = open(resultsPath + 'foundGroups.bin','rb')
+fh = open(resultsPath + 'foundFEs.bin','rb')
 FEs = dict(pickle.load(fh))

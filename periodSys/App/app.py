@@ -10,7 +10,7 @@ import plotly.express as px
 import plotly.graph_objects as go 
 import numpy as np
 
-from Components import loadData,simmat, periodTable
+from Components import loadData,simmat, periodTable, FEs
 
 #Create the app
 app = dash.Dash(__name__,title="Evolution of element families", external_stylesheets = [dbc.themes.BOOTSTRAP])
@@ -23,8 +23,8 @@ title = html.Div([html.H1("Visualization of an empirical Periodic System, over h
                 ])
 
 
-matrix_height = '600px'
-matrix_width = '670px'
+matrix_height = '400px'
+matrix_width = '430px'
 
 year_slider = html.Div([
                     #html.H1("Year",
@@ -41,23 +41,45 @@ matplot = dcc.Graph(figure=simmat.fig, id='simmat-plot',
 
 
 PTplot = dcc.Graph(figure=periodTable.fig, id="PT-plot",
-                style=dict(height='300px'))
+                    style={"height":'300px',"margin-bottom":"30px"})
 
 col2 = dbc.Col([
+            PTplot,
+            ],
+            style={"width":"600px"}
+            )
+
+
+closure = dcc.Graph(figure=FEs.closure_fig, id="closure-plot",
+        style={"height":"450px","width":"800px","magin-top":"40px"})
+
+relev = dcc.Graph(figure=FEs.relev_fig) #TODO, id="FErelev-plot")
+
+
+row =  dbc.Col([ html.Button("Optimize\npermutation", id='opt-button',),
+                      matplot,
+                      html.Div("",id = 'show-cost',
+                            style={'height':'80px','text-align':'center',
+                                    'font-size':20,'width':'300px'}),
+                      ])
+
+row2 = dbc.Col([
+    
             dbc.Row([
-                    html.Button("Optimize\npermutation", id='opt-button',),
-                    html.Div("",id = 'show-cost',
-                            style={'height':'200px','text-align':'center',
-                                    'font-size':25,'width':'500px'}),
+                    html.Div([dcc.Input(id="contain-clos", type="text", placeholder="Show families containing:")],
+                                style={"height":"30px"}),
+                    html.Div([dcc.Input(id="non-contain-clos", type="text", placeholder="Show families that don't contain:")],
+                                style={"height":"30px"}),
                     ]),
-            PTplot
-            ])
+    
+    closure ])#, relev])
 
-row = dbc.Row([matplot, col2])
-tabs = dbc.Col([title, year_slider,  row],
+row1 = dbc.Row([
+                row, row2            
+    ])
+
+tabs = dbc.Col([title, year_slider,  row1, col2],
         style={'margin-bottom':'100px'})
-
-
 
 app.layout = html.Div([tabs, dcc.Store(id='current-perm')])
     
@@ -181,6 +203,32 @@ def update_cost(year, _, store):
     return "Do something!"
 
 
+# Select elems to modify closure plot
+@app.callback(
+        Output('closure-plot','figure'),
+        [Input('contain-clos','n_submit'), Input('non-contain-clos','n_submit')],
+        [State('contain-clos','value'), State('non-contain-clos','value')],
+        )
+def update_closure(_,__,incl_ce,notincl_ce):
+
+    ctx_trig = dash.callback_context.triggered[0]["prop_id"]
+
+    #if ctx_trig=='contain-clos.n_submit' or ctx_trig=='non-contain-clos.n_submit':
+    if incl_ce is not None:
+        incl_ce = set(incl_ce.split(","))
+
+    if notincl_ce is not None:
+        notincl_ce = set(notincl_ce.split(","))
+
+
+    print(incl_ce, notincl_ce)
+    fig = FEs.HeatmapClosure(2021,
+                       FEs.FEs_df,FEs.hist_relev,
+                       incl_ce = incl_ce,
+                       notincl_ce = notincl_ce,
+                       thresh_relev=0.)
+
+    return fig
 
 
 ###################################################### Run app server ###################################################    
