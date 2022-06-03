@@ -11,7 +11,9 @@ echo "Done with raw data. Now collecting results."
 
 # Just do the same process once again: Get substances + substance data, and update every time.
 gawk '
-BEGIN{OFS="\t"}
+BEGIN{
+	OFS="\t"
+	FS=OFS}
 {
 # For each substance, add to array, and update array data depending on year.
 
@@ -47,5 +49,5 @@ END{	##### Print Number of authors that published this year
 		# SUB_ID, YEAR, CNR, NUM AUTHORS, AUTHOR LIST
 		print subs, all_subs[subs]["y"],all_subs[subs]["cnr"], n, auth
 	}
-}' scr/subs_yr_cnr_auth_* > subs_yr_cnr_auth.txt
+}' scr/* > subs_yr_cnr_auth.txt
 
