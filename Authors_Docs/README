@@ -1,0 +1,35 @@
+In this subproject the idea is to count (or better, estimate) also the number 
+of authors and documents in which reactions and substances are published.
+
+There are two dirs (everything is reported with yearly resolution):
+
+	- rxns: Everything related to reactions
+		{
+		new_rxns_docs_auth.awk is a data collector from XML files, 
+		runProc.sh calls it ^ over many processors, and consolidates results into rxns_data.txt
+		count[Authors,Docs].awk processes output ^ and dumps into count[Authors,Docs].txt
+		}
+		- Number of authors involved in publishing new rxns 
+		- Mean and median number of new rxns associated with each author, per year
+		- Number of docs in which new rxns were published
+		- Mean and median num of new rxns per document
+		- Mean and median num of authors per document
+
+	- subs: Everything related to substances (that are reported in reactions)
+		
+		{
+		new_subs_docs_auth.awk is a data collector from XML files, 
+		runProc.sh calls it ^ over many processors, and consolidates results into subs_yr_cnr_auth.txt
+		count[Authors,Docs].awk processes output ^ and dumps into count[Authors,Docs].txt
+		}
+
+		- Number of authors involved in publishing new substs 
+		- Mean and median number of new substances associated with each author, per year
+		- Number of docs in which new substs were published
+		- Mean and median num of new substs per document
+		- Mean and median num of authors per document
+
+		TODO: Something went wrong with author lists
+
+	- use_subs: Yearly use of some particular substances, in reactions.
+		- Acetic anhydride

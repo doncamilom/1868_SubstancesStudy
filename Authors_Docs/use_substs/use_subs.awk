@@ -85,6 +85,10 @@ for(i in year_q){  	# Collect years of pub for this RXD
 		ind=length(years_rxd)+1
 		years_rxd[ind]=gensub(rgx, "\\1","g",$0)  # Concatenate with previous entries found for this reaction detail
 	}
+}
+
+
+if(match($0,/<\/RXD>/)){	
 	# Count +1 in every field where SID is in array
 	yr=min(years_rxd)
 
@@ -108,11 +112,10 @@ for(i in year_q){  	# Collect years of pub for this RXD
 END{
 for(s in SIDl){
 	SID=SIDl[s]
-	print "Substance ID = ", SID
 	if(length(count[SID])>0){
 		for(yr in count[SID]){
 			for(field in count[SID][yr]){
-				print yr, field, count[SID][yr][field]
+				print SID, yr, field, count[SID][yr][field]
 			}
 		}
 	}
