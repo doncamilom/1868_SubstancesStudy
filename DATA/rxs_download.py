@@ -351,18 +351,23 @@ class Downloader(object):
                 d.ra.disconnect()
 
         def fetchCompounds(self, fromId, toId, check_str):
-            return self._fetch(fromId, toId, "S", "IDE.XRN", ["IDE"], check_str)
+            return self._fetch(fromId, toId, "S", "IDE.XRN", ["PHY","SPE","PDE","ECO","ID"], check_str)
 
         def fetchReactions(self, fromId, toId, n, m, checkRXD):
             return self._fetch(fromId, toId, "R", "RX.ID", ["RX","RY","RXD({},{})".format(n,m)],checkRXD=checkRXD)
 
+        def fetchXCitations(self, fromId, toId, check_str):
+            return self._fetch(fromId, toId, "C", "CNR.CNR", ["CIT"], check_str)
+
+        def fetchBioactivity(self, fromId, toId, check_str):
+            return self._fetch(fromId, toId, "DPI", "DAT.ID", ["DAT"], check_str)
 
 if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser(description="Reaxys XML downloader.")
 
-    parser.add_argument("--type","-t", choices=["S", "R"], required=True,
-                        help="Which type to download. S=Substances, R=Reactions")
+    parser.add_argument("--type","-t", choices=["S", "R", "C" , "B"], required=True,
+                        help="Which type to download. S=Substances, R=Reactions, C=Citations , B=Bioactivities")
     parser.add_argument("--num","-n", type=int, required=True, 
                         help="The size of the chunck of entries to download.")
     parser.add_argument("--offset","-o", type=int, required=False, default=0,
@@ -404,10 +409,10 @@ if __name__ == "__main__":
 
             downloader = Downloader(
                 # Reaxys credentials (leave blank if IP-based authentication is used)
-                username = "***REMOVED***",
+                username ="***REMOVED***",
                 password = "***REMOVED***",
                 # API Key
-                callername = "***REMOVED***",
+                callername = "uni_leipzig_dec2015",
                 logName = logName,
                 debug=args.debug
             )
@@ -434,11 +439,15 @@ if __name__ == "__main__":
 
 
                 # Proceed with retrieval
-                d.logger("proc {}: fromId {} toID {}".format(proc,fromId,toId))
+                d.logger("proc {}: fromId: {} toID {}".format(proc,fromId,toId))
                 if args.type == "S":
                     res = d.fetchCompounds(fromId, toId, args.check_str)
                 elif args.type == "R":
                     res = d.fetchReactions(fromId,toId,1,100,args.check_rxd)
+                elif args.type == "C":
+                    res = d.fetchXCitations(fromId, toId, args.check_str)
+                elif args.type == "B":
+                    res = d.fetchBioactivity(fromId,toId,args.check_str)    
                 else:   assert False
 
 
@@ -486,6 +495,9 @@ if __name__ == "__main__":
 
     if args.type == "R":        todir="./DATA/RXN/"
     elif args.type == "S" :     todir="./DATA/SUB/"
+    elif args.type == "C" :     todir="./DATA/CIT/"
+    elif args.type == "B" :     todir="./DATA/DPI/"
+
 
     if not os.path.isdir('{}'.format(todir)):
         os.mkdir('{}'.format(todir))
