@@ -9,11 +9,14 @@ from dash.dependencies import Input, Output, State, ClientsideFunction
 import plotly.express as px
 import plotly.graph_objects as go 
 import numpy as np
+import flask
 
 from Components import loadData,simmat, periodTable, FEs
 
 #Create the app
-app = dash.Dash(__name__,title="Evolution of element families", external_stylesheets = [dbc.themes.BOOTSTRAP])
+server = flask.Flask(__name__)
+app = dash.Dash(__name__,title="Evolution of element families", external_stylesheets = [dbc.themes.BOOTSTRAP],
+        server=server)
 
 
 title = html.Div([html.H1("Visualization of an empirical Periodic System, over history.",
@@ -22,9 +25,6 @@ title = html.Div([html.H1("Visualization of an empirical Periodic System, over h
                                       "margin-top":"10px"})
                 ])
 
-
-matrix_height = '400px'
-matrix_width = '430px'
 
 year_slider = html.Div([
                     #html.H1("Year",
@@ -36,49 +36,52 @@ year_slider = html.Div([
                     ],
                     style={'margin-bottom':'40px'})
 
+# Plot similarity matrix and buttons
+
+matrix_height = '330px'
+matrix_width = '350px'
 matplot = dcc.Graph(figure=simmat.fig, id='simmat-plot', 
         style={'height':matrix_height,'width':matrix_width,'margin-top':'0px'})
 
+matplot_col =  dbc.Col([ html.Button("Optimize\npermutation", id='opt-button',),
+                          matplot,
+                          html.Div("",id = 'show-cost',
+                                style={'height':'80px','text-align':'center',
+                                        'font-size':20,'width':'30px'}),
+                      ],
+                      style={"width":"300px"}
+                      )
 
-PTplot = dcc.Graph(figure=periodTable.fig, id="PT-plot",
-                    style={"height":'300px',"margin-bottom":"30px"})
+# Closure plot and input boxes
+closure = dcc.Graph(figure=FEs.closure_fig, id="closure-plot",
+        style={"height":"300px","width":"1000px","magin-top":"40px"})
 
-col2 = dbc.Col([
-            PTplot,
+closure_col = dbc.Col([
+                dbc.Row([
+                        html.Div([dcc.Input(id="contain-clos", type="text", placeholder="Show families containing:")],
+                                    style={"height":"30px"}),
+                        html.Div([dcc.Input(id="non-contain-clos", type="text", placeholder="Show families that don't contain:")],
+                                    style={"height":"30px"}),
+                        ]),
+                closure 
             ],
-            style={"width":"600px"}
+            style={"width":"10px"}
             )
 
-
-closure = dcc.Graph(figure=FEs.closure_fig, id="closure-plot",
-        style={"height":"450px","width":"800px","magin-top":"40px"})
-
-relev = dcc.Graph(figure=FEs.relev_fig) #TODO, id="FErelev-plot")
+# PT table plot
+PTplot = dcc.Graph(figure=periodTable.fig, id="PT-plot",
+                    style={"width":'50px',"margin-bottom":"30px"})
 
 
-row =  dbc.Col([ html.Button("Optimize\npermutation", id='opt-button',),
-                      matplot,
-                      html.Div("",id = 'show-cost',
-                            style={'height':'80px','text-align':'center',
-                                    'font-size':20,'width':'300px'}),
-                      ])
 
-row2 = dbc.Col([
-    
-            dbc.Row([
-                    html.Div([dcc.Input(id="contain-clos", type="text", placeholder="Show families containing:")],
-                                style={"height":"30px"}),
-                    html.Div([dcc.Input(id="non-contain-clos", type="text", placeholder="Show families that don't contain:")],
-                                style={"height":"30px"}),
-                    ]),
-    
-    closure ])#, relev])
+main_row_plots = dbc.Row([
+                        matplot_col,
+                        closure_col,
+                        PTplot
+                        ])
 
-row1 = dbc.Row([
-                row, row2            
-    ])
 
-tabs = dbc.Col([title, year_slider,  row1, col2],
+tabs = dbc.Col([title, year_slider,  main_row_plots],
         style={'margin-bottom':'100px'})
 
 app.layout = html.Div([tabs, dcc.Store(id='current-perm')])
@@ -213,12 +216,16 @@ def update_closure(_,__,incl_ce,notincl_ce):
 
     ctx_trig = dash.callback_context.triggered[0]["prop_id"]
 
-    #if ctx_trig=='contain-clos.n_submit' or ctx_trig=='non-contain-clos.n_submit':
-    if incl_ce is not None:
-        incl_ce = set(incl_ce.split(","))
+    valid_trigs = ['contain-clos.n_submit','non-contain-clos.n_submit'] 
 
-    if notincl_ce is not None:
-        notincl_ce = set(notincl_ce.split(","))
+    if ctx_trig in valid_trigs:
+        if incl_ce is not None:
+            incl_ce = set(incl_ce.split(","))
+
+        if notincl_ce is not None:
+            notincl_ce = set(notincl_ce.split(","))
+    else:
+        incl_ce = {'Na'}
 
 
     print(incl_ce, notincl_ce)
@@ -234,4 +241,4 @@ def update_closure(_,__,incl_ce,notincl_ce):
 ###################################################### Run app server ###################################################    
     
 if __name__ == "__main__":
-    app.run_server(debug=True,host='localhost',port='8080')
+    app.run_server(debug=True,host='0.0.0.0',port=8050)

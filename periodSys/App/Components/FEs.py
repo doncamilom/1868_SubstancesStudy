@@ -70,11 +70,11 @@ hist_relev = FEs_df.loc[:,1800:2021]/(denom*(denom>=0)+1)
 
 
 fig_closure = go.Figure()
-def HeatmapClosure(year_relat,
+def HeatmapClosure(year_relat, 
                    FEs_df, hist_relev,
-                   incl_ce=False,
-                   notincl_ce=False,
-                   thresh_relev = 0.1,
+                   incl_ce=False, 
+                   notincl_ce=False, 
+                   thresh_relev = False, 
                    update = True,):
     """
     Compute relevancy descriptors for each FE
@@ -136,7 +136,7 @@ def HeatmapClosure(year_relat,
                     )
               .T    # Make FE name be rows, year columns
               .rename(columns={i:y for i,y in enumerate(range(1800,2022))})     # Rename cols using year
-              .merge(FEs_df["relev"],
+              .merge(FEs_df["yr_find_FE"],
                      left_index=True, right_index=True)    # Merge with FEs_df to get relevances
              )
 
@@ -155,21 +155,51 @@ Restriction: Containing {incl_ce} but not {notincl_ce}\n"
 
 
     hmap = (FEs_df
-            .sort_values("relev",
-                         ascending=False)
+            .sort_values("yr_find_FE",)
             .loc[:,1800:2021]
             .replace(np.inf,np.nan)
            )
 
 
-    trace = go.Heatmap(y=hmap.index.values,x=hmap.columns,
+    # Percentage of zeros in total closure for each FE. Use this to filter out results.
+    p_0clos = np.zeros([hmap.shape[0]])
+    for i in range(hmap.shape[0]):
+        g = hmap.iloc[i].loc[~np.isnan(hmap.iloc[i])]
+        p_0clos[i] = np.sum(g==0)/len(g)
+
+    hmap = hmap[p_0clos>0.2]
+
+    # Clip values not to show very high values. Anything above 4 is same color (>4)
+    hmap[hmap>4] = 4
+
+
+    def spl(x, i):
+        n=30
+        if len(x)>n:
+            x = x.split(", ")
+            l = len(x)
+            x = ", ".join(x[:l//2+1]) + "\n" + ", ".join(x[l//2+1:])
+
+        return x
+
+    labls = hmap.index.to_series()
+    labls = [spl(lab,i) for i,lab in enumerate(labls)]
+
+
+    vmax = np.nanmax(hmap.to_numpy())+1
+
+
+    trace = go.Heatmap(y=labls,x=hmap.columns,
                          z=hmap.values,
-                         colorscale='Jet',
+                         zmax=vmax,
+                         zmin=-1.,
+                         colorscale='Jet_r',
                          colorbar = dict(
                                 tickmode = "array",
                                 thickness = 8,
                                 len = 0.7,
                                 x = 1,
+
                             ),
                 #         text = p,
                 #         hovertemplate =

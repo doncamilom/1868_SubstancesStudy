@@ -93,8 +93,8 @@ def symmetrize(S):
 
     diag = np.diag(S)
     n = S.shape[0]
-    Sum0 = S.sum(axis=0).reshape(-1,1).repeat(n,axis=1)
-    Sum1 = S.sum(axis=1).reshape(1,-1).repeat(n,axis=0)
+    Sum0 = S.sum(axis=0).reshape(-1,1).repeat(n,axis=1) - np.diag(diag)
+    Sum1 = S.sum(axis=1).reshape(1,-1).repeat(n,axis=0) - np.diag(diag)
 
     P = np.sqrt(S**2/(Sum0*Sum1+1e-5))
 

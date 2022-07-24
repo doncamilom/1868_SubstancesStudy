@@ -83,7 +83,7 @@ fig = go.Figure()
 fig.add_trace(go.Heatmap(
                 z=color[::-1],
                 colorscale=colorscale,
-                text=hover[::-1],
+                #text=hover[::-1],
                 hoverinfo='text',
                 showscale=False,
                 ygap=5,
