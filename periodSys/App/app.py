@@ -15,41 +15,86 @@ from Components import loadData,simmat, periodTable, FEs
 
 #Create the app
 server = flask.Flask(__name__)
-app = dash.Dash(__name__,title="Evolution of element families", external_stylesheets = [dbc.themes.BOOTSTRAP],
+app = dash.Dash(__name__,title="The Evolving Periodic System", external_stylesheets = [dbc.themes.BOOTSTRAP],
         server=server)
 
 
-title = html.Div([html.H1("Visualization of an empirical Periodic System, over history.",
-                               style={"textAlign": "center",
-                                      "background": "#a6bddb",
-                                      "margin-top":"10px"})
-                ])
+title = html.Div(
+    [
+        dbc.Row([
+            dbc.Col([
+                html.Div(
+                    [html.H1("The Evolving Periodic System",
+                             style={#"textAlign": "center",
+                                 #"background": "#a6bddb",
+                                 "margin-top":"20px",
+                                 'width':'100%'}
+                             ),
+                     html.P("Chemistry evolves rapidly over the years, but...\
+                     how does the Periodic System react to these changes?",
+                            style={"width":"70%",
+                                   "font-size":"110%",
+                                   "margin-left":'0'},
+                            )
+                     ],
+                )
+            ],
+                    width=7,
+                    align='start'),
+            dbc.Col([
+                html.Img(src="./assets/ENG_MPI_MiS_Bildwortmarke_farbig.png",
+                         style={#'height':'9%',
+                             'width':'100%',
+                             'float':'right',
+                             #'position':'relative',
+                             'margin-top':'0',
+                             'padding-top':'0',
+                             'padding-right':'0'
+                         },
+                         ),
+            ],
+                    width=5,
+                    align='start')
+        ],
+                className='g-0',
+                justify='between',
+                style={'height':'140px'}
+                )
+    ],)
 
+year_slider = html.Div(
+    [
+        dcc.Slider(id="year-slider",
+                   min=1800,
+                   max=2021,
+                   step=1,
+                   value=2021,
+                   marks={yr:str(yr) for yr in range(1800,2022,10)},
+                   tooltip={"placement": "top",
+                            "always_visible": False}),
+    ],
+    style={'margin-bottom':'60px',
+           'margin-top':'30px',
+           'margin-right':'140px',
+           'margin-left':'140px',
+           }
+)
 
-year_slider = html.Div([
-                    #html.H1("Year",
-                    #        style={'text-align':'center',
-                    #                'font-size':'1'}),
-                    dcc.Slider(id="year-slider",min=1800,max=2021,step=1,value=2021,
-                            marks={yr:str(yr) for yr in range(1800,2022,10)},
-                            tooltip={"placement": "top", "always_visible": True}),
-                    ],
-                    style={'margin-bottom':'40px'})
 
 # Plot similarity matrix and buttons
-
-matrix_height = '330px'
-matrix_width = '350px'
+matrix_height = '530px'
+matrix_width = '550px'
 matplot = dcc.Graph(figure=simmat.fig, id='simmat-plot', 
         style={'height':matrix_height,'width':matrix_width,'margin-top':'0px'})
 
-matplot_col =  dbc.Col([ html.Button("Optimize\npermutation", id='opt-button',),
+matplot_col =  dbc.Col([ 
                           matplot,
+                            html.Button("Optimize\npermutation", id='opt-button',),
                           html.Div("",id = 'show-cost',
                                 style={'height':'80px','text-align':'center',
                                         'font-size':20,'width':'30px'}),
                       ],
-                      style={"width":"300px"}
+                      style={"width":"500px"}
                       )
 
 # Closure plot and input boxes
@@ -70,19 +115,19 @@ closure_col = dbc.Col([
 
 # PT table plot
 PTplot = dcc.Graph(figure=periodTable.fig, id="PT-plot",
-                    style={"width":'50px',"margin-bottom":"30px"})
+                    style={"width":'550px',"margin-bottom":"30px"})
 
 
 
-main_row_plots = dbc.Row([
+main_col_plots = dbc.Col([
                         matplot_col,
                         closure_col,
                         PTplot
                         ])
 
 
-tabs = dbc.Col([title, year_slider,  main_row_plots],
-        style={'margin-bottom':'100px'})
+tabs = dbc.Col([title, year_slider,  main_col_plots],
+       style={'margin-bottom':'100px'})
 
 app.layout = html.Div([tabs, dcc.Store(id='current-perm')])
     

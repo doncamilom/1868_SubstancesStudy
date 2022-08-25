@@ -3,6 +3,32 @@
     color: red;
 }
 
+.rc-slider-track {
+    background-color: #8d4e73;
+}
+
+.rc-slider-mark-text {
+    font-size: 12px;
+}
+
+.rc-slider-dot {
+    background-color: #000000;
+    border-color: #000000;
+}
+
+.rc-slider-dot-active {
+    background-color: #000000;
+    color: #000000;
+}
+
+.rc-slider-handle {
+    border: solid 3px #306ea0;
+}
+
+.rc-slider-handle-click-focused {
+    border: solid 3px #306ea0;
+}
+
 .box-right {
     background-color: #dbe8d8;
 }
