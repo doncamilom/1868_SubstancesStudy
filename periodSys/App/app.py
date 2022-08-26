@@ -15,7 +15,9 @@ from Components import loadData,simmat, periodTable, FEs
 
 #Create the app
 server = flask.Flask(__name__)
-app = dash.Dash(__name__,title="The Evolving Periodic System", external_stylesheets = [dbc.themes.BOOTSTRAP],
+app = dash.Dash(__name__,
+                title="The Evolving Periodic System",
+                external_stylesheets = [dbc.themes.BOOTSTRAP],
         server=server)
 
 
@@ -64,6 +66,11 @@ title = html.Div(
 
 year_slider = html.Div(
     [
+        html.H1("Select the year you want to explore.",
+                style={'text-align':'center',
+                       'margin-top':'80px',
+                       'font-size':'200%'}
+        ),
         dcc.Slider(id="year-slider",
                    min=1800,
                    max=2021,
@@ -81,56 +88,152 @@ year_slider = html.Div(
 )
 
 
-# Plot similarity matrix and buttons
-matrix_height = '530px'
-matrix_width = '550px'
-matplot = dcc.Graph(figure=simmat.fig, id='simmat-plot', 
-        style={'height':matrix_height,'width':matrix_width,'margin-top':'0px'})
-
-matplot_col =  dbc.Col([ 
-                          matplot,
-                            html.Button("Optimize\npermutation", id='opt-button',),
-                          html.Div("",id = 'show-cost',
-                                style={'height':'80px','text-align':'center',
-                                        'font-size':20,'width':'30px'}),
-                      ],
-                      style={"width":"500px"}
-                      )
-
-# Closure plot and input boxes
-closure = dcc.Graph(figure=FEs.closure_fig, id="closure-plot",
-        style={"height":"300px","width":"1000px","magin-top":"40px"})
-
-closure_col = dbc.Col([
-                dbc.Row([
-                        html.Div([dcc.Input(id="contain-clos", type="text", placeholder="Show families containing:")],
-                                    style={"height":"30px"}),
-                        html.Div([dcc.Input(id="non-contain-clos", type="text", placeholder="Show families that don't contain:")],
-                                    style={"height":"30px"}),
-                        ]),
-                closure 
-            ],
-            style={"width":"10px"}
-            )
-
-# PT table plot
-PTplot = dcc.Graph(figure=periodTable.fig, id="PT-plot",
-                    style={"width":'550px',"margin-bottom":"30px"})
+# Similarity matrix
+matrix_width = '530px'
+matrix_fig = dbc.Col(
+    [
+        dcc.Graph(figure=simmat.fig,
+                  id='simmat-plot',
+                  style={'height':'100%',
+                         'margin-left':'10%',
+                         'margin-right':'10%'})
+    ],
+    align="start")
 
 
+# Description and guide to similarity matrix
+simmat_p = dbc.Col(
+    [
+        html.Div(
+            [
+                html.H1("Similarity between the chemical elements."),
+                html.P("This similarity matrix encodes how similar each element \
+                is to ny other one.",
+                       className="p-html-text"),
+                html.Li(
+                    [
+                        html.P("Chemical elements show resemblances to others,\
+                        in the way they react, and in the compounds they form.",
+                               className="p-html-text"),
+                        html.P("Hover over any pixel to visualize the similarity \
+                        between a pair of elements",
+                               className="p-html-instruction"),
+                    ]
+                ),
+                html.Br(),
+                html.P("The periodic system attempts to condense this similarities \
+                into a tabular format. ",
+                       className="p-html-highlight"),
+                html.H3("Optimize the sequence of elements"),
+                html.P("Press the button to optimize the sequence.\
+                This will bring high values of the matrix closer to the diagonal.",
+                       className="p-html-instruction"),
+            ]
+        ),
+        html.Button("Optimize permutation",
+                    id='opt-button'),
+        html.Div("",
+             id="show-cost",
+                 style={'height':'80px',
+                        'text=align':'center',
+                        'font-size':20,
+                        'width':'100%'}
+                 )
+    ],
+    align='start',
+    style={'margin-left':'100px'})
 
-main_col_plots = dbc.Col([
-                        matplot_col,
-                        closure_col,
-                        PTplot
-                        ])
+
+# Build similarity row
+matplot_row = dbc.Row(
+    [
+        matrix_fig,
+        simmat_p
+    ],
+    justify='between',
+    style={'width': '100%',
+           'margin-top': '120px'}
+)
 
 
-tabs = dbc.Col([title, year_slider,  main_col_plots],
-       style={'margin-bottom':'100px'})
+# Families evolution plot
+family_plot = dbc.Col(
+    [
+        dcc.Graph(figure=FEs.closure_fig,
+                  id="closure-plot",
+                  style={"width":"100%",
+                         "height": "250px",
+                         "margin-top":"0px"})
+    ],
+    align='start',
+    width=8
+)
 
-app.layout = html.Div([tabs, dcc.Store(id='current-perm')])
-    
+# Descripting text
+families_p = dbc.Col(
+    [
+        html.H1("Evolution of families"),
+        html.P("Similar elements are clustered into families."),
+        html.P("Select an element to visualize its evolution in families."),
+        html.Div(dcc.Input(id="contain-clos",
+                           type="text",
+                           placeholder="Show families containing:"),
+                 style={'height':'30px'}
+                 )
+    ],
+    width=4
+)
+
+# Build row
+families_row = dbc.Row(
+    [
+        families_p,
+        family_plot
+    ],
+    justify='between',
+    style={'width': '100%',
+           'margin-top': '120px'}
+)
+
+
+# Periodic Table
+PTplot = dbc.Row(
+    [
+        dcc.Graph(figure=periodTable.fig,
+                  id="PT-plot",
+                  style={"width":'750px',
+                         "margin-top":"30px"})
+    ],
+    justify='between',
+    style={'width': '100%',
+           'margin-top': '80px'}
+)
+
+
+main_col_plots = dbc.Col(
+    [
+        matplot_row,
+        families_row,
+        PTplot
+    ]
+)
+
+
+tabs = dbc.Col(
+    [
+        title,
+        year_slider,
+        main_col_plots
+    ],
+    style={'margin-bottom':'100px'}
+)
+
+app.layout = html.Div(
+    [
+        tabs,
+        dcc.Store(id='current-perm')
+    ]
+)
 
 ###################################################### Callbacks ###################################################
 
@@ -148,7 +251,6 @@ def update_PT(click, yr, fig):
             x,y = s_elem['x'], s_elem['y']
             elem = periodTable.symbol[::-1][y,x]
         except:      elem = None
-        
 
         fig = go.Figure(fig)
         s_data = periodTable.plotSimPT(yr, elem)    # Get necessary data for update
@@ -254,10 +356,10 @@ def update_cost(year, _, store):
 # Select elems to modify closure plot
 @app.callback(
         Output('closure-plot','figure'),
-        [Input('contain-clos','n_submit'), Input('non-contain-clos','n_submit')],
-        [State('contain-clos','value'), State('non-contain-clos','value')],
+        [Input('contain-clos','n_submit')],
+        [State('contain-clos','value')],
         )
-def update_closure(_,__,incl_ce,notincl_ce):
+def update_closure(_,incl_ce,):
 
     ctx_trig = dash.callback_context.triggered[0]["prop_id"]
 
@@ -267,17 +369,17 @@ def update_closure(_,__,incl_ce,notincl_ce):
         if incl_ce is not None:
             incl_ce = set(incl_ce.split(","))
 
-        if notincl_ce is not None:
-            notincl_ce = set(notincl_ce.split(","))
+        #if notincl_ce is not None:
+            #notincl_ce = set(notincl_ce.split(","))
     else:
         incl_ce = {'Na'}
 
 
-    print(incl_ce, notincl_ce)
+    print(incl_ce)#, notincl_ce)
     fig = FEs.HeatmapClosure(2021,
                        FEs.FEs_df,FEs.hist_relev,
                        incl_ce = incl_ce,
-                       notincl_ce = notincl_ce,
+                  #     notincl_ce = notincl_ce,
                        thresh_relev=0.)
 
     return fig

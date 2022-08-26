@@ -3,6 +3,26 @@
     color: red;
 }
 
+.p-html-text {
+    font-size: 18px;
+    color: #000000
+}
+
+.p-html-instruction {
+    font-size: 20px;
+    color: #9b274f
+}
+
+.p-html-highlight {
+    font-size: 20px;
+    color: #3a71a1
+}
+
+.p-html-subtitle {
+    font-size: 20px;
+    color: #9b274f
+}
+
 .rc-slider-track {
     background-color: #8d4e73;
 }
