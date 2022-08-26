@@ -98,7 +98,7 @@ matrix_fig = dbc.Col(
                          'margin-left':'10%',
                          'margin-right':'10%'})
     ],
-    align="start")
+    align="center")
 
 
 # Description and guide to similarity matrix
@@ -107,20 +107,33 @@ simmat_p = dbc.Col(
         html.Div(
             [
                 html.H1("Similarity between the chemical elements."),
-                html.P("This similarity matrix encodes how similar each element \
-                is to ny other one.",
-                       className="p-html-text"),
-                html.Li(
+
+                html.Div(
                     [
-                        html.P("Chemical elements show resemblances to others,\
+                        html.P("Chemical elements show resemblances to others\
                         in the way they react, and in the compounds they form.",
-                               className="p-html-text"),
-                        html.P("Hover over any pixel to visualize the similarity \
-                        between a pair of elements",
-                               className="p-html-instruction"),
-                    ]
+                                className="p-html-text"),
+                        html.P("This similarity matrix encodes how similar each element \
+                        is to any other one.",
+                            className="p-html-text"),
+                    ],
+                    style={'margin-left': '40px',
+                           'margin-right': '70px'}
                 ),
-                html.Br(),
+
+                html.P("Hover over any pixel to visualize the similarity \
+                between a pair of elements",
+                        className="p-html-instruction"),
+                html.Div(
+                    [
+                        html.Div("Maybe display something here on hover?")
+                    ],
+                    style={'margin-left': '40px',
+                           'margin-right': '70px',
+                           'height': '100px',
+                           'text-align': 'center'}
+                ),
+
                 html.P("The periodic system attempts to condense this similarities \
                 into a tabular format. ",
                        className="p-html-highlight"),
@@ -130,18 +143,26 @@ simmat_p = dbc.Col(
                        className="p-html-instruction"),
             ]
         ),
-        html.Button("Optimize permutation",
-                    id='opt-button'),
+        html.Div(
+            [
+                html.Button("Optimize permutation",
+                            id='opt-button',
+                            style={'text-align': 'center'}),
+            ],
+            style={'text-align': 'center'}
+        ),
         html.Div("",
              id="show-cost",
-                 style={'height':'80px',
-                        'text=align':'center',
+                 style={'height':'40px',
+                        'text-align':'center',
                         'font-size':20,
-                        'width':'100%'}
+                        'width':'100%',
+                        'position': 'relative'}
                  )
     ],
-    align='start',
-    style={'margin-left':'100px'})
+    align='center',
+    style={'margin-left':'100px'}
+)
 
 
 # Build similarity row
@@ -152,7 +173,7 @@ matplot_row = dbc.Row(
     ],
     justify='between',
     style={'width': '100%',
-           'margin-top': '120px'}
+           'margin-top': '60px'}
 )
 
 
@@ -173,12 +194,15 @@ family_plot = dbc.Col(
 families_p = dbc.Col(
     [
         html.H1("Evolution of families"),
-        html.P("Similar elements are clustered into families."),
-        html.P("Select an element to visualize its evolution in families."),
+        html.P("Similar elements are clustered into families.",
+               className='p-html-highlight'),
+        html.P("Select an element to visualize its evolution in families.",
+               className='p-html-instruction'),
         html.Div(dcc.Input(id="contain-clos",
                            type="text",
-                           placeholder="Show families containing:"),
-                 style={'height':'30px'}
+                           placeholder="Input elements:"),
+                 style={#'height': '30px',
+                        'width': '250px'}
                  )
     ],
     width=4
@@ -192,7 +216,8 @@ families_row = dbc.Row(
     ],
     justify='between',
     style={'width': '100%',
-           'margin-top': '120px'}
+           'margin-top': '120px',
+           'margin-left': '60px'}
 )
 
 
@@ -206,7 +231,7 @@ PTplot = dbc.Row(
     ],
     justify='between',
     style={'width': '100%',
-           'margin-top': '80px'}
+           'margin-top': '130px'}
 )
 
 
@@ -350,7 +375,7 @@ def update_cost(year, _, store):
         if ctx_trig[0]['prop_id'] in ['year-slider.value', 'opt-button.n_clicks']:
             return "Using 1D-PS from {},\n\nthe cost in {} is {:.3f}".format(perm_year, year, cost)
 
-    return "Do something!"
+    return "Void container"
 
 
 # Select elems to modify closure plot

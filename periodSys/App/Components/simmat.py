@@ -77,9 +77,9 @@ def colorbar(zmin):
         tickmode = "array",
         tickvals = list(tickvals)+[0],
         ticktext = ['10^-{}'.format(i) for i in -tickvals.astype(int)] + ['10^0'],
-        thickness = 8,
+        thickness = 4,
         len = 0.7,
-        x = 0.99,
+        x = 0.9781,
     )
 
 elemList = getElemList('../Data')
@@ -111,7 +111,9 @@ def plotSimMat(year, perm=range(103), update=True):
     fig.update_layout(yaxis = dict(scaleanchor = 'x',autorange='reversed'),
                       xaxis = dict(side='top',tickangle=0),
                       margin=dict(l=0,r=0,b=0,t=0),
-                      plot_bgcolor='rgba(0,0,0,0)'
+                      plot_bgcolor='rgba(0,0,0,0)',
+                      height=500,
+                      width=550,
                       )
     return fig
 

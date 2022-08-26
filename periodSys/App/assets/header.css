@@ -4,7 +4,7 @@
 }
 
 .p-html-text {
-    font-size: 18px;
+    font-size: 17px;
     color: #000000
 }
 
@@ -15,7 +15,8 @@
 
 .p-html-highlight {
     font-size: 20px;
-    color: #3a71a1
+    color: #3a71a1;
+    font-weight: bold;
 }
 
 .p-html-subtitle {
