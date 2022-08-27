@@ -101,67 +101,124 @@ matrix_fig = dbc.Col(
     align="center")
 
 
-# Description and guide to similarity matrix
-simmat_p = dbc.Col(
+
+tab_width = "550px"
+
+display_hover = [
+    dbc.CardHeader("Display on hover"),
+    dbc.CardBody(
+        [
+            html.H5("Display stuff", className="card-title"),
+            html.P(
+                "This is some card content that we'll reuse",
+                className="card-text",
+            ),
+        ]
+    ),
+]
+
+optimize_col_div = html.Div(
     [
+        html.H3("Optimize the sequence of elements"),
         html.Div(
             [
-                html.H1("Similarity between the chemical elements."),
-
-                html.Div(
-                    [
-                        html.P("Chemical elements show resemblances to others\
-                        in the way they react, and in the compounds they form.",
-                                className="p-html-text"),
-                        html.P("This similarity matrix encodes how similar each element \
-                        is to any other one.",
-                            className="p-html-text"),
-                    ],
-                    style={'margin-left': '40px',
-                           'margin-right': '70px'}
-                ),
-
-                html.P("Hover over any pixel to visualize the similarity \
-                between a pair of elements",
-                        className="p-html-instruction"),
-                html.Div(
-                    [
-                        html.Div("Maybe display something here on hover?")
-                    ],
-                    style={'margin-left': '40px',
-                           'margin-right': '70px',
-                           'height': '100px',
-                           'text-align': 'center'}
-                ),
-
-                html.P("The periodic system attempts to condense this similarities \
-                into a tabular format. ",
-                       className="p-html-highlight"),
-                html.H3("Optimize the sequence of elements"),
-                html.P("Press the button to optimize the sequence.\
-                This will bring high values of the matrix closer to the diagonal.",
-                       className="p-html-instruction"),
-            ]
+                html.Div("Press the button to optimize the sequence.",
+                         className="p-html-instruction"),
+                html.Div("This will bring high values of the matrix \
+                closer to the diagonal.",
+                        className="p-html-text"),
+            ],
+                    style={"width": tab_width,
+                           "margin-top": "50px",
+                           "margin-bottom": "30px"
+                           }
         ),
         html.Div(
             [
                 html.Button("Optimize permutation",
                             id='opt-button',
-                            style={'text-align': 'center'}),
+                            style={'text-align': 'center',
+                                   'margin-bottom': '50px'
+                                   }
+                            ),
             ],
             style={'text-align': 'center'}
         ),
-        html.Div("",
-             id="show-cost",
-                 style={'height':'40px',
+        html.Div([],
+                 id="show-cost",
+                 style={'height':'90px',
                         'text-align':'center',
                         'font-size':20,
                         'width':'100%',
-                        'position': 'relative'}
+                        'position': 'relative'},
+                 className="p-html-highlight"
                  )
+    ]
+)
+
+simmat_descript = html.Div(
+    [
+        html.H3("Similarity between the chemical elements."),
+        html.Div(
+            [
+                html.P("Chemical elements show resemblances to others\
+                in the way they react, and in the compounds they form.",
+                        className="p-html-text"),
+                html.P("This similarity matrix encodes how similar each element \
+                is to any other one.",
+                    className="p-html-text"),
+            ],
+            style={'margin-left': '40px',
+                'margin-right': '70px'}
+        ),
+
+        html.P("Hover over any pixel to visualize the similarity \
+        between a pair of elements",
+                className="p-html-instruction"),
+        html.Div(
+            display_hover,
+            style={'margin-left': '40px',
+                'margin-right': '70px',
+                   'height': '150px',
+                   'text-align': 'center'}
+        ),
+       # html.Div(
+       #     html.P("The periodic system attempts to condense this similarities \
+       #     into a tabular format. ",
+       #         className="p-html-highlight"),
+       #     style={"margin-left": "40px"}
+       # )
     ],
-    align='center',
-    style={'margin-left':'100px'}
+    style={"width": tab_width}
+)
+
+
+# Description and guide to similarity matrix
+simmat_p = html.Div(
+    dbc.Col(
+        dcc.Tabs(
+            [
+                dcc.Tab(simmat_descript,
+                        label="Similarity",
+                        className='custom-tab',
+                        selected_className='custom-tab--selected'
+                        ),
+                dcc.Tab(optimize_col_div,
+                        label="Optimization",
+                        className='custom-tab',
+                        selected_className='custom-tab--selected'
+                        ),
+            ],
+            parent_className='custom-tabs',
+            className='custom-tabs-container',
+        ),
+        #[
+            #simmat_descript,
+            #optimize_col_div
+        #],
+        align='center',
+        style={'margin-left':'0px'}
+    ),
 )
 
 
@@ -173,7 +230,8 @@ matplot_row = dbc.Row(
     ],
     justify='between',
     style={'width': '100%',
-           'margin-top': '60px'}
+           'margin-top': '60px',
+           }
 )
 
 
@@ -184,41 +242,57 @@ family_plot = dbc.Col(
                   id="closure-plot",
                   style={"width":"100%",
                          "height": "250px",
-                         "margin-top":"0px"})
+                         "margin-top":"0px",
+                         }
+                  )
     ],
-    align='start',
-    width=8
+    width={"size": 8,
+           "offset": 0,
+           "order": "last"
+    }
 )
 
 # Descripting text
 families_p = dbc.Col(
     [
-        html.H1("Evolution of families"),
-        html.P("Similar elements are clustered into families.",
-               className='p-html-highlight'),
-        html.P("Select an element to visualize its evolution in families.",
-               className='p-html-instruction'),
-        html.Div(dcc.Input(id="contain-clos",
-                           type="text",
-                           placeholder="Input elements:"),
-                 style={#'height': '30px',
-                        'width': '250px'}
-                 )
+        html.Div(
+            [
+                html.H1("Evolution of families"),
+                html.P("Similar elements are clustered into families.",
+                    className='p-html-highlight'),
+                html.P("Select an element to visualize its evolution in families.",
+                    className='p-html-instruction'),
+                html.Div(dcc.Input(id="contain-clos",
+                                type="text",
+                                placeholder="Input elements:"
+                                ),
+                        style={#'height': '30px',
+                            'width': '250px',
+                        }
+                        )
+            ],
+            style={'height': '300px'}
+        )
     ],
-    width=4
+    width={"size": 4,
+           "offset": 0,
+           "order": 1}
 )
 
 # Build row
-families_row = dbc.Row(
-    [
-        families_p,
-        family_plot
-    ],
-    justify='between',
-    style={'width': '100%',
-           'margin-top': '120px',
-           'margin-left': '60px'}
+families_row = html.Div(
+    dbc.Row(
+        [
+            families_p,
+            family_plot
+        ],
+        justify='end',
+        style={'width': '100%',
+               'margin-top': '120px',}
+    ),
+    style={"margin-left": '60px'}
 )
+
 
 
 # Periodic Table
@@ -229,7 +303,7 @@ PTplot = dbc.Row(
                   style={"width":'750px',
                          "margin-top":"30px"})
     ],
-    justify='between',
+    justify='center',
     style={'width': '100%',
            'margin-top': '130px'}
 )
@@ -368,14 +442,17 @@ def update_cost(year, _, store):
 
         S = loadData.simMats[year - 1800].copy()
         P = simmat.symmetrize(S)
-        
         cost = loadData.costPerm(P,perm)
 
         ctx_trig = dash.callback_context.triggered
         if ctx_trig[0]['prop_id'] in ['year-slider.value', 'opt-button.n_clicks']:
-            return "Using 1D-PS from {},\n\nthe cost in {} is {:.3f}".format(perm_year, year, cost)
+            return [
+                html.Div("Sequence optimized in {}".format(perm_year)),
+                html.Div("Cost in {} is {:.3f}".format(year, cost))
+            ]
 
-    return "Void container"
+    return ["Void container"]
+
 
 
 # Select elems to modify closure plot
