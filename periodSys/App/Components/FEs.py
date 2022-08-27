@@ -175,21 +175,30 @@ def compMat(
     # Clip values not to show very high values. Anything above 4 is same color (>4)
     hmap[hmap>4] = 4
 
-    labls = hmap.index.to_series()
-#    labls = [i
-#             #spl(lab,i)
-#             for i,lab in enumerate(labls)]
+    labls = hmap.index
 
+    def text_val(z):
+        if z==0:
+            return "Found exactly"
+        return "Found as subset"
 
+    datalabels = np.vectorize(text_val)(hmap.values)
+    
     trace = go.Heatmap(y=labls,
                        x=hmap.columns,
                        z=hmap.values,
                        colorscale=[
                            [0,'#000000'],
-                           [1,'#9b2850']
+                           [1,'rgba(154, 40, 80, 0.7)']
                        ],
-                       showscale=False
+                       showscale=False,
+                       customdata=datalabels,
+                       hovertemplate =
+                       '%{y}'+
+                       '<br><b>Year</b>: %{x}<br>'+
+                       '<extra>%{customdata}</extra>'
                        )
+
 
     fig_closure.update_layout(
         yaxis = dict(scaleanchor = 'x',
@@ -199,10 +208,18 @@ def compMat(
                      ),
         xaxis = dict(side='top',
                      tickangle=-90,
-                     tickvals=np.arange(1800,2022,10)),
+                     tickvals=np.arange(1800,2022,10)
+                     ),
         margin=dict(l=0,r=0,b=0,t=0),
-        plot_bgcolor='rgba(0,0,0,0)'
+        plot_bgcolor='rgba(0,0,0,0)',
+        hoverlabel=dict(
+            bgcolor="white",
+            font_size=16,
+            font_family="Rockwell"
+        )
     )
+
+
     fig_closure.update_xaxes(showgrid=True, gridwidth=1, gridcolor='black')
 
     if update:
