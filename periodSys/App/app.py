@@ -241,7 +241,7 @@ family_plot = dbc.Col(
         dcc.Graph(figure=FEs.closure_fig,
                   id="closure-plot",
                   style={"width":"100%",
-                         "height": "250px",
+                         "height": "300px",
                          "margin-top":"0px",
                          }
                   )
@@ -465,24 +465,20 @@ def update_closure(_,incl_ce,):
 
     ctx_trig = dash.callback_context.triggered[0]["prop_id"]
 
-    valid_trigs = ['contain-clos.n_submit','non-contain-clos.n_submit'] 
-
-    if ctx_trig in valid_trigs:
+    if ctx_trig == 'contain-clos.n_submit':
         if incl_ce is not None:
             incl_ce = set(incl_ce.split(","))
-
-        #if notincl_ce is not None:
-            #notincl_ce = set(notincl_ce.split(","))
     else:
         incl_ce = {'Na'}
 
-
-    print(incl_ce)#, notincl_ce)
-    fig = FEs.HeatmapClosure(2021,
-                       FEs.FEs_df,FEs.hist_relev,
-                       incl_ce = incl_ce,
-                  #     notincl_ce = notincl_ce,
-                       thresh_relev=0.)
+    fig = FEs.compMat(
+        2021,
+        FEs.FEs_df,
+        FEs.hist_relev,
+        incl_ce = incl_ce,
+        update=True,
+        show_nr=10,
+    )
 
     return fig
 
