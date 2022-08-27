@@ -347,7 +347,7 @@ def update_PT(click, yr, fig):
     if ctx_trig[0]['prop_id'] in [ 'PT-plot.clickData','year-slider.value' ]:
         try:    # If element exists in clicked position
             s_elem = click['points'][0]
-            x,y = s_elem['x'], s_elem['y']
+            x, y = s_elem['x'], s_elem['y']
             elem = periodTable.symbol[::-1][y,x]
         except:      elem = None
 
