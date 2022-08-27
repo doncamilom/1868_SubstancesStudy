@@ -263,13 +263,17 @@ families_p = dbc.Col(
                 html.P("Select an element to visualize its evolution in families.",
                     className='p-html-instruction'),
                 html.Div(dcc.Input(id="contain-clos",
-                                type="text",
-                                placeholder="Input elements:"
-                                ),
-                        style={#'height': '30px',
+                                   type="text",
+                                   placeholder="Input elements:"
+                                   ),
+                         style={#'height': '30px',
                             'width': '250px',
                         }
-                        )
+                         ),
+                html.Div("Each row shows the evolution of a single family.",
+                         className='p-html-text'),
+                html.Div("Hover over it to see more information.",
+                         className='p-html-instruction'),
             ],
             style={'height': '300px'}
         )

@@ -172,11 +172,14 @@ def compMat(
         x = "{}".format(x)
         return x
 
-    labls = hmap.index.to_series()
-    labls = [spl(lab,i) for i,lab in enumerate(labls)]
-
     # Clip values not to show very high values. Anything above 4 is same color (>4)
     hmap[hmap>4] = 4
+
+    labls = hmap.index.to_series()
+#    labls = [i
+#             #spl(lab,i)
+#             for i,lab in enumerate(labls)]
+
 
     trace = go.Heatmap(y=labls,
                        x=hmap.columns,
@@ -190,7 +193,10 @@ def compMat(
 
     fig_closure.update_layout(
         yaxis = dict(scaleanchor = 'x',
-                     autorange='reversed'),
+                     autorange='reversed',
+                     tickvals=list(range(len(labls))),
+                     ticktext=["" for i in labls]
+                     ),
         xaxis = dict(side='top',
                      tickangle=-90,
                      tickvals=np.arange(1800,2022,10)),

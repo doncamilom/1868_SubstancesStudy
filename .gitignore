@@ -22,3 +22,5 @@ rxns/tables
 /periodSys/Notebooks/*.png
 /.DS_Store
 /periodSys/exports/
+/periodSys/Notebooks/.ipynb_checkpoints/
+/periodSys/App/assets/mpi_mis_logos.zip
