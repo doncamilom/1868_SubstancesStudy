@@ -21,48 +21,58 @@ app = dash.Dash(__name__,
         server=server)
 
 
+title_descrip = dbc.Col(
+    [
+        html.Div(
+            [
+                html.H1("The Evolving Periodic System",
+                        style={
+                            "margin-top":"20px",
+                            'width':'100%'}
+                        ),
+                html.P("Chemistry evolves rapidly over the years, but...\
+                how does the Periodic System react to these changes?",
+                       style={"width":"70%",
+                              "font-size":"110%",
+                            "margin-left":'0'},
+                       )
+            ],
+        )
+    ],
+    width=7,
+    align='start'
+)
+
+
+mpi_title_img = dbc.Col(
+    [
+        html.Img(src="./assets/ENG_MPI_MiS_Bildwortmarke_farbig.png",
+                 style={
+                     'width':'100%',
+                     'float':'right',
+                     'margin-top':'0',
+                     'padding-top':'0',
+                     'padding-right':'0'
+                 },
+                 ),
+    ],
+    width=5,
+    align='start'
+)
+
 title = html.Div(
     [
-        dbc.Row([
-            dbc.Col([
-                html.Div(
-                    [html.H1("The Evolving Periodic System",
-                             style={#"textAlign": "center",
-                                 #"background": "#a6bddb",
-                                 "margin-top":"20px",
-                                 'width':'100%'}
-                             ),
-                     html.P("Chemistry evolves rapidly over the years, but...\
-                     how does the Periodic System react to these changes?",
-                            style={"width":"70%",
-                                   "font-size":"110%",
-                                   "margin-left":'0'},
-                            )
-                     ],
-                )
+        dbc.Row(
+            [
+                title_descrip,
+                mpi_title_img
             ],
-                    width=7,
-                    align='start'),
-            dbc.Col([
-                html.Img(src="./assets/ENG_MPI_MiS_Bildwortmarke_farbig.png",
-                         style={#'height':'9%',
-                             'width':'100%',
-                             'float':'right',
-                             #'position':'relative',
-                             'margin-top':'0',
-                             'padding-top':'0',
-                             'padding-right':'0'
-                         },
-                         ),
-            ],
-                    width=5,
-                    align='start')
-        ],
-                className='g-0',
-                justify='between',
-                style={'height':'140px'}
-                )
-    ],)
+            className='g-0',
+            justify='between',
+            style={'height':'140px'}
+        )
+    ],
+)
 
 year_slider = html.Div(
     [
@@ -101,9 +111,6 @@ matrix_fig = dbc.Col(
     align="center")
 
 
-
-tab_width = "550px"
-
 display_hover = [
     dbc.CardHeader("Display on hover"),
     dbc.CardBody(
@@ -117,6 +124,9 @@ display_hover = [
     ),
 ]
 
+
+
+tab_width = "550px"
 optimize_col_div = html.Div(
     [
         html.H3("Optimize the sequence of elements"),
@@ -135,7 +145,7 @@ optimize_col_div = html.Div(
         ),
         html.Div(
             [
-                html.Button("Optimize permutation",
+                html.Button("Optimize sequence",
                             id='opt-button',
                             style={'text-align': 'center',
                                    'margin-bottom': '50px'
@@ -182,12 +192,6 @@ simmat_descript = html.Div(
                    'height': '150px',
                    'text-align': 'center'}
         ),
-       # html.Div(
-       #     html.P("The periodic system attempts to condense this similarities \
-       #     into a tabular format. ",
-       #         className="p-html-highlight"),
-       #     style={"margin-left": "40px"}
-       # )
     ],
     style={"width": tab_width}
 )
@@ -212,10 +216,6 @@ simmat_p = html.Div(
             parent_className='custom-tabs',
             className='custom-tabs-container',
         ),
-        #[
-            #simmat_descript,
-            #optimize_col_div
-        #],
         align='center',
         style={'margin-left':'0px'}
     ),
