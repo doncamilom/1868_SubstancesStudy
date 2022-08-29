@@ -76,7 +76,7 @@ title = html.Div(
 
 year_slider = html.Div(
     [
-        html.H1("Select the year you want to explore.",
+        html.H1("Select the year you want to explore",
                 style={'text-align':'center',
                        'margin-top':'80px',
                        'font-size':'200%'}
@@ -168,30 +168,32 @@ optimize_col_div = html.Div(
 
 simmat_descript = html.Div(
     [
-        html.H3("Similarity between the chemical elements."),
+        html.H3("Similarity between the chemical elements"),
         html.Div(
             [
-                html.P("Chemical elements show resemblances to others\
-                in the way they react, and in the compounds they form.",
-                        className="p-html-text"),
+                html.P("Chemical elements show resemblances to others in \
+                the compounds they form.\
+                Two elements are alike if they both form compounds \
+                with similar compositions.",
+                       className="p-html-text"),
                 html.P("This similarity matrix encodes how similar each element \
                 is to any other one.",
-                    className="p-html-text"),
+                       className="p-html-text"),
             ],
             style={'margin-left': '40px',
-                'margin-right': '70px'}
+                   'margin-right': '70px'}
         ),
 
         html.P("Hover over any pixel to visualize the similarity \
         between a pair of elements",
                 className="p-html-instruction"),
-        html.Div(
-            display_hover,
-            style={'margin-left': '40px',
-                'margin-right': '70px',
-                   'height': '150px',
-                   'text-align': 'center'}
-        ),
+       # html.Div(
+       #     display_hover,
+       #     style={'margin-left': '40px',
+       #         'margin-right': '70px',
+       #            'height': '150px',
+       #            'text-align': 'center'}
+       # ),
     ],
     style={"width": tab_width}
 )
@@ -317,18 +319,30 @@ main_col_plots = dbc.Col(
     [
         matplot_row,
         families_row,
-        PTplot
-    ]
+        #PTplot
+    ],
+    style={'margin-bottom': '100px'}
 )
 
+footer = html.P(
+    [
+        html.A("Source code", href="https://github.com/doncamilom/Reaxys_PS/tree/master/periodSys/App"),
+        ". Read the ",
+        html.A("paper", href="https://arxiv.org/"),
+        ". App built by ",
+        html.A("Andres M Bran ", href="https://twitter.com/drecmb"),
+        ":)"
+    ],
+)
 
 tabs = dbc.Col(
     [
         title,
         year_slider,
-        main_col_plots
+        main_col_plots,
+        html.Hr(),
+        footer
     ],
-    style={'margin-bottom':'100px'}
 )
 
 app.layout = html.Div(
@@ -340,32 +354,32 @@ app.layout = html.Div(
 
 ###################################################### Callbacks ###################################################
 
-@app.callback(
-        Output('PT-plot','figure'),
-        [Input('PT-plot','clickData'), Input('year-slider','value')],
-        [State('PT-plot','figure')]
-        )
-def update_PT(click, yr, fig):
-    ctx_trig = dash.callback_context.triggered
-
-    if ctx_trig[0]['prop_id'] in [ 'PT-plot.clickData','year-slider.value' ]:
-        try:    # If element exists in clicked position
-            s_elem = click['points'][0]
-            x, y = s_elem['x'], s_elem['y']
-            elem = periodTable.symbol[::-1][y,x]
-        except:      elem = None
-
-        fig = go.Figure(fig)
-        s_data = periodTable.plotSimPT(yr, elem)    # Get necessary data for update
-
-        # Update color pattern
-        fig['data'][0]['z'] = s_data[0][::-1]
-
-        # Update labels, to account for elements that don't exist at some given year
-        new_annots = [e for e in periodTable.annotations if e.text.split('<')[1][2:] in s_data[1]]
-        fig['layout']['annotations'] = new_annots
-
-    return fig
+#@app.callback(
+#        Output('PT-plot','figure'),
+#        [Input('PT-plot','clickData'), Input('year-slider','value')],
+#        [State('PT-plot','figure')]
+#        )
+#def update_PT(click, yr, fig):
+#    ctx_trig = dash.callback_context.triggered
+#
+#    if ctx_trig[0]['prop_id'] in [ 'PT-plot.clickData','year-slider.value' ]:
+#        try:    # If element exists in clicked position
+#            s_elem = click['points'][0]
+#            x, y = s_elem['x'], s_elem['y']
+#            elem = periodTable.symbol[::-1][y,x]
+#        except:      elem = None
+#
+#        fig = go.Figure(fig)
+#        s_data = periodTable.plotSimPT(yr, elem)    # Get necessary data for update
+#
+#        # Update color pattern
+#        fig['data'][0]['z'] = s_data[0][::-1]
+#
+#        # Update labels, to account for elements that don't exist at some given year
+#        new_annots = [e for e in periodTable.annotations if e.text.split('<')[1][2:] in s_data[1]]
+#        fig['layout']['annotations'] = new_annots
+#
+#    return fig
 
 
 @app.callback(
@@ -441,12 +455,14 @@ def update_cost(year, _, store):
         perm_year, perm_n = store
         indivs_yr = loadData.opt_permut[perm_year]
 
-        if type(perm_n)==int:   perm = indivs_yr[ perm_n ]
-        else:                   perm = np.arange(103)
+        if type(perm_n)==int:
+            perm = indivs_yr[perm_n]
+        else:
+            perm = np.arange(103)
 
         S = loadData.simMats[year - 1800].copy()
         P = simmat.symmetrize(S)
-        cost = loadData.costPerm(P,perm)
+        cost = loadData.costPerm(P, perm)
 
         ctx_trig = dash.callback_context.triggered
         if ctx_trig[0]['prop_id'] in ['year-slider.value', 'opt-button.n_clicks']:
@@ -455,7 +471,7 @@ def update_cost(year, _, store):
                 html.Div("Cost in {} is {:.3f}".format(year, cost))
             ]
 
-    return ["Void container"]
+    return [""]
 
 
 

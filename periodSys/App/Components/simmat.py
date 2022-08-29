@@ -16,7 +16,7 @@ Sum1 = P.sum(axis=2).reshape(P.shape[0], 1, P.shape[1]).repeat(103,axis=1)
 
 with np.errstate(divide='ignore', invalid='ignore'):
     P = np.sqrt(P**2/(Sum0*Sum1))
-    P /= np.nanmax(P)
+    #P /= np.nanmax(P)
 
 zmin = P[P>0.].min()
 min_yr = 1800
@@ -105,8 +105,10 @@ def plotSimMat(year, perm=range(103), update=True):
                         ),
         )
 
-    if update:      fig.update_traces(trace)
-    else:           fig.add_traces(trace)
+    if update:
+        fig.update_traces(trace)
+    else:
+        fig.add_traces(trace)
 
     fig.update_layout(yaxis = dict(scaleanchor = 'x',autorange='reversed'),
                       xaxis = dict(side='top',tickangle=0),
