@@ -69,10 +69,11 @@ title = html.Div(
 
 year_slider = html.Div(
     [
-        html.H1("Select the year you want to explore",
+        html.H1("Change the year to see how similarities are modified",
                 style={'text-align':'center',
                        'margin-top':'80px',
-                       'font-size':'200%'}
+                       'font-size':'200%',
+                       }
         ),
         dcc.Slider(id="year-slider",
                    min=1800,

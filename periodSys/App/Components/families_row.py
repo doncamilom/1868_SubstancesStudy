@@ -28,7 +28,7 @@ family_plot = dbc.Col(
     ],
     width={"size": 8,
            "offset": 0,
-           "order": "last"
+           "order": 1
            },
     align="center"
 
@@ -68,7 +68,7 @@ families_p = dbc.Col(
     ],
     width={"size": 4,
            "offset": 0,
-           "order": 1}
+           "order": "last"}
 )
 
 # Build row
@@ -80,7 +80,7 @@ families_row = html.Div(
         ],
         justify='end',
         style={'width': '100%',
-               'margin-top': '120px',}
+               'margin-top': '50px',}
     ),
     style={"margin-left": '60px',
            "margin-bottom": '190px'}
