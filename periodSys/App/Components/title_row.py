@@ -39,19 +39,27 @@ title_descrip = dbc.Col(
 
 mpi_title_img = dbc.Col(
     [
-        html.Img(src="./assets/ENG_MPI_MiS_Bildwortmarke_farbig.png",
-                 style={
-                     'width':'100%',
-                     'float':'right',
-                     'margin-top':'0',
-                     'padding-top':'0',
-                     'padding-right':'0'
-                 },
-                 ),
+        html.A(href = "https://www.mis.mpg.de/",
+               target = "_blank",
+               children = [
+                   html.Img(src="./assets/ENG_MPI_MiS_Bildwortmarke_farbig.png",
+                            style={
+                                'width':'100%',
+                                'float':'right',
+                                'margin-top':'0',
+                                'padding-top':'0',
+                                'padding-right':'0'
+                            },
+                            ),
+               ]
+               )
     ],
     width=5,
     align='start'
 )
+
+
+
 
 title = html.Div(
     [
@@ -92,7 +100,7 @@ year_slider = html.Div(
 )
 
 
-footer = html.P(
+footer_left = dbc.Col(
     [
         html.A("Source code",
                href="https://github.com/doncamilom/Reaxys_PS/tree/master/periodSys/App",
@@ -107,4 +115,38 @@ footer = html.P(
                target = "_blank"),
         ":)"
     ],
+)
+
+footer_right = dbc.Row(
+    [
+        html.Div("Data analysis with data from ",
+                 style={"width": "230px"}),
+        html.A(href = "https://www.reaxys.com",
+               target = "_blank",
+               children = [
+                   html.Img(src="./assets/reaxys.png",
+                            style={
+                                'width':'100%',
+                                'float':'right',
+                                'margin-bottom':'10px',
+                                'margin-left': '60px',
+                            },
+                            ),
+               ],
+            style={"width": "20%"}
+        )
+    ],
+    style={"width": "650px",
+           'margin-right': '60px',
+           },
+    #width=5,
+    justify="end"
+    #align='end'
+)
+
+footer = dbc.Row(
+    [
+        footer_left,
+        footer_right
+    ]
 )

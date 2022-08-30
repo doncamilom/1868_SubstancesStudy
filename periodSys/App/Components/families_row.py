@@ -47,11 +47,11 @@ families_p = dbc.Col(
                     className='p-html-instruction'),
                 html.Div(dcc.Input(id="contain-clos",
                                    type="text",
-                                   placeholder="Input elements:"
+                                   placeholder="Na,K,H"
                                    ),
-                         style={#'height': '30px',
-                            'width': '250px',
-                        }
+                         style={"text-align": "center",
+                                'width': '250px',
+                                }
                          ),
                 html.Div("Each row shows the evolution of a single family.",
                          className='p-html-text'),
