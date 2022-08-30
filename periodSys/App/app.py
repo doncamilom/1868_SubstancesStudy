@@ -90,7 +90,7 @@ year_slider = html.Div(
                    tooltip={"placement": "top",
                             "always_visible": False}),
     ],
-    style={'margin-bottom':'60px',
+    style={'margin-bottom':'20px',
            'margin-top':'30px',
            'margin-right':'140px',
            'margin-left':'140px',
@@ -132,6 +132,20 @@ optimize_col_div = html.Div(
         html.H3("Optimize the sequence of elements"),
         html.Div(
             [
+                html.P("Similarity information can be encoded in a sequence \
+                of elements, so that similar elements are closer together.",
+                       className="p-html-text"),
+                html.P("Using genetic algorithms,\
+                we find such optimal sequences.",
+                       className="p-html-text"),
+            ],
+            style={'margin-left': '40px',
+                   'margin-right': '70px',
+                   "margin-top": "20px",
+                   "margin-bottom": "10px"}
+        ),
+        html.Div(
+            [
                 html.Div("Press the button to optimize the sequence.",
                          className="p-html-instruction"),
                 html.Div("This will bring high values of the matrix \
@@ -139,8 +153,8 @@ optimize_col_div = html.Div(
                         className="p-html-text"),
             ],
                     style={"width": tab_width,
-                           "margin-top": "50px",
-                           "margin-bottom": "30px"
+                           "margin-top": "10px",
+                           "margin-bottom": "20px"
                            }
         ),
         html.Div(
@@ -148,7 +162,13 @@ optimize_col_div = html.Div(
                 html.Button("Optimize sequence",
                             id='opt-button',
                             style={'text-align': 'center',
-                                   'margin-bottom': '50px'
+                                   'margin-bottom': '10px'
+                                   }
+                            ),
+                html.Button("Atomic Number",
+                            id='an-button',
+                            style={'text-align': 'center',
+                                   'margin-bottom': '10px'
                                    }
                             ),
             ],
@@ -163,7 +183,8 @@ optimize_col_div = html.Div(
                         'position': 'relative'},
                  className="p-html-highlight"
                  )
-    ]
+    ],
+    style={"width": tab_width}
 )
 
 simmat_descript = html.Div(
@@ -181,21 +202,23 @@ simmat_descript = html.Div(
                        className="p-html-text"),
             ],
             style={'margin-left': '40px',
-                   'margin-right': '70px'}
+                   'margin-right': '70px',
+                   "margin-top": "20px",
+                   "margin-bottom": "30px"}
         ),
 
         html.P("Hover over any pixel to visualize the similarity \
         between a pair of elements",
                 className="p-html-instruction"),
-       # html.Div(
+        html.Div("",
        #     display_hover,
-       #     style={'margin-left': '40px',
-       #         'margin-right': '70px',
-       #            'height': '150px',
-       #            'text-align': 'center'}
-       # ),
+            style={'margin-left': '40px',
+                   'margin-right': '70px',
+                   'height': '100px',
+                   'text-align': 'center'}
+        ),
     ],
-    style={"width": tab_width}
+    style={"width": tab_width,}
 )
 
 
@@ -251,7 +274,9 @@ family_plot = dbc.Col(
     width={"size": 8,
            "offset": 0,
            "order": "last"
-    }
+           },
+    align="center"
+
 )
 
 # Descripting text
@@ -260,9 +285,10 @@ families_p = dbc.Col(
         html.Div(
             [
                 html.H1("Evolution of families"),
-                html.P("Similar elements are clustered into families.",
-                    className='p-html-highlight'),
-                html.P("Select an element to visualize its evolution in families.",
+                html.P("Similar elements are clustered into families",
+                       className='p-html-text',
+                       style={"margin-left": "30px"}),
+                html.P("Enter a (list of) elements to visualize its evolution in families",
                     className='p-html-instruction'),
                 html.Div(dcc.Input(id="contain-clos",
                                    type="text",
@@ -274,10 +300,15 @@ families_p = dbc.Col(
                          ),
                 html.Div("Each row shows the evolution of a single family.",
                          className='p-html-text'),
+                html.Div("Here, black means the family was found exactly \
+                in that year, while red, that the family was found in that \
+                year as a subset of another family.",
+                         className='p-html-highlight',
+                         style={"margin-left": "30px"}),
                 html.Div("Hover over it to see more information.",
                          className='p-html-instruction'),
             ],
-            style={'height': '300px'}
+            style={'height': '400px'}
         )
     ],
     width={"size": 4,
@@ -296,30 +327,76 @@ families_row = html.Div(
         style={'width': '100%',
                'margin-top': '120px',}
     ),
-    style={"margin-left": '60px'}
+    style={"margin-left": '60px',
+           "margin-bottom": '190px'}
 )
 
 
 
 # Periodic Table
-PTplot = dbc.Row(
+PTplot = dbc.Col(
     [
         dcc.Graph(figure=periodTable.fig,
                   id="PT-plot",
-                  style={"width":'750px',
+                  style={"width":'100%',
                          "margin-top":"30px"})
     ],
-    justify='center',
+    align='center',
     style={'width': '100%',
-           'margin-top': '130px'}
+           'margin-top': '30px'},
+    width={"size": 7,
+           "order": 2,
+           "offset": 0}
+)
+
+# PT description
+pt_descr = dbc.Col(
+    [
+        html.Div(
+            [
+                html.H1("The Periodic System encodes similarity."),
+            ],
+            style={'height': '100px'}
+        ),
+        html.P("Elements in the same column tend to be similar, \
+        however this is not always true!",
+               className="p-html-text",
+               style={"margin-left": "30px",
+                      "margin-top": "30px"}),
+        html.P("Select an element in the Periodic Table,\
+        to see what are the most similar elements to it.",
+               className="p-html-instruction"),
+        html.P("Note how this is time dependent.",
+               className="p-html-highlight")
+    ],
+    width={"size": 4,
+           "offset": 1,
+           "order": 1},
+    align="center"
+)
+
+# Build row
+pt_row = html.Div(
+    dbc.Row(
+        [
+            PTplot,
+            pt_descr
+        ],
+        justify='end',
+        style={'width': '100%',
+               'margin-top': '20px',}
+    ),
+    style={"margin-left": '0px',
+           "margin-bottom": '190px'}
 )
 
 
 main_col_plots = dbc.Col(
     [
         matplot_row,
+        year_slider,
+        pt_row,
         families_row,
-        #PTplot
     ],
     style={'margin-bottom': '100px'}
 )
@@ -338,7 +415,7 @@ footer = html.P(
 tabs = dbc.Col(
     [
         title,
-        year_slider,
+        html.Hr(),
         main_col_plots,
         html.Hr(),
         footer
@@ -352,42 +429,45 @@ app.layout = html.Div(
     ]
 )
 
-###################################################### Callbacks ###################################################
+################################## Callbacks ###############################
 
-#@app.callback(
-#        Output('PT-plot','figure'),
-#        [Input('PT-plot','clickData'), Input('year-slider','value')],
-#        [State('PT-plot','figure')]
-#        )
-#def update_PT(click, yr, fig):
-#    ctx_trig = dash.callback_context.triggered
-#
-#    if ctx_trig[0]['prop_id'] in [ 'PT-plot.clickData','year-slider.value' ]:
-#        try:    # If element exists in clicked position
-#            s_elem = click['points'][0]
-#            x, y = s_elem['x'], s_elem['y']
-#            elem = periodTable.symbol[::-1][y,x]
-#        except:      elem = None
-#
-#        fig = go.Figure(fig)
-#        s_data = periodTable.plotSimPT(yr, elem)    # Get necessary data for update
-#
-#        # Update color pattern
-#        fig['data'][0]['z'] = s_data[0][::-1]
-#
-#        # Update labels, to account for elements that don't exist at some given year
-#        new_annots = [e for e in periodTable.annotations if e.text.split('<')[1][2:] in s_data[1]]
-#        fig['layout']['annotations'] = new_annots
-#
-#    return fig
+@app.callback(
+        Output('PT-plot','figure'),
+        [Input('PT-plot','clickData'), Input('year-slider','value')],
+        [State('PT-plot','figure')]
+        )
+def update_PT(click, yr, fig):
+    ctx_trig = dash.callback_context.triggered
+
+    if ctx_trig[0]['prop_id'] in [ 'PT-plot.clickData','year-slider.value' ]:
+        try:    # If element exists in clicked position
+            s_elem = click['points'][0]
+            x, y = s_elem['x'], s_elem['y']
+            elem = periodTable.symbol[::-1][y,x]
+        except:      elem = None
+
+        fig = go.Figure(fig)
+        # Get necessary data for update
+        s_data = periodTable.plotSimPT(yr, elem)    
+
+        # Update color pattern
+        fig['data'][0]['z'] = s_data[0][::-1]
+
+        # Update labels, to account for elements that don't exist at some given year
+        new_annots = [e for e in periodTable.annotations if e.text.split('<')[1][2:] in s_data[1]]
+        fig['layout']['annotations'] = new_annots
+
+    return fig
 
 
 @app.callback(
         Output('current-perm','data'),
-        [Input('year-slider','value'), Input('opt-button','n_clicks')],
+        [Input('year-slider','value'),
+         Input('opt-button','n_clicks'),
+         Input('an-button','n_clicks')],
         [State('current-perm','data')]
         )
-def select_perm(year, _, current):
+def select_perm(year, _, __, current):
     """
     Upon pressing button, select a random index of permutation, and store in dcc.Store
     """
@@ -397,15 +477,20 @@ def select_perm(year, _, current):
         indivs_yr = loadData.opt_permut[2020]
         n = np.random.choice(len(indivs_yr))
         return year, n
-    else: return current
-
+    elif ctx_trig[0]['prop_id'] == 'an-button.n_clicks':
+        return year, 999
+    else:
+        return current
 
 @app.callback(
         Output('simmat-plot','figure'),
-        [Input('year-slider','value'),Input('opt-button','n_clicks'), Input('current-perm','data')],
+        [Input('year-slider','value'),
+         Input('opt-button','n_clicks'),
+         Input('an-button','n_clicks'),
+         Input('current-perm','data')],
         [State('simmat-plot','figure')]
         )
-def update_simmat(year, _, store, fig):
+def update_simmat(year, _, __, store, fig):
     """
     Update what similarity matrix is being shown.
     User has the option to select a year, and to optimize permutation.
@@ -418,23 +503,35 @@ def update_simmat(year, _, store, fig):
 
     ctx_trig = dash.callback_context.triggered
 
-    if ctx_trig[0]['prop_id'] == 'year-slider.value':   # If only year is updated: don't change permutation
+    # If only year is updated: don't change permutation
+    if ctx_trig[0]['prop_id'] == 'year-slider.value':   
         if store:
             prev_yr, perm_n = store
-            indivs_yr = loadData.opt_permut[prev_yr]
-            perm = indivs_yr[ perm_n ]
+            if perm_n != 999:
+                indivs_yr = loadData.opt_permut[prev_yr]
+                perm = indivs_yr[perm_n]
+            else:
+                perm = np.arange(103)
         else:
             perm = np.arange(103)
 
         fig = simmat.plotSimMat(year, perm)
 
-    if ctx_trig[0]['prop_id'] == 'opt-button.n_clicks': # If opt button was activated: change permutation, to this year's
+    # If opt button was activated: change permutation, to this year's
+    if ctx_trig[0]['prop_id'] in ['opt-button.n_clicks',
+                                  'an-button.n_clicks',]:
         # Select a random pre-optimized permutation for this year. 
         _, perm_n = store
 
+        print(store)
         indivs_yr = loadData.opt_permut[year]
-        if type(perm_n)==int:   perm = indivs_yr[ perm_n ]
-        else:                   perm = range(103)
+        if type(perm_n)==int:
+            if perm_n != 999:
+                perm = indivs_yr[perm_n]
+            else:
+                perm = np.arange(103)
+        else:
+            perm = np.arange(103)
 
         fig = simmat.plotSimMat(year, perm)
 
@@ -444,9 +541,12 @@ def update_simmat(year, _, store, fig):
 
 @app.callback(
         Output('show-cost','children'),
-        [Input('year-slider','value'), Input('opt-button','n_clicks'), Input('current-perm','data')]
+        [Input('year-slider','value'),
+         Input('opt-button','n_clicks'),
+         Input('an-button','n_clicks'),
+         Input('current-perm','data')]
         )
-def update_cost(year, _, store):
+def update_cost(year, _, __, store):
     """
     Update box showing the cost of permutation, on the current simmat.
     """
@@ -456,7 +556,10 @@ def update_cost(year, _, store):
         indivs_yr = loadData.opt_permut[perm_year]
 
         if type(perm_n)==int:
-            perm = indivs_yr[perm_n]
+            if perm_n != 999:
+                perm = indivs_yr[perm_n]
+            else:
+                perm = np.arange(103)
         else:
             perm = np.arange(103)
 
@@ -465,15 +568,16 @@ def update_cost(year, _, store):
         cost = loadData.costPerm(P, perm)
 
         ctx_trig = dash.callback_context.triggered
-        if ctx_trig[0]['prop_id'] in ['year-slider.value', 'opt-button.n_clicks']:
+        if ctx_trig[0]['prop_id'] in ['year-slider.value',
+                                      'opt-button.n_clicks',
+                                      'an-button.n_clicks',
+                                      ]:
             return [
                 html.Div("Sequence optimized in {}".format(perm_year)),
                 html.Div("Cost in {} is {:.3f}".format(year, cost))
             ]
 
     return [""]
-
-
 
 # Select elems to modify closure plot
 @app.callback(

@@ -38,31 +38,31 @@ def plotSimPT(year,elem):
     isna = np.isnan(np.diag(Pyr))
     elems_yr = np.array(simmat.elemList)[~isna]
 
-    if elem==None:        return color, elems_yr
+    if elem==None:
+        return color, elems_yr
 
 
-    if elem!='':
-        X,Y = TP['xy'][elem]
-    else: X,Y = 0,0
-    
+    if elem != '':
+        X, Y = TP['xy'][elem]
+    else:
+        X, Y = 0,0
+
     # Get list of similarities between our element and all the rest
     sims = np.nan_to_num(Pyr[elemList.index(elem)],0.)
-    if sims.sum()==0.:        sims += 1.    # If all 0., click stops responding 
+    if sims.sum()==0.:
+        sims += 1.    # If all 0., click stops responding
 
     img = np.zeros(TP['shape'])
     for e in simmat.elemList:
-        x,y = TP['xy'][e]
-        img[x,y] = sims[elemList.index(e)]
+        x, y = TP['xy'][e]
+        img[x, y] = sims[elemList.index(e)]
 
     # Modify entry for our element, so others are not opaque
-    img[X,Y] = 0
-    img[X,Y] = np.nanmax(img)
+    img[X, Y] = 0
+    img[X, Y] = np.nanmax(img)
     img /= np.nanmax(img)
 
     return img,elems_yr
-
-
-
 
 
 
@@ -75,7 +75,7 @@ for x in range(len(symbol)):
 # Set Colorscale
 colorscale=[
         [0.0, 'rgba(0,0,0,0)'],
-        [1.0, 'rgba(252,85,0,0.6)']
+        [1.0, 'rgba(49,108,159,0.6)']
         ]
 
 
@@ -99,7 +99,7 @@ for n, row in enumerate(symbol):
 
 fig.update_layout(
         annotations=annotations,
-        title='Periodic Table',
+        #title='Periodic Table',
         margin=dict(l=40, r=40, t=50, b=0, pad=0),
         xaxis=dict(zeroline=False, showgrid=False,visible=False),
         yaxis=dict(zeroline=False, showgrid=False, scaleanchor="x", visible=False),
