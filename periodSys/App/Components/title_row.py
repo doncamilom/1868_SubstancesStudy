@@ -94,11 +94,17 @@ year_slider = html.Div(
 
 footer = html.P(
     [
-        html.A("Source code", href="https://github.com/doncamilom/Reaxys_PS/tree/master/periodSys/App"),
+        html.A("Source code",
+               href="https://github.com/doncamilom/Reaxys_PS/tree/master/periodSys/App",
+               target="_blank"),
         ". Read the ",
-        html.A("paper", href="https://arxiv.org/"),
+        html.A("paper",
+               href="https://arxiv.org/",
+               target="_blank"),
         ". App built by ",
-        html.A("Andres M Bran ", href="https://twitter.com/drecmb"),
+        html.A("Andres M Bran ",
+               href="https://twitter.com/drecmb",
+               target = "_blank"),
         ":)"
     ],
 )
